@@ -68,7 +68,7 @@ Manages user profiles and their affiliations.
 - `GET /api/v1/profiles` - Retrieve all user profiles.
 - `GET /api/v1/profiles/{profileId}` - Retrieve a specific profile by its ID.
 - `GET /api/v1/profiles/user/{userId}` - Retrieve a profile associated with a specific user ID.
-  - **Output Example**: `{ "profileId": "uuid", "userId": "uuid", "firstName": "John", "lastName": "Doe", "email": "john@example.com", "fullName": "John Doe" }`
+  - **Output Example**: `{ "profileId": "uuid", "userId": "uuid", "firstName": "John", "lastName": "Doe", "email": "john@example.com", "fullName": "John Doe", "companyId": "uuid" }`
 - `GET /api/v1/profiles/company/{companyId}` - Retrieve profiles associated with a specific company ID.
 - `POST /api/v1/profiles` - Create a new profile.
   - **Input Example**: `{ "userId": "uuid", "firstName": "John", "lastName": "Doe", "email": "john@example.com", "avatarUrl": "url" }`
@@ -83,9 +83,9 @@ Handles authentication, user management, and roles.
 ### Authentication (`/api/v1/auth`)
 - `POST /api/v1/auth/sign-in` - Authenticate a user and return a token.
   - **Input Example**: `{ "username": "admin@example.com", "password": "SecurePassword123!" }`
-  - **Output Example**: `{ "id": 1, "username": "admin@example.com", "token": "eyJhb..." }`
+  - **Output Example**: `{ "id": "uuid", "username": "admin@example.com", "token": "eyJhb...", "companyId": "uuid" }`
 - `POST /api/v1/auth/sign-up` - Register a new user.
-  - **Input Example**: `{ "username": "user_name", "password": "SecurePassword123!", "name": "John", "lastname": "Doe", "email": "john.doe@company.com", "roles": ["ROLE_USER"] }`
+  - **Input Example**: `{ "username": "user@example.com", "password": "SecurePassword123!", "name": "John", "lastname": "Doe", "email": "john.doe@company.com", "roles": ["ROLE_USER"] }`
 
 ### Users (`/api/v1/users`)
 - `GET /api/v1/users` - Retrieve all users.
@@ -167,9 +167,10 @@ export interface SignUpRequest {
 }
 
 export interface AuthenticatedUser {
-  id: number;
+  id: string;
   username: string;
   token: string;
+  companyId?: string;
 }
 
 // Announcements
@@ -250,6 +251,7 @@ export interface Profile {
   email: string;
   fullName: string;
   avatarUrl?: string;
+  companyId?: string;
 }
 
 // Chat Messages

@@ -1,24 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final List<Widget>? actions;
 
-  const MainAppBar({super.key, this.title = 'App'});
+  const MainAppBar({super.key, this.title = 'App', this.actions});
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(title),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.person),
-          onPressed: () {
-            context.push('/profile');
-          },
-        )
-      ],
-    );
+    return AppBar(title: Text(title), actions: actions);
   }
 
   @override

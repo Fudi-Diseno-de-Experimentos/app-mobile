@@ -38,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 return IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () =>
-                      context.push('/update-profile', extra: profile),
+                      context.push('/profile/update', extra: profile),
                 );
               }
               return const SizedBox();
