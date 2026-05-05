@@ -1,0 +1,1 @@
+import 'package:flutter/material.dart';\n\nclass CompanyPage extends StatelessWidget {\n  const CompanyPage({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return const Scaffold();\n  }\n}

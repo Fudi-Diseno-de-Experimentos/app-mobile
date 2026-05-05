@@ -1,0 +1,1 @@
+import 'package:flutter_bloc/flutter_bloc.dart';\nimport 'profile_event.dart';\nimport 'profile_state.dart';\n\nclass ProfileBloc extends Bloc<ProfileEvent, ProfileState> {\n  ProfileBloc() : super(InitialProfileState()) {\n    on<ProfileEvent>((event, emit) { });\n  }\n}\n\nclass InitialProfileState extends ProfileState {}

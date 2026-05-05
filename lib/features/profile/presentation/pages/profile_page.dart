@@ -1,0 +1,1 @@
+import 'package:flutter/material.dart';\n\nclass ProfilePage extends StatelessWidget {\n  const ProfilePage({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return const Scaffold();\n  }\n}

@@ -1,0 +1,1 @@
+import 'package:flutter_bloc/flutter_bloc.dart';\nimport 'chat_event.dart';\nimport 'chat_state.dart';\n\nclass ChatBloc extends Bloc<ChatEvent, ChatState> {\n  ChatBloc() : super(InitialChatState()) {\n    on<ChatEvent>((event, emit) { });\n  }\n}\n\nclass InitialChatState extends ChatState {}

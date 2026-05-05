@@ -1,0 +1,1 @@
+import 'package:flutter_bloc/flutter_bloc.dart';\nimport 'iam_event.dart';\nimport 'iam_state.dart';\n\nclass IamBloc extends Bloc<IamEvent, IamState> {\n  IamBloc() : super(InitialIamState()) {\n    on<IamEvent>((event, emit) { });\n  }\n}\n\nclass InitialIamState extends IamState {}
