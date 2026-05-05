@@ -7,6 +7,8 @@ class ProfileEntity extends Equatable {
   final String lastname;
   final String email;
   final List<String>? roles;
+  final String? companyId;
+  final String? avatarUrl;
 
   const ProfileEntity({
     required this.id,
@@ -15,8 +17,19 @@ class ProfileEntity extends Equatable {
     required this.lastname,
     required this.email,
     this.roles,
+    this.companyId,
+    this.avatarUrl,
   });
 
   @override
-  List<Object?> get props => [id, username, name, lastname, email, roles];
+  List<Object?> get props => [
+    id,
+    username,
+    name,
+    lastname,
+    email,
+    roles,
+    companyId,
+    avatarUrl,
+  ];
 }

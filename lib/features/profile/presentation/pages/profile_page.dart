@@ -90,13 +90,26 @@ class _ProfilePageState extends State<ProfilePage> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: theme.colorScheme.surface,
-                          image: const DecorationImage(
-                            image: NetworkImage(
-                              "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/9pEVa5rDhG/n8l05wxa_expires_30_days.png",
-                            ),
-                            fit: BoxFit.cover,
-                          ),
+                          image:
+                              profile.avatarUrl != null &&
+                                  profile.avatarUrl!.isNotEmpty
+                              ? DecorationImage(
+                                  image: NetworkImage(profile.avatarUrl!),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
                         ),
+                        child:
+                            profile.avatarUrl == null ||
+                                profile.avatarUrl!.isEmpty
+                            ? Icon(
+                                Icons.person,
+                                size: 80,
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.5,
+                                ),
+                              )
+                            : null,
                       ),
                       const SizedBox(height: 16),
                       Text(

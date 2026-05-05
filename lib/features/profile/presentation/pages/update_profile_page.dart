@@ -49,6 +49,8 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
       lastname: _lastnameController.text,
       email: _emailController.text,
       roles: widget.profile.roles,
+      companyId: widget.profile.companyId,
+      avatarUrl: widget.profile.avatarUrl,
     );
 
     context.read<ProfileBloc>().add(ProfileUpdateRequested(updatedProfile));

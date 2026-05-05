@@ -35,6 +35,8 @@ class ProfileRepositoryImpl implements ProfileRepository {
         lastname: profile.lastname,
         email: profile.email,
         roles: profile.roles,
+        companyId: profile.companyId,
+        avatarUrl: profile.avatarUrl,
       );
       final updatedProfile = await remoteDataSource.updateProfile(profileModel);
       return Right(updatedProfile);
