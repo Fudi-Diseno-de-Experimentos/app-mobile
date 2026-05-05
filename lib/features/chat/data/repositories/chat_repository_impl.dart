@@ -1,1 +1,3 @@
-import '../../domain/repositories/chat_repository.dart';\n\nclass ChatRepositoryImpl implements ChatRepository { }
+import '../../domain/repositories/chat_repository.dart';
+
+class ChatRepositoryImpl implements ChatRepository { }

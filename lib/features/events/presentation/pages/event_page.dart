@@ -1,1 +1,10 @@
-import 'package:flutter/material.dart';\n\nclass EventPage extends StatelessWidget {\n  const EventPage({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return const Scaffold();\n  }\n}
+import 'package:flutter/material.dart';
+
+class EventPage extends StatelessWidget {
+  const EventPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold();
+  }
+}

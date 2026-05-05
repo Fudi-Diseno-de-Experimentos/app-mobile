@@ -1,1 +1,3 @@
-void initChatDependencies() {\n  // TODO: Register Chat dependencies\n}
+void initChatDependencies() {
+  // TODO: Register Chat dependencies
+}

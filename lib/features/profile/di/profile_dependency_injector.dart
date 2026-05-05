@@ -1,1 +1,3 @@
-void initProfileDependencies() {\n  // TODO: Register Profile dependencies\n}
+void initProfileDependencies() {
+  // TODO: Register Profile dependencies
+}

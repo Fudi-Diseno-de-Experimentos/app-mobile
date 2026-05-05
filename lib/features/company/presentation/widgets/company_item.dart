@@ -1,1 +1,10 @@
-import 'package:flutter/material.dart';\n\nclass CompanyItem extends StatelessWidget {\n  const CompanyItem({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return const SizedBox();\n  }\n}
+import 'package:flutter/material.dart';
+
+class CompanyItem extends StatelessWidget {
+  const CompanyItem({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox();
+  }
+}

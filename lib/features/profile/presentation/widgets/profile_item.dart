@@ -1,1 +1,10 @@
-import 'package:flutter/material.dart';\n\nclass ProfileItem extends StatelessWidget {\n  const ProfileItem({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return const SizedBox();\n  }\n}
+import 'package:flutter/material.dart';
+
+class ProfileItem extends StatelessWidget {
+  const ProfileItem({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox();
+  }
+}

@@ -1,1 +1,10 @@
-import 'package:flutter/material.dart';\n\nclass ChatPage extends StatelessWidget {\n  const ChatPage({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return const Scaffold();\n  }\n}
+import 'package:flutter/material.dart';
+
+class ChatPage extends StatelessWidget {
+  const ChatPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold();
+  }
+}

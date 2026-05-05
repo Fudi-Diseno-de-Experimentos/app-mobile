@@ -1,1 +1,10 @@
-import 'package:flutter/material.dart';\n\nclass IamPage extends StatelessWidget {\n  const IamPage({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return const Scaffold();\n  }\n}
+import 'package:flutter/material.dart';
+
+class IamPage extends StatelessWidget {
+  const IamPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold();
+  }
+}

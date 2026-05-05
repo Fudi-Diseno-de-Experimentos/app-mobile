@@ -1,1 +1,3 @@
-import '../../domain/entities/iam_entity.dart';\n\nclass IamModel extends IamEntity { }
+import '../../domain/entities/iam_entity.dart';
+
+class IamModel extends IamEntity { }

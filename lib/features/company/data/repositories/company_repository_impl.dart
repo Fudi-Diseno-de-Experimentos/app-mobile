@@ -1,1 +1,3 @@
-import '../../domain/repositories/company_repository.dart';\n\nclass CompanyRepositoryImpl implements CompanyRepository { }
+import '../../domain/repositories/company_repository.dart';
+
+class CompanyRepositoryImpl implements CompanyRepository { }

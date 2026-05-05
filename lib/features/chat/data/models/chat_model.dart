@@ -1,1 +1,3 @@
-import '../../domain/entities/chat_entity.dart';\n\nclass ChatModel extends ChatEntity { }
+import '../../domain/entities/chat_entity.dart';
+
+class ChatModel extends ChatEntity { }

@@ -1,1 +1,3 @@
-void initCompanyDependencies() {\n  // TODO: Register Company dependencies\n}
+void initCompanyDependencies() {
+  // TODO: Register Company dependencies
+}

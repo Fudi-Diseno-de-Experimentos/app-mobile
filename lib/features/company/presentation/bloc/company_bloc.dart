@@ -1,1 +1,11 @@
-import 'package:flutter_bloc/flutter_bloc.dart';\nimport 'company_event.dart';\nimport 'company_state.dart';\n\nclass CompanyBloc extends Bloc<CompanyEvent, CompanyState> {\n  CompanyBloc() : super(InitialCompanyState()) {\n    on<CompanyEvent>((event, emit) { });\n  }\n}\n\nclass InitialCompanyState extends CompanyState {}
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'company_event.dart';
+import 'company_state.dart';
+
+class CompanyBloc extends Bloc<CompanyEvent, CompanyState> {
+  CompanyBloc() : super(InitialCompanyState()) {
+    on<CompanyEvent>((event, emit) { });
+  }
+}
+
+class InitialCompanyState extends CompanyState {}

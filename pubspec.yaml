@@ -37,6 +37,9 @@ dependencies:
   google_fonts: ^8.1.0
   flutter_bloc: ^9.1.1
   equatable: ^2.0.8
+  dio: ^5.9.2
+  fpdart: ^1.2.0
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

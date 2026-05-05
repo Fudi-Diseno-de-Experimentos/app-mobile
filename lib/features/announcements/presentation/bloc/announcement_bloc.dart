@@ -1,1 +1,11 @@
-import 'package:flutter_bloc/flutter_bloc.dart';\nimport 'announcement_event.dart';\nimport 'announcement_state.dart';\n\nclass AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {\n  AnnouncementBloc() : super(InitialAnnouncementState()) {\n    on<AnnouncementEvent>((event, emit) { });\n  }\n}\n\nclass InitialAnnouncementState extends AnnouncementState {}
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'announcement_event.dart';
+import 'announcement_state.dart';
+
+class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
+  AnnouncementBloc() : super(InitialAnnouncementState()) {
+    on<AnnouncementEvent>((event, emit) { });
+  }
+}
+
+class InitialAnnouncementState extends AnnouncementState {}

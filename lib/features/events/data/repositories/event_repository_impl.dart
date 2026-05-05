@@ -1,1 +1,3 @@
-import '../../domain/repositories/event_repository.dart';\n\nclass EventRepositoryImpl implements EventRepository { }
+import '../../domain/repositories/event_repository.dart';
+
+class EventRepositoryImpl implements EventRepository { }

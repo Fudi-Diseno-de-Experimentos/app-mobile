@@ -1,1 +1,3 @@
-void initAnnouncementDependencies() {\n  // TODO: Register Announcement dependencies\n}
+void initAnnouncementDependencies() {
+  // TODO: Register Announcement dependencies
+}
