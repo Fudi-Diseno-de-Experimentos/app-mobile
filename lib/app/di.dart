@@ -10,6 +10,7 @@ import '../features/iam/domain/usecases/join_company_usecase.dart';
 import '../features/iam/domain/usecases/sign_in_usecase.dart';
 import '../features/iam/domain/usecases/sign_up_usecase.dart';
 import '../features/iam/presentation/bloc/iam_bloc.dart';
+import '../features/profile/di/profile_dependency_injector.dart';
 
 final sl = GetIt.instance;
 
@@ -51,4 +52,7 @@ Future<void> initDependencies() async {
       joinCompanyUseCase: sl(),
     ),
   );
+
+  // Initialize other features
+  initProfileDependencies();
 }

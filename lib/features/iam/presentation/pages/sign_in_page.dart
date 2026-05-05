@@ -41,8 +41,11 @@ class _SignInPageState extends State<SignInPage> {
     return BlocListener<IamBloc, IamState>(
       listener: (context, state) {
         if (state is IamSignInSuccess) {
-          // Go to verification/home
-          context.go('/join-company');
+          if (state.user.companyId == null || state.user.companyId!.isEmpty) {
+            context.go('/join-company');
+          } else {
+            context.go('/home');
+          }
         } else if (state is IamError) {
           ScaffoldMessenger.of(
             context,

@@ -28,7 +28,7 @@ class IamBloc extends Bloc<IamEvent, IamState> {
     final result = await signInUseCase(event.username, event.password);
     result.fold(
       (failure) => emit(IamError(failure.message)),
-      (user) => emit(IamSignInSuccess()),
+      (user) => emit(IamSignInSuccess(user)),
     );
   }
 
