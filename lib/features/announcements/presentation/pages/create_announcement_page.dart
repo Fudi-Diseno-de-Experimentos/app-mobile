@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/image_upload_picker.dart';
 
 class CreateAnnouncementPage extends StatefulWidget {
   const CreateAnnouncementPage({super.key});
@@ -12,23 +12,23 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _imageUrlController = TextEditingController();
+  String? _uploadedImageUrl;
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _imageUrlController.dispose();
     super.dispose();
   }
 
   void _submitForm() {
+    final colorScheme = Theme.of(context).colorScheme;
     if (_formKey.currentState!.validate()) {
       // Simulate creation
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Announcement published successfully!'),
-          backgroundColor: AppColors.primary,
+        SnackBar(
+          content: const Text('Announcement published successfully!'),
+          backgroundColor: colorScheme.primary,
         ),
       );
       Navigator.of(context).pop();
@@ -37,17 +37,20 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Create Announcement',
-          style: TextStyle(color: AppColors.neutral),
+          style: TextStyle(color: colorScheme.onSurface),
         ),
-        backgroundColor: AppColors.background,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.neutral),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -59,30 +62,28 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "New Announcement",
-                  style: TextStyle(
-                    color: AppColors.neutral,
-                    fontSize: 20,
+                  style: textTheme.headlineSmall?.copyWith(
+                    color: colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   "Fill out the details below to broadcast a new announcement to your company feed.",
-                  style: TextStyle(
-                    color: AppColors.tertiary,
-                    fontSize: 14,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: 32),
 
                 // Title Input
-                _buildLabel("Title"),
+                _buildLabel("Title", colorScheme),
                 TextFormField(
                   controller: _titleController,
-                  style: const TextStyle(color: AppColors.neutral),
-                  decoration: _buildInputDecoration("Enter announcement title"),
+                  style: TextStyle(color: colorScheme.onSurface),
+                  decoration: _buildInputDecoration("Enter announcement title", colorScheme),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter a title';
@@ -93,12 +94,12 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                 const SizedBox(height: 24),
 
                 // Description Input
-                _buildLabel("Description"),
+                _buildLabel("Description", colorScheme),
                 TextFormField(
                   controller: _descriptionController,
                   maxLines: 5,
-                  style: const TextStyle(color: AppColors.neutral),
-                  decoration: _buildInputDecoration("Enter announcement details..."),
+                  style: TextStyle(color: colorScheme.onSurface),
+                  decoration: _buildInputDecoration("Enter announcement details...", colorScheme),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter a description';
@@ -108,12 +109,13 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                 ),
                 const SizedBox(height: 24),
 
-                // Image URL Input
-                _buildLabel("Image URL (Optional)"),
-                TextFormField(
-                  controller: _imageUrlController,
-                  style: const TextStyle(color: AppColors.neutral),
-                  decoration: _buildInputDecoration("https://example.com/image.png"),
+                // Image Upload Component
+                ImageUploadPicker(
+                  onImageUploaded: (url) {
+                    setState(() {
+                      _uploadedImageUrl = url;
+                    });
+                  },
                 ),
                 const SizedBox(height: 48),
 
@@ -124,8 +126,8 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                   child: ElevatedButton(
                     onPressed: _submitForm,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.neutral,
-                      foregroundColor: AppColors.surface,
+                      backgroundColor: colorScheme.onSurface,
+                      foregroundColor: colorScheme.surface,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -148,13 +150,13 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         text,
-        style: const TextStyle(
-          color: AppColors.neutral,
+        style: TextStyle(
+          color: colorScheme.onSurface,
           fontSize: 14,
           fontWeight: FontWeight.bold,
         ),
@@ -162,12 +164,12 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
     );
   }
 
-  InputDecoration _buildInputDecoration(String hint) {
+  InputDecoration _buildInputDecoration(String hint, ColorScheme colorScheme) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: AppColors.tertiary),
+      hintStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.4)),
       filled: true,
-      fillColor: AppColors.secondary.withOpacity(0.1),
+      fillColor: colorScheme.secondary.withValues(alpha: 0.1),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -179,9 +181,9 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
       ),
-      errorStyle: const TextStyle(color: AppColors.destructive),
+      errorStyle: TextStyle(color: colorScheme.error),
     );
   }
 }
