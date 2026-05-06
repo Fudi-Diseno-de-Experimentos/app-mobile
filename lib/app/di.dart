@@ -11,6 +11,8 @@ import '../features/iam/domain/usecases/sign_in_usecase.dart';
 import '../features/iam/domain/usecases/sign_up_usecase.dart';
 import '../features/iam/presentation/bloc/iam_bloc.dart';
 import '../features/profile/di/profile_dependency_injector.dart';
+import '../features/announcements/di/announcement_dependency_injector.dart';
+import '../features/events/di/event_dependency_injector.dart';
 
 final sl = GetIt.instance;
 
@@ -55,4 +57,6 @@ Future<void> initDependencies() async {
 
   // Initialize other features
   initProfileDependencies();
+  initAnnouncementDependencies();
+  initEventDependencies();
 }

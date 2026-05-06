@@ -1,3 +1,26 @@
+import '../../../../app/di.dart';
+import '../data/datasources/event_remote_datasource.dart';
+import '../data/repositories/event_repository_impl.dart';
+import '../domain/repositories/event_repository.dart';
+import '../domain/usecases/get_events_usecase.dart';
+import '../presentation/bloc/event_bloc.dart';
+
 void initEventDependencies() {
-  // TODO: Register Event dependencies
+  // Datasources
+  sl.registerLazySingleton<EventRemoteDataSource>(
+    () => EventRemoteDataSourceImpl(sl()),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<EventRepository>(
+    () => EventRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // UseCases
+  sl.registerLazySingleton(() => GetEventsUseCase(sl()));
+
+  // BLoC
+  sl.registerFactory(
+    () => EventBloc(getEventsUseCase: sl()),
+  );
 }
