@@ -28,20 +28,6 @@ class EventsView extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Schedule
-              Container(
-                margin: const EdgeInsets.only(bottom: 24, left: 24),
-                child: const Text(
-                  "Schedule",
-                  style: TextStyle(
-                    color: AppColors.neutral,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              const ScheduleBar(),
-              const SizedBox(height: 32),
-              
               // Upcoming Events Header
               Container(
                 margin: const EdgeInsets.only(left: 24, bottom: 12),
