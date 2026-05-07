@@ -1,7 +1,10 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class ApiConstants {
   ApiConstants._();
 
-  static const String baseUrl = 'http://192.168.1.104:8080/api/v1';
+  static  String baseUrl = '${dotenv.env['URL_SERVICE']}/api/v1' ?? 'http://192.168.1.104:8080/api/v1';
+
 
   // Timeout limits
   static const int receiveTimeout = 15000;

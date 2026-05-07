@@ -14,11 +14,9 @@ class $AssetsImagesGen {
   const $AssetsImagesGen();
 
   final AssetGenImage logoCentralisPng = const AssetGenImage(
-    'assets/images/logo-centralis.png',
-  );
+      'assets/images/logo-centralis.png');
   final SvgGenImage logoCentralisSvg = const SvgGenImage(
-    'assets/images/logo-centralis.svg',
-  );
+      'assets/images/logo-centralis.svg');
 }
 
 class $AssetsIconsGen {
@@ -27,8 +25,7 @@ class $AssetsIconsGen {
   final SvgGenImage fileIcon = const SvgGenImage('assets/icons/file-icon.svg');
   final SvgGenImage homeIcon = const SvgGenImage('assets/icons/home-icon.svg');
   final SvgGenImage messageSquareIcon = const SvgGenImage(
-    'assets/icons/message-square-icon.svg',
-  );
+      'assets/icons/message-square-icon.svg');
   final SvgGenImage userIcon = const SvgGenImage('assets/icons/user-icon.svg');
 }
 
@@ -36,6 +33,7 @@ class AssetGenImage {
   const AssetGenImage(this._assetName, {this.size, this.flavors = const {}});
 
   final String _assetName;
+
 
   final Size? size;
   final Set<String> flavors;
@@ -93,8 +91,15 @@ class AssetGenImage {
     );
   }
 
-  ImageProvider provider({AssetBundle? bundle, String? package}) {
-    return AssetImage(_assetName, bundle: bundle, package: package);
+  ImageProvider provider({
+    AssetBundle? bundle,
+    String? package,
+  }) {
+    return AssetImage(
+      _assetName,
+      bundle: bundle,
+      package: package,
+    );
   }
 
   Widget custom({
@@ -166,3 +171,4 @@ class SvgGenImage {
 
   String get keyName => _assetName;
 }
+

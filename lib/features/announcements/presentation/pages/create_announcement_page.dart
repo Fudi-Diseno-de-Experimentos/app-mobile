@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/widgets/image_upload_picker.dart';
+import '../../../../shared/widgets/image_upload_picker.dart';
 
 class CreateAnnouncementPage extends StatefulWidget {
   const CreateAnnouncementPage({super.key});
