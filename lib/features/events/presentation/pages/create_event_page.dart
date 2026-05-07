@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class CreateEventPage extends StatefulWidget {
   const CreateEventPage({super.key});
@@ -28,6 +27,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   Future<void> _selectDate() async {
+    final colorScheme = Theme.of(context).colorScheme;
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -36,10 +36,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.neutral,
-              onPrimary: AppColors.surface,
-              onSurface: AppColors.neutral,
+            colorScheme: ColorScheme.light(
+              primary: colorScheme.primary,
+              onPrimary: colorScheme.onPrimary,
+              onSurface: colorScheme.onSurface,
             ),
           ),
           child: child!,
@@ -55,16 +55,17 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   Future<void> _selectTime() async {
+    final colorScheme = Theme.of(context).colorScheme;
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.neutral,
-              onPrimary: AppColors.surface,
-              onSurface: AppColors.neutral,
+            colorScheme: ColorScheme.light(
+              primary: colorScheme.primary,
+              onPrimary: colorScheme.onPrimary,
+              onSurface: colorScheme.onSurface,
             ),
           ),
           child: child!,
@@ -80,21 +81,22 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   void _submitForm() {
+    final colorScheme = Theme.of(context).colorScheme;
     if (_formKey.currentState!.validate()) {
       if (_selectedDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please pick a date for the event'),
-            backgroundColor: AppColors.destructive,
+          SnackBar(
+            content: const Text('Please pick a date for the event'),
+            backgroundColor: colorScheme.error,
           ),
         );
         return;
       }
       if (_selectedTime == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please pick a time for the event'),
-            backgroundColor: AppColors.destructive,
+          SnackBar(
+            content: const Text('Please pick a time for the event'),
+            backgroundColor: colorScheme.error,
           ),
         );
         return;
@@ -102,9 +104,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
       // Simulate event creation
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Event created successfully!'),
-          backgroundColor: AppColors.primary,
+        SnackBar(
+          content: const Text('Event created successfully!'),
+          backgroundColor: colorScheme.primary,
         ),
       );
       Navigator.of(context).pop();
@@ -113,6 +115,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     final formattedDate = _selectedDate == null 
         ? "No date chosen" 
         : "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
@@ -122,16 +127,16 @@ class _CreateEventPageState extends State<CreateEventPage> {
         : _selectedTime!.format(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Create Event',
-          style: TextStyle(color: AppColors.neutral),
+          style: TextStyle(color: colorScheme.onSurface),
         ),
-        backgroundColor: AppColors.background,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.neutral),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -143,30 +148,28 @@ class _CreateEventPageState extends State<CreateEventPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "New Event Details",
-                  style: TextStyle(
-                    color: AppColors.neutral,
-                    fontSize: 20,
+                  style: textTheme.headlineSmall?.copyWith(
+                    color: colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   "Establish a new official company event. Only Admins and Managers can perform this action.",
-                  style: TextStyle(
-                    color: AppColors.tertiary,
-                    fontSize: 14,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: 32),
 
                 // Title Input
-                _buildLabel("Event Title"),
+                _buildLabel("Event Title", colorScheme),
                 TextFormField(
                   controller: _titleController,
-                  style: const TextStyle(color: AppColors.neutral),
-                  decoration: _buildInputDecoration("Enter event title"),
+                  style: TextStyle(color: colorScheme.onSurface),
+                  decoration: _buildInputDecoration("Enter event title", colorScheme),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter a title';
@@ -177,12 +180,12 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 const SizedBox(height: 24),
 
                 // Description Input
-                _buildLabel("Description"),
+                _buildLabel("Description", colorScheme),
                 TextFormField(
                   controller: _descriptionController,
                   maxLines: 4,
-                  style: const TextStyle(color: AppColors.neutral),
-                  decoration: _buildInputDecoration("Describe the event details..."),
+                  style: TextStyle(color: colorScheme.onSurface),
+                  decoration: _buildInputDecoration("Describe the event details...", colorScheme),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter a description';
@@ -199,25 +202,27 @@ class _CreateEventPageState extends State<CreateEventPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildLabel("Date"),
+                          _buildLabel("Date", colorScheme),
                           InkWell(
                             onTap: _selectDate,
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                               decoration: BoxDecoration(
-                                color: AppColors.secondary.withOpacity(0.1),
+                                color: colorScheme.secondary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.calendar_today, size: 18, color: AppColors.neutral),
+                                  Icon(Icons.calendar_today, size: 18, color: colorScheme.onSurface),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       formattedDate,
                                       style: TextStyle(
-                                        color: _selectedDate == null ? AppColors.tertiary : AppColors.neutral,
+                                        color: _selectedDate == null 
+                                            ? colorScheme.onSurface.withValues(alpha: 0.4) 
+                                            : colorScheme.onSurface,
                                         fontSize: 12,
                                       ),
                                       overflow: TextOverflow.ellipsis,
@@ -235,25 +240,27 @@ class _CreateEventPageState extends State<CreateEventPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildLabel("Time"),
+                          _buildLabel("Time", colorScheme),
                           InkWell(
                             onTap: _selectTime,
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                               decoration: BoxDecoration(
-                                color: AppColors.secondary.withOpacity(0.1),
+                                color: colorScheme.secondary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.access_time, size: 18, color: AppColors.neutral),
+                                  Icon(Icons.access_time, size: 18, color: colorScheme.onSurface),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       formattedTime,
                                       style: TextStyle(
-                                        color: _selectedTime == null ? AppColors.tertiary : AppColors.neutral,
+                                        color: _selectedTime == null 
+                                            ? colorScheme.onSurface.withValues(alpha: 0.4) 
+                                            : colorScheme.onSurface,
                                         fontSize: 12,
                                       ),
                                       overflow: TextOverflow.ellipsis,
@@ -271,11 +278,11 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 const SizedBox(height: 24),
 
                 // Location Input
-                _buildLabel("Location"),
+                _buildLabel("Location", colorScheme),
                 TextFormField(
                   controller: _locationController,
-                  style: const TextStyle(color: AppColors.neutral),
-                  decoration: _buildInputDecoration("e.g. Conference Room A, or Zoom"),
+                  style: TextStyle(color: colorScheme.onSurface),
+                  decoration: _buildInputDecoration("e.g. Conference Room A, or Zoom", colorScheme),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter a location';
@@ -286,11 +293,11 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 const SizedBox(height: 24),
 
                 // Recipients input (comma separated values)
-                _buildLabel("Recipient User UUIDs (Comma Separated)"),
+                _buildLabel("Recipient User UUIDs (Comma Separated)", colorScheme),
                 TextFormField(
                   controller: _recipientsController,
-                  style: const TextStyle(color: AppColors.neutral),
-                  decoration: _buildInputDecoration("e.g. uuid-1, uuid-2"),
+                  style: TextStyle(color: colorScheme.onSurface),
+                  decoration: _buildInputDecoration("e.g. uuid-1, uuid-2", colorScheme),
                 ),
                 const SizedBox(height: 48),
 
@@ -301,8 +308,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
                   child: ElevatedButton(
                     onPressed: _submitForm,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.neutral,
-                      foregroundColor: AppColors.surface,
+                      backgroundColor: colorScheme.onSurface,
+                      foregroundColor: colorScheme.surface,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -325,13 +332,13 @@ class _CreateEventPageState extends State<CreateEventPage> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         text,
-        style: const TextStyle(
-          color: AppColors.neutral,
+        style: TextStyle(
+          color: colorScheme.onSurface,
           fontSize: 14,
           fontWeight: FontWeight.bold,
         ),
@@ -339,12 +346,12 @@ class _CreateEventPageState extends State<CreateEventPage> {
     );
   }
 
-  InputDecoration _buildInputDecoration(String hint) {
+  InputDecoration _buildInputDecoration(String hint, ColorScheme colorScheme) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: AppColors.tertiary),
+      hintStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.4)),
       filled: true,
-      fillColor: AppColors.secondary.withOpacity(0.1),
+      fillColor: colorScheme.secondary.withValues(alpha: 0.1),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -356,9 +363,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
       ),
-      errorStyle: const TextStyle(color: AppColors.destructive),
+      errorStyle: TextStyle(color: colorScheme.error),
     );
   }
 }

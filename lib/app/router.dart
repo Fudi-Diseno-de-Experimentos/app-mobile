@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'di.dart';
 import '../features/iam/presentation/pages/sign_up_page.dart';
 import '../features/iam/presentation/pages/sign_in_page.dart';
 import '../features/iam/presentation/pages/verification_page.dart';
@@ -11,7 +13,9 @@ import '../shared/widgets/main_layout.dart';
 import '../features/chat/presentation/pages/chat_page.dart';
 import '../features/feed/presentation/pages/company_feed_page.dart';
 import '../features/announcements/presentation/pages/create_announcement_page.dart';
+import '../features/announcements/presentation/bloc/announcement_bloc.dart';
 import '../features/events/presentation/pages/create_event_page.dart';
+import '../features/events/presentation/bloc/event_bloc.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -64,12 +68,18 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: 'create-announcement',
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const CreateAnnouncementPage(),
+                  builder: (context, state) => BlocProvider(
+                    create: (context) => sl<AnnouncementBloc>(),
+                    child: const CreateAnnouncementPage(),
+                  ),
                 ),
                 GoRoute(
                   path: 'create-event',
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const CreateEventPage(),
+                  builder: (context, state) => BlocProvider(
+                    create: (context) => sl<EventBloc>(),
+                    child: const CreateEventPage(),
+                  ),
                 ),
               ],
             ),

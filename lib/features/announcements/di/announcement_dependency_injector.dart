@@ -3,6 +3,7 @@ import '../data/datasources/announcement_remote_datasource.dart';
 import '../data/repositories/announcement_repository_impl.dart';
 import '../domain/repositories/announcement_repository.dart';
 import '../domain/usecases/get_announcements_usecase.dart';
+import '../domain/usecases/create_announcement_usecase.dart';
 import '../presentation/bloc/announcement_bloc.dart';
 
 void initAnnouncementDependencies() {
@@ -18,9 +19,13 @@ void initAnnouncementDependencies() {
 
   // UseCases
   sl.registerLazySingleton(() => GetAnnouncementsUseCase(sl()));
+  sl.registerLazySingleton(() => CreateAnnouncementUseCase(sl()));
 
   // BLoC
   sl.registerFactory(
-    () => AnnouncementBloc(getAnnouncementsUseCase: sl()),
+    () => AnnouncementBloc(
+      getAnnouncementsUseCase: sl(),
+      createAnnouncementUseCase: sl(),
+    ),
   );
 }

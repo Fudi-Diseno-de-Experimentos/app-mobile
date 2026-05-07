@@ -18,4 +18,26 @@ class AnnouncementRepositoryImpl implements AnnouncementRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, AnnouncementEntity>> createAnnouncement({
+    required String title,
+    required String description,
+    String? image,
+    required String priority,
+    required String createdBy,
+  }) async {
+    try {
+      final announcement = await remoteDataSource.createAnnouncement(
+        title: title,
+        description: description,
+        image: image,
+        priority: priority,
+        createdBy: createdBy,
+      );
+      return Right(announcement);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }
