@@ -9,6 +9,9 @@ import '../features/profile/domain/entities/profile_entity.dart';
 import '../shared/widgets/main_app_bar.dart';
 import '../shared/widgets/main_layout.dart';
 import '../features/chat/presentation/pages/chat_page.dart';
+import '../features/feed/presentation/pages/company_feed_page.dart';
+import '../features/announcements/presentation/pages/create_announcement_page.dart';
+import '../features/events/presentation/pages/create_event_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -56,10 +59,19 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/files',
-              builder: (context, state) => const Scaffold(
-                appBar: MainAppBar(title: 'Files'),
-                body: Center(child: Text('Files Placeholder')),
-              ),
+              builder: (context, state) => const CompanyFeedPage(),
+              routes: [
+                GoRoute(
+                  path: 'create-announcement',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const CreateAnnouncementPage(),
+                ),
+                GoRoute(
+                  path: 'create-event',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const CreateEventPage(),
+                ),
+              ],
             ),
           ],
         ),
