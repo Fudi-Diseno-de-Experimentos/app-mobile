@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/image_upload_picker.dart';
+import '../../../../core/network/cloudinary_config.dart';
+import '../../../profile/presentation/bloc/profile_bloc.dart';
+import '../../../profile/presentation/bloc/profile_state.dart';
+import '../bloc/announcement_bloc.dart';
+import '../bloc/announcement_event.dart';
+import '../bloc/announcement_state.dart';
 
 class CreateAnnouncementPage extends StatefulWidget {
   const CreateAnnouncementPage({super.key});
@@ -12,7 +20,10 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  String _priority = 'NORMAL';
   String? _uploadedImageUrl;
+
+  final List<String> _priorities = ['NORMAL', 'HIGH', 'URGENT'];
 
   @override
   void dispose() {
@@ -22,16 +33,25 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
   }
 
   void _submitForm() {
-    final colorScheme = Theme.of(context).colorScheme;
     if (_formKey.currentState!.validate()) {
-      // Simulate creation
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Announcement published successfully!'),
-          backgroundColor: colorScheme.primary,
-        ),
-      );
-      Navigator.of(context).pop();
+      final profileState = context.read<ProfileBloc>().state;
+      String userId = '00000000-0000-0000-0000-000000000000'; // Fallback
+
+      if (profileState is ProfileLoaded) {
+        userId = profileState.profile.id;
+      } else if (profileState is ProfileUpdateSuccess) {
+        userId = profileState.profile.id;
+      }
+
+      context.read<AnnouncementBloc>().add(
+            CreateAnnouncementRequested(
+              title: _titleController.text,
+              description: _descriptionController.text,
+              priority: _priority,
+              image: _uploadedImageUrl,
+              createdBy: userId,
+            ),
+          );
     }
   }
 
@@ -40,109 +60,160 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          'Create Announcement',
-          style: TextStyle(color: colorScheme.onSurface),
-        ),
+    return BlocListener<AnnouncementBloc, AnnouncementState>(
+      listener: (context, state) {
+        if (state is AnnouncementCreateSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Announcement published successfully!')),
+          );
+          context.pop();
+        } else if (state is AnnouncementError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message), backgroundColor: colorScheme.error),
+          );
+        }
+      },
+      child: Scaffold(
         backgroundColor: colorScheme.surface,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
-          onPressed: () => Navigator.of(context).pop(),
+        appBar: AppBar(
+          title: Text(
+            'Create Announcement',
+            style: TextStyle(color: colorScheme.onSurface),
+          ),
+          backgroundColor: colorScheme.surface,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
+            onPressed: () => context.pop(),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "New Announcement",
-                  style: textTheme.headlineSmall?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Fill out the details below to broadcast a new announcement to your company feed.",
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Title Input
-                _buildLabel("Title", colorScheme),
-                TextFormField(
-                  controller: _titleController,
-                  style: TextStyle(color: colorScheme.onSurface),
-                  decoration: _buildInputDecoration("Enter announcement title", colorScheme),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Please enter a title';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-
-                // Description Input
-                _buildLabel("Description", colorScheme),
-                TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 5,
-                  style: TextStyle(color: colorScheme.onSurface),
-                  decoration: _buildInputDecoration("Enter announcement details...", colorScheme),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Please enter a description';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-
-                // Image Upload Component
-                ImageUploadPicker(
-                  onImageUploaded: (url) {
-                    setState(() {
-                      _uploadedImageUrl = url;
-                    });
-                  },
-                ),
-                const SizedBox(height: 48),
-
-                // Submit Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _submitForm,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.onSurface,
-                      foregroundColor: colorScheme.surface,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      'Publish Announcement',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "New Announcement",
+                    style: textTheme.headlineSmall?.copyWith(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Text(
+                    "Fill out the details below to broadcast a new announcement to your company feed.",
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Title Input
+                  _buildLabel("Title", colorScheme),
+                  TextFormField(
+                    controller: _titleController,
+                    style: TextStyle(color: colorScheme.onSurface),
+                    decoration: _buildInputDecoration("Enter announcement title", colorScheme),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter a title';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Priority Dropdown
+                  _buildLabel("Priority", colorScheme),
+                  DropdownButtonFormField<String>(
+                    initialValue: _priority,
+                    dropdownColor: colorScheme.surface,
+                    style: TextStyle(color: colorScheme.onSurface),
+                    decoration: _buildInputDecoration("Select priority", colorScheme),
+                    items: _priorities.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          _priority = newValue;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Description Input
+                  _buildLabel("Description", colorScheme),
+                  TextFormField(
+                    controller: _descriptionController,
+                    maxLines: 5,
+                    style: TextStyle(color: colorScheme.onSurface),
+                    decoration: _buildInputDecoration("Enter announcement details...", colorScheme),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter a description';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Image Upload Component
+                  ImageUploadPicker(
+                    onImageUploaded: (url) {
+                      setState(() {
+                        _uploadedImageUrl = url;
+                      });
+                    },
+                    imageType: ImageType.announcement,
+                  ),
+                  const SizedBox(height: 48),
+
+                  // Submit Button
+                  BlocBuilder<AnnouncementBloc, AnnouncementState>(
+                    builder: (context, state) {
+                      return SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: state is AnnouncementLoading ? null : _submitForm,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.onSurface,
+                            foregroundColor: colorScheme.surface,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: state is AnnouncementLoading
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: colorScheme.surface,
+                                  ),
+                                )
+                              : const Text(
+                                  'Publish Announcement',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

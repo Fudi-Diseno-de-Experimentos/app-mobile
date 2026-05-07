@@ -4,7 +4,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../bloc/announcement_bloc.dart';
 import '../bloc/announcement_state.dart';
 import 'announcement_card.dart';
-import 'avatar_placeholder.dart';
 
 class AnnouncementsView extends StatelessWidget {
   const AnnouncementsView({super.key});
@@ -34,18 +33,10 @@ class AnnouncementsView extends StatelessWidget {
             );
           }
 
-          // Extract unique createdBy uuids for the bottom avatar list
-          final uniqueUuids = announcements.map((e) => e.createdBy).toSet().toList();
-
           return ListView.builder(
             padding: const EdgeInsets.only(top: 16, bottom: 64),
-            itemCount: announcements.length + 1,
+            itemCount: announcements.length,
             itemBuilder: (context, index) {
-              if (index == announcements.length) {
-                // Return the horizontal avatar list at the bottom
-                return BottomAvatarList(uuids: uniqueUuids);
-              }
-
               final item = announcements[index];
               return AnnouncementCard(item: item);
             },

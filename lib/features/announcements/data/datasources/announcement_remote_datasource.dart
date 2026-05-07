@@ -3,6 +3,13 @@ import '../models/announcement_model.dart';
 
 abstract class AnnouncementRemoteDataSource {
   Future<List<AnnouncementModel>> getAnnouncements();
+  Future<AnnouncementModel> createAnnouncement({
+    required String title,
+    required String description,
+    String? image,
+    required String priority,
+    required String createdBy,
+  });
 }
 
 class AnnouncementRemoteDataSourceImpl implements AnnouncementRemoteDataSource {
@@ -20,5 +27,26 @@ class AnnouncementRemoteDataSourceImpl implements AnnouncementRemoteDataSource {
           .toList();
     }
     return [];
+  }
+
+  @override
+  Future<AnnouncementModel> createAnnouncement({
+    required String title,
+    required String description,
+    String? image,
+    required String priority,
+    required String createdBy,
+  }) async {
+    final response = await apiClient.post(
+      '/announcements',
+      data: {
+        'title': title,
+        'description': description,
+        'image': image,
+        'priority': priority,
+        'createdBy': createdBy,
+      },
+    );
+    return AnnouncementModel.fromJson(response.data);
   }
 }

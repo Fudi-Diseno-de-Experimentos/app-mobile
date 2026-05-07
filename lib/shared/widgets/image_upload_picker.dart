@@ -33,8 +33,20 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
     _currentImageUrl = widget.initialImageUrl;
   }
 
+  @override
+  void didUpdateWidget(ImageUploadPicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Si la URL inicial cambia externamente (ej: al limpiar el formulario), 
+    // reseteamos la imagen actual.
+    if (widget.initialImageUrl != oldWidget.initialImageUrl) {
+      setState(() {
+        _currentImageUrl = widget.initialImageUrl;
+      });
+    }
+  }
+
   Future<void> _pickImage(ImageSource source) async {
-    // Request permissions
+    // 1. Check permissions first
     if (source == ImageSource.camera) {
       var status = await Permission.camera.request();
       if (!status.isGranted) {
@@ -46,15 +58,9 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
         return;
       }
     } else {
-      // Handle gallery permissions for Android 13+ (API 33)
       if (Platform.isAndroid) {
-        // On Android 13+, we need to check for photos permission
-        // Permission.photos is for READ_MEDIA_IMAGES
         var status = await Permission.photos.request();
-        
-        // On Android 14+ (API 34), we might have limited access
         if (!status.isGranted && !status.isLimited) {
-          // Fallback for older Android versions
           var storageStatus = await Permission.storage.request();
           if (!storageStatus.isGranted) {
             if (mounted) {
@@ -66,21 +72,21 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
           }
         }
       } else {
-        // iOS
         var status = await Permission.photos.request();
         if (!status.isGranted && !status.isLimited) return;
       }
     }
 
+    // 2. Pick the image
     final XFile? image = await _picker.pickImage(
       source: source,
       imageQuality: 70,
     );
 
+    // 3. Process the picked image
     if (image != null) {
       setState(() {
         _isUploading = true;
-        // Mostramos una previsualización local antes de subir
         _currentImageUrl = image.path; 
       });
 
@@ -89,21 +95,20 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
         imageType: widget.imageType,
       );
 
-      setState(() {
-        _isUploading = false;
-        if (url != null) {
-          _currentImageUrl = url;
-          widget.onImageUploaded(url);
-        } else {
-          // Si falla la subida, limpiamos o mostramos error
-          _currentImageUrl = widget.initialImageUrl;
-          if (mounted) {
+      if (mounted) {
+        setState(() {
+          _isUploading = false;
+          if (url != null) {
+            _currentImageUrl = url;
+            widget.onImageUploaded(url);
+          } else {
+            _currentImageUrl = widget.initialImageUrl;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Error al subir la imagen a la nube')),
             );
           }
-        }
-      });
+        });
+      }
     }
   }
 

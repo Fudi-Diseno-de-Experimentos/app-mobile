@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/announcement_entity.dart';
 
 class AnnouncementCard extends StatelessWidget {
@@ -9,67 +8,125 @@ class AnnouncementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return IntrinsicHeight(
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
-          color: AppColors.secondary.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(12),
+          color: colorScheme.surface,
+          border: Border.all(
+            color: colorScheme.secondary.withValues(alpha: 0.2),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.onSurface.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        padding: const EdgeInsets.only(top: 18, bottom: 18, right: 16),
-        margin: const EdgeInsets.only(bottom: 21, left: 29, right: 29),
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         width: double.infinity,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              margin: const EdgeInsets.only(bottom: 16, left: 17),
-              child: Text(
-                item.title,
-                style: const TextStyle(
-                  color: AppColors.neutral,
-                  fontSize: 16,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    item.title,
+                    style: textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
+                _buildPriorityBadge(context, item.priority),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              item.description,
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
-            Container(
-              margin: const EdgeInsets.only(bottom: 16, left: 17),
-              width: double.infinity,
-              child: Text(
-                item.description,
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 10,
-                ),
-              ),
-            ),
-            if (item.image != null && item.image!.isNotEmpty)
-              Container(
-                margin: const EdgeInsets.only(bottom: 10, left: 16),
-                height: 125,
-                width: double.infinity,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: Image.network(
-                    item.image!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: AppColors.secondary,
-                      child: const Icon(Icons.image_not_supported, color: AppColors.tertiary),
+            if (item.image != null && item.image!.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  item.image!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 180,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 180,
+                    width: double.infinity,
+                    color: colorScheme.secondary.withValues(alpha: 0.1),
+                    child: Icon(
+                      Icons.image_not_supported,
+                      color: colorScheme.secondary,
                     ),
                   ),
                 ),
               ),
-            Container(
-              margin: const EdgeInsets.only(left: 17),
-              child: Text(
-                _formatRelativeDate(item.createdAt),
-                style: const TextStyle(
-                  color: AppColors.tertiary,
-                  fontSize: 10,
+            ],
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _formatRelativeDate(item.createdAt),
+                  style: textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
                 ),
-              ),
+                Icon(
+                  Icons.more_horiz,
+                  color: colorScheme.onSurface.withValues(alpha: 0.5),
+                  size: 20,
+                ),
+              ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPriorityBadge(BuildContext context, String priority) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    Color badgeColor;
+    switch (priority.toUpperCase()) {
+      case 'URGENT':
+        badgeColor = colorScheme.error;
+        break;
+      case 'HIGH':
+        badgeColor = Colors.orange;
+        break;
+      default:
+        badgeColor = colorScheme.primary;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: badgeColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: badgeColor.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        priority,
+        style: TextStyle(
+          color: badgeColor,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -86,7 +143,7 @@ class AnnouncementCard extends StatelessWidget {
       } else if (difference.inDays == 1 || (difference.inDays == 0 && now.day != date.day)) {
         return "Yesterday";
       } else {
-        return "${date.month}/${date.day}/${date.year}";
+        return "${date.day}/${date.month}/${date.year}";
       }
     } catch (e) {
       return isoDate;

@@ -21,6 +21,8 @@ class AnnouncementLoaded extends AnnouncementState {
   List<Object> get props => [announcements];
 }
 
+class AnnouncementCreateSuccess extends AnnouncementState {}
+
 class AnnouncementError extends AnnouncementState {
   final String message;
 
