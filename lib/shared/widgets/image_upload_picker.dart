@@ -2,16 +2,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../core/network/cloudinary_config.dart';
 import '../../core/network/cloudinary_service.dart';
 
 class ImageUploadPicker extends StatefulWidget {
   final Function(String) onImageUploaded;
   final String? initialImageUrl;
+  final ImageType imageType;
 
   const ImageUploadPicker({
     super.key,
     required this.onImageUploaded,
     this.initialImageUrl,
+    this.imageType = ImageType.announcement,
   });
 
   @override
@@ -81,7 +84,10 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
         _currentImageUrl = image.path; 
       });
 
-      final url = await _cloudinaryService.uploadImage(image.path);
+      final url = await _cloudinaryService.uploadImage(
+        image.path,
+        imageType: widget.imageType,
+      );
 
       setState(() {
         _isUploading = false;
@@ -132,25 +138,29 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isAvatar = widget.imageType == ImageType.avatar;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: isAvatar ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
-        Text(
-          'Imagen del Anuncio',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurface,
-              ),
-        ),
-        const SizedBox(height: 8),
+        if (!isAvatar) ...[
+          Text(
+            'Imagen del Anuncio',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+          ),
+          const SizedBox(height: 8),
+        ],
         GestureDetector(
           onTap: _isUploading ? null : _showPickerOptions,
           child: Container(
-            height: 200,
-            width: double.infinity,
+            height: isAvatar ? 120 : 200,
+            width: isAvatar ? 120 : double.infinity,
             decoration: BoxDecoration(
               color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
+              shape: isAvatar ? BoxShape.circle : BoxShape.rectangle,
+              borderRadius: isAvatar ? null : BorderRadius.circular(12),
               border: Border.all(
                 color: colorScheme.secondary.withValues(alpha: 0.5),
               ),
@@ -162,44 +172,61 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
                       if (_currentImageUrl != null)
                         Opacity(
                           opacity: 0.5,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: _currentImageUrl!.startsWith('http')
-                                ? Image.network(_currentImageUrl!, fit: BoxFit.cover, width: double.infinity)
-                                : Image.file(File(_currentImageUrl!), fit: BoxFit.cover, width: double.infinity),
-                          ),
+                          child: isAvatar
+                              ? CircleAvatar(
+                                  radius: 60,
+                                  backgroundImage: _currentImageUrl!.startsWith('http')
+                                      ? NetworkImage(_currentImageUrl!) as ImageProvider
+                                      : FileImage(File(_currentImageUrl!)),
+                                )
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: _currentImageUrl!.startsWith('http')
+                                      ? Image.network(_currentImageUrl!, fit: BoxFit.cover, width: double.infinity)
+                                      : Image.file(File(_currentImageUrl!), fit: BoxFit.cover, width: double.infinity),
+                                ),
                         ),
                       const CircularProgressIndicator(),
                     ],
                   )
                 : _currentImageUrl != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: _currentImageUrl!.startsWith('http')
-                            ? Image.network(
-                                _currentImageUrl!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(Icons.error, size: 50),
-                              )
-                            : Image.file(
-                                File(_currentImageUrl!),
-                                fit: BoxFit.cover,
-                              ),
-                      )
+                    ? isAvatar
+                        ? CircleAvatar(
+                            radius: 60,
+                            backgroundImage: _currentImageUrl!.startsWith('http')
+                                ? NetworkImage(_currentImageUrl!) as ImageProvider
+                                : FileImage(File(_currentImageUrl!)),
+                            onBackgroundImageError: (_, __) {},
+                          )
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: _currentImageUrl!.startsWith('http')
+                                ? Image.network(
+                                    _currentImageUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        const Icon(Icons.error, size: 50),
+                                  )
+                                : Image.file(
+                                    File(_currentImageUrl!),
+                                    fit: BoxFit.cover,
+                                  ),
+                          )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            Icons.add_a_photo,
-                            size: 50,
+                            isAvatar ? Icons.person : Icons.add_a_photo,
+                            size: isAvatar ? 60 : 50,
                             color: colorScheme.primary,
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Toca para subir una imagen',
-                            style: TextStyle(color: colorScheme.primary),
-                          ),
+                          if (!isAvatar) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              'Toca para subir una imagen',
+                              style: TextStyle(color: colorScheme.primary),
+                            ),
+                          ],
                         ],
                       ),
           ),

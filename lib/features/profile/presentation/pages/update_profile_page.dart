@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/custom_text_field.dart';
 import '../../../../shared/widgets/primary_button.dart';
+import '../../../../shared/widgets/image_upload_picker.dart';
+import '../../../../core/network/cloudinary_config.dart';
 import '../../domain/entities/profile_entity.dart';
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_event.dart';
@@ -20,23 +22,22 @@ class UpdateProfilePage extends StatefulWidget {
 class _UpdateProfilePageState extends State<UpdateProfilePage> {
   late final TextEditingController _nameController;
   late final TextEditingController _lastnameController;
-  late final TextEditingController _usernameController;
   late final TextEditingController _emailController;
+  String? _avatarUrl;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.profile.name);
     _lastnameController = TextEditingController(text: widget.profile.lastname);
-    _usernameController = TextEditingController(text: widget.profile.username);
     _emailController = TextEditingController(text: widget.profile.email);
+    _avatarUrl = widget.profile.avatarUrl;
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _lastnameController.dispose();
-    _usernameController.dispose();
     _emailController.dispose();
     super.dispose();
   }
@@ -44,13 +45,13 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   void _onUpdate() {
     final updatedProfile = ProfileEntity(
       id: widget.profile.id,
-      username: _usernameController.text,
+      username: widget.profile.username, // Maintain existing username
       name: _nameController.text,
       lastname: _lastnameController.text,
       email: _emailController.text,
       roles: widget.profile.roles,
       companyId: widget.profile.companyId,
-      avatarUrl: widget.profile.avatarUrl,
+      avatarUrl: _avatarUrl,
     );
 
     context.read<ProfileBloc>().add(ProfileUpdateRequested(updatedProfile));
@@ -58,6 +59,9 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return BlocListener<ProfileBloc, ProfileState>(
       listener: (context, state) {
         if (state is ProfileUpdateSuccess) {
@@ -72,12 +76,50 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Update Profile')),
+        backgroundColor: colorScheme.surface,
+        appBar: AppBar(
+          title: Text(
+            'Update Profile',
+            style: textTheme.titleLarge?.copyWith(color: colorScheme.onSurface),
+          ),
+          backgroundColor: colorScheme.surface,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
+            onPressed: () => context.pop(),
+          ),
+        ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Avatar Section
+              Center(
+                child: Column(
+                  children: [
+                    ImageUploadPicker(
+                      initialImageUrl: _avatarUrl,
+                      onImageUploaded: (url) {
+                        setState(() {
+                          _avatarUrl = url;
+                        });
+                      },
+                      imageType: ImageType.avatar,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tap to change photo',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              
+              // Form Fields
               CustomTextField(
                 hintText: 'First Name',
                 controller: _nameController,
@@ -89,12 +131,12 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
               ),
               const SizedBox(height: 16),
               CustomTextField(
-                hintText: 'Username',
-                controller: _usernameController,
+                hintText: 'Email',
+                controller: _emailController,
               ),
-              const SizedBox(height: 16),
-              CustomTextField(hintText: 'Email', controller: _emailController),
               const SizedBox(height: 48),
+              
+              // Action Button
               BlocBuilder<ProfileBloc, ProfileState>(
                 builder: (context, state) {
                   return PrimaryButton(
