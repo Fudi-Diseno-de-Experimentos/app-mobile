@@ -25,6 +25,8 @@ class IamSignUpSuccess extends IamState {}
 
 class IamJoinCompanySuccess extends IamState {}
 
+class IamSignOutSuccess extends IamState {}
+
 class IamError extends IamState {
   final String message;
 

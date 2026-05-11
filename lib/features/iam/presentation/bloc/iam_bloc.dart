@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/usecases/join_company_usecase.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
+import '../../domain/usecases/sign_out_usecase.dart';
 import '../../domain/usecases/sign_up_usecase.dart';
 import 'iam_event.dart';
 import 'iam_state.dart';
@@ -9,15 +10,18 @@ class IamBloc extends Bloc<IamEvent, IamState> {
   final SignInUseCase signInUseCase;
   final SignUpUseCase signUpUseCase;
   final JoinCompanyUseCase joinCompanyUseCase;
+  final SignOutUseCase signOutUseCase;
 
   IamBloc({
     required this.signInUseCase,
     required this.signUpUseCase,
     required this.joinCompanyUseCase,
+    required this.signOutUseCase,
   }) : super(IamInitial()) {
     on<SignInSubmitted>(_onSignInSubmitted);
     on<SignUpSubmitted>(_onSignUpSubmitted);
     on<JoinCompanySubmitted>(_onJoinCompanySubmitted);
+    on<SignOutSubmitted>(_onSignOutSubmitted);
   }
 
   Future<void> _onSignInSubmitted(
@@ -59,6 +63,18 @@ class IamBloc extends Bloc<IamEvent, IamState> {
     result.fold(
       (failure) => emit(IamError(failure.message)),
       (_) => emit(IamJoinCompanySuccess()),
+    );
+  }
+
+  Future<void> _onSignOutSubmitted(
+    SignOutSubmitted event,
+    Emitter<IamState> emit,
+  ) async {
+    emit(IamLoading());
+    final result = await signOutUseCase();
+    result.fold(
+      (failure) => emit(IamError(failure.message)),
+      (_) => emit(IamSignOutSuccess()),
     );
   }
 }

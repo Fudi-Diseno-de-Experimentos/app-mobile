@@ -44,3 +44,7 @@ class JoinCompanySubmitted extends IamEvent {
   @override
   List<Object> get props => [joinCode];
 }
+
+class SignOutSubmitted extends IamEvent {
+  const SignOutSubmitted();
+}

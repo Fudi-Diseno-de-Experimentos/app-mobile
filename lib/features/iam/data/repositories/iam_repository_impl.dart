@@ -67,4 +67,14 @@ class IamRepositoryImpl implements IamRepository {
       return const Left(ServerFailure('An unexpected error occurred'));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> signOut() async {
+    try {
+      await sharedPreferences.remove('auth_token');
+      return const Right(null);
+    } catch (e) {
+      return const Left(ServerFailure('Failed to sign out'));
+    }
+  }
 }
