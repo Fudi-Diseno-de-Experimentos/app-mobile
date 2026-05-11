@@ -21,6 +21,8 @@ class EventLoaded extends EventState {
   List<Object> get props => [events];
 }
 
+class EventCreateSuccess extends EventState {}
+
 class EventError extends EventState {
   final String message;
 
