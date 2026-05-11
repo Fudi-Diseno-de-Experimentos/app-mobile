@@ -5,6 +5,7 @@ import '../domain/repositories/event_repository.dart';
 import '../domain/usecases/get_events_usecase.dart';
 import '../domain/usecases/create_event_usecase.dart';
 import '../presentation/bloc/event_bloc.dart';
+import '../../profile/domain/usecases/get_company_members_usecase.dart';
 
 void initEventDependencies() {
   // Datasources
@@ -26,6 +27,7 @@ void initEventDependencies() {
     () => EventBloc(
       getEventsUseCase: sl(),
       createEventUseCase: sl(),
+      getCompanyMembersUseCase: sl(),
     ),
   );
 }

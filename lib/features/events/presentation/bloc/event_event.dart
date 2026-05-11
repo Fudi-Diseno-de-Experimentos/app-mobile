@@ -9,6 +9,15 @@ abstract class EventEvent extends Equatable {
 
 class FetchEvents extends EventEvent {}
 
+class FetchCompanyMembers extends EventEvent {
+  final String companyId;
+
+  const FetchCompanyMembers(this.companyId);
+
+  @override
+  List<Object> get props => [companyId];
+}
+
 class CreateEventRequested extends EventEvent {
   final String title;
   final String description;
