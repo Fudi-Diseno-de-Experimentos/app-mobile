@@ -4,6 +4,7 @@ import '../models/profile_model.dart';
 abstract class ProfileRemoteDataSource {
   Future<ProfileModel> getProfile();
   Future<ProfileModel> updateProfile(ProfileModel profile);
+  Future<List<ProfileModel>> getCompanyMembers(String companyId);
 }
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -39,5 +40,16 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       data: profile.toJson(),
     );
     return ProfileModel.fromJson(response.data);
+  }
+
+  @override
+  Future<List<ProfileModel>> getCompanyMembers(String companyId) async {
+    final response = await apiClient.get('/profiles/company/$companyId');
+    if (response.data != null && response.data is List) {
+      return (response.data as List)
+          .map((json) => ProfileModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+    }
+    return [];
   }
 }

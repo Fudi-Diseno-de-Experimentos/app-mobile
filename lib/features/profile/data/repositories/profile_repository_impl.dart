@@ -46,4 +46,18 @@ class ProfileRepositoryImpl implements ProfileRepository {
       return const Left(ServerFailure('An unexpected error occurred'));
     }
   }
+
+  @override
+  Future<Either<Failure, List<ProfileEntity>>> getCompanyMembers(
+    String companyId,
+  ) async {
+    try {
+      final members = await remoteDataSource.getCompanyMembers(companyId);
+      return Right(members);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return const Left(ServerFailure('An unexpected error occurred'));
+    }
+  }
 }
