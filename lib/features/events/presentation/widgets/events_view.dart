@@ -74,7 +74,7 @@ class EventsView extends StatelessWidget {
           );
         }
 
-        return const Center(child: Text("Initializing..."));
+        return const Center(child: Text("Loading events..."));
       },
     );
   }

@@ -2,16 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../domain/entities/event_entity.dart';
+import '../../../profile/domain/entities/profile_entity.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_state.dart';
 import '../bloc/event_bloc.dart';
 import '../bloc/event_event.dart';
 import '../bloc/event_state.dart';
 
-class EventPage extends StatelessWidget {
+class EventPage extends StatefulWidget {
   final EventEntity event;
 
   const EventPage({super.key, required this.event});
+
+  @override
+  State<EventPage> createState() => _EventPageState();
+}
+
+class _EventPageState extends State<EventPage> {
+  List<ProfileEntity> _recipients = [];
+  bool _recipientsLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.event.recipientIds.isNotEmpty) {
+      _fetchRecipients();
+    } else {
+      _recipientsLoaded = true;
+    }
+  }
+
+  void _fetchRecipients() {
+    final profileState = context.read<ProfileBloc>().state;
+    String? companyId;
+    if (profileState is ProfileLoaded) {
+      companyId = profileState.profile.companyId;
+    } else if (profileState is ProfileUpdateSuccess) {
+      companyId = profileState.profile.companyId;
+    }
+    if (companyId != null) {
+      context.read<EventBloc>().add(FetchCompanyMembers(companyId));
+    } else {
+      setState(() => _recipientsLoaded = true);
+    }
+  }
 
   bool _canManage(BuildContext context) {
     final profileState = context.read<ProfileBloc>().state;
@@ -24,7 +58,7 @@ class EventPage extends StatelessWidget {
       userId = profileState.profile.id;
       roles = profileState.profile.roles ?? const [];
     }
-    final isOwner = userId != null && userId == event.createdBy;
+    final isOwner = userId != null && userId == widget.event.createdBy;
     final isAdmin = roles.contains('ROLE_ADMIN');
     return isOwner || isAdmin;
   }
@@ -37,9 +71,16 @@ class EventPage extends StatelessWidget {
 
     return BlocListener<EventBloc, EventState>(
       listener: (context, state) {
-        if (state is EventDeleteSuccess) {
+        if (state is EventMembersLoaded) {
+          setState(() {
+            _recipients = state.members
+                .where((m) => widget.event.recipientIds.contains(m.id))
+                .toList();
+            _recipientsLoaded = true;
+          });
+        } else if (state is EventDeleteSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Evento eliminado')),
+            const SnackBar(content: Text('Event deleted')),
           );
           context.pop();
         } else if (state is EventError) {
@@ -61,7 +102,7 @@ class EventPage extends StatelessWidget {
             onPressed: () => context.pop(),
           ),
           title: Text(
-            'Detalle del evento',
+            'Event Details',
             style: TextStyle(color: colorScheme.onSurface),
           ),
           actions: [
@@ -77,7 +118,7 @@ class EventPage extends StatelessWidget {
                         Icon(Icons.edit_outlined,
                             size: 20, color: colorScheme.onSurface),
                         const SizedBox(width: 12),
-                        const Text('Editar'),
+                        const Text('Edit'),
                       ],
                     ),
                   ),
@@ -89,7 +130,7 @@ class EventPage extends StatelessWidget {
                             size: 20, color: colorScheme.error),
                         const SizedBox(width: 12),
                         Text(
-                          'Eliminar',
+                          'Delete',
                           style: TextStyle(color: colorScheme.error),
                         ),
                       ],
@@ -111,7 +152,7 @@ class EventPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          event.title,
+                          widget.event.title,
                           style: textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: colorScheme.onSurface,
@@ -120,18 +161,18 @@ class EventPage extends StatelessWidget {
                         const SizedBox(height: 12),
                         _InfoRow(
                           icon: Icons.access_time,
-                          label: _formatDate(event.date),
+                          label: _formatDate(widget.event.date),
                         ),
                         const SizedBox(height: 8),
                         _InfoRow(
                           icon: Icons.location_on_outlined,
-                          label: event.location.isEmpty
-                              ? 'Sin ubicación'
-                              : event.location,
+                          label: widget.event.location.isEmpty
+                              ? 'No location'
+                              : widget.event.location,
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'Descripción',
+                          'Description',
                           style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: colorScheme.onSurface,
@@ -139,30 +180,23 @@ class EventPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          event.description.isEmpty
-                              ? 'Sin descripción'
-                              : event.description,
+                          widget.event.description.isEmpty
+                              ? 'No description'
+                              : widget.event.description,
                           style: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurface.withValues(alpha: 0.8),
                           ),
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'Invitados',
+                          'Invited',
                           style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: colorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(
-                          event.recipientIds.isEmpty
-                              ? 'Sin invitados'
-                              : '${event.recipientIds.length} persona${event.recipientIds.length == 1 ? '' : 's'}',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface.withValues(alpha: 0.7),
-                          ),
-                        ),
+                        _buildInvitedSection(colorScheme, textTheme),
                       ],
                     ),
                   ),
@@ -180,11 +214,99 @@ class EventPage extends StatelessWidget {
     );
   }
 
+  Widget _buildInvitedSection(ColorScheme colorScheme, TextTheme textTheme) {
+    if (widget.event.recipientIds.isEmpty) {
+      return Text(
+        'No invited people',
+        style: textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurface.withValues(alpha: 0.7),
+        ),
+      );
+    }
+
+    if (!_recipientsLoaded) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Center(
+          child: CircularProgressIndicator(color: colorScheme.onSurface),
+        ),
+      );
+    }
+
+    if (_recipients.isEmpty) {
+      return Text(
+        '${widget.event.recipientIds.length} invited',
+        style: textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurface.withValues(alpha: 0.7),
+        ),
+      );
+    }
+
+    return Column(
+      children: _recipients.map((member) {
+        final initials =
+            '${member.name.isNotEmpty ? member.name[0] : ''}${member.lastname.isNotEmpty ? member.lastname[0] : ''}'
+                .toUpperCase();
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: colorScheme.secondary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: colorScheme.secondary.withValues(alpha: 0.3),
+                backgroundImage: member.avatarUrl != null &&
+                        member.avatarUrl!.isNotEmpty
+                    ? NetworkImage(member.avatarUrl!)
+                    : null,
+                child: member.avatarUrl == null || member.avatarUrl!.isEmpty
+                    ? Text(
+                        initials,
+                        style: TextStyle(
+                          color: colorScheme.onSurface,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${member.name} ${member.lastname}',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      member.email,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
   void _onMenuSelected(BuildContext context, String value) {
     switch (value) {
       case 'edit':
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Edición próximamente disponible')),
+          const SnackBar(content: Text('Edit coming soon')),
         );
         break;
       case 'delete':
@@ -199,25 +321,25 @@ class EventPage extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Eliminar evento'),
+        title: const Text('Delete Event'),
         content: const Text(
-          '¿Estás seguro de que deseas eliminar este evento? Esta acción no se puede deshacer.',
+          'Are you sure you want to delete this event? This action cannot be undone.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancelar'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             style: TextButton.styleFrom(foregroundColor: colorScheme.error),
-            child: const Text('Eliminar'),
+            child: const Text('Delete'),
           ),
         ],
       ),
     );
     if (confirmed == true) {
-      bloc.add(DeleteEventRequested(event.id));
+      bloc.add(DeleteEventRequested(widget.event.id));
     }
   }
 
