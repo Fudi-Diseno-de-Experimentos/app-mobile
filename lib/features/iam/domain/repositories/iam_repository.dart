@@ -12,4 +12,5 @@ abstract class IamRepository {
     required String email,
   });
   Future<Either<Failure, void>> joinCompany(String joinCode);
+  Future<Either<Failure, void>> signOut();
 }

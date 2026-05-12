@@ -6,6 +6,7 @@ import '../features/iam/presentation/pages/sign_up_page.dart';
 import '../features/iam/presentation/pages/sign_in_page.dart';
 import '../features/iam/presentation/pages/verification_page.dart';
 import '../features/profile/presentation/pages/profile_page.dart';
+import '../features/profile/presentation/pages/settings_page.dart';
 import '../features/profile/presentation/pages/update_profile_page.dart';
 import '../features/profile/domain/entities/profile_entity.dart';
 import '../shared/widgets/main_app_bar.dart';
@@ -16,6 +17,7 @@ import '../features/announcements/presentation/pages/create_announcement_page.da
 import '../features/announcements/presentation/bloc/announcement_bloc.dart';
 import '../features/events/presentation/pages/create_event_page.dart';
 import '../features/events/presentation/bloc/event_bloc.dart';
+import '../features/iam/presentation/bloc/iam_bloc.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -104,6 +106,17 @@ final GoRouter appRouter = GoRouter(
               path: '/profile',
               builder: (context, state) => const ProfilePage(),
               routes: [
+                GoRoute(
+                  path: 'settings',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final profile = state.extra as ProfileEntity;
+                    return BlocProvider(
+                      create: (context) => sl<IamBloc>(),
+                      child: SettingsPage(profile: profile),
+                    );
+                  },
+                ),
                 GoRoute(
                   path: 'update',
                   parentNavigatorKey: _rootNavigatorKey,

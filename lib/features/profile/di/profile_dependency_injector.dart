@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import '../data/datasources/profile_remote_datasource.dart';
 import '../data/repositories/profile_repository_impl.dart';
 import '../domain/repositories/profile_repository.dart';
+import '../domain/usecases/get_company_members_usecase.dart';
 import '../domain/usecases/get_profile_usecase.dart';
 import '../domain/usecases/update_profile_usecase.dart';
 import '../presentation/bloc/profile_bloc.dart';
@@ -29,6 +30,9 @@ void initProfileDependencies() {
   }
   if (!sl.isRegistered<UpdateProfileUseCase>()) {
     sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
+  }
+  if (!sl.isRegistered<GetCompanyMembersUseCase>()) {
+    sl.registerLazySingleton(() => GetCompanyMembersUseCase(sl()));
   }
 
   // Blocs

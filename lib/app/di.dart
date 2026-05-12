@@ -8,6 +8,7 @@ import '../features/iam/data/repositories/iam_repository_impl.dart';
 import '../features/iam/domain/repositories/iam_repository.dart';
 import '../features/iam/domain/usecases/join_company_usecase.dart';
 import '../features/iam/domain/usecases/sign_in_usecase.dart';
+import '../features/iam/domain/usecases/sign_out_usecase.dart';
 import '../features/iam/domain/usecases/sign_up_usecase.dart';
 import '../features/iam/presentation/bloc/iam_bloc.dart';
 import '../features/profile/di/profile_dependency_injector.dart';
@@ -45,6 +46,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => SignInUseCase(sl()));
   sl.registerLazySingleton(() => SignUpUseCase(sl()));
   sl.registerLazySingleton(() => JoinCompanyUseCase(sl()));
+  sl.registerLazySingleton(() => SignOutUseCase(sl()));
 
   // BLoC
   sl.registerFactory(
@@ -52,6 +54,7 @@ Future<void> initDependencies() async {
       signInUseCase: sl(),
       signUpUseCase: sl(),
       joinCompanyUseCase: sl(),
+      signOutUseCase: sl(),
     ),
   );
 
