@@ -6,7 +6,6 @@ import '../bloc/profile_bloc.dart';
 import '../bloc/profile_event.dart';
 import '../bloc/profile_state.dart';
 import '../widgets/profile_action_button.dart';
-import '../widgets/role_chip.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -88,6 +87,23 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
+String _positionLabel(String role) {
+  switch (role) {
+    case 'ROLE_ADMIN':
+      return 'Admin';
+    case 'ROLE_MANAGER':
+      return 'Manager';
+    case 'ROLE_USER':
+      return 'Miembro';
+    default:
+      if (role.startsWith('ROLE_')) {
+        final raw = role.substring(5).toLowerCase();
+        return raw.isEmpty ? role : raw[0].toUpperCase() + raw.substring(1);
+      }
+      return role;
+  }
+}
+
 class _ProfileBody extends StatelessWidget {
   final ProfileEntity profile;
 
@@ -143,13 +159,15 @@ class _ProfileBody extends StatelessWidget {
             ),
             const SizedBox(height: 4),
 
-            // Username
-            Text(
-              '@${profile.username}',
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withValues(alpha: 0.6),
+            // Position (plain text)
+            if (roles.isNotEmpty)
+              Text(
+                roles.map(_positionLabel).join(' · '),
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
             const SizedBox(height: 12),
 
             // Email row
@@ -172,17 +190,6 @@ class _ProfileBody extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-
-            // Roles as chips
-            if (roles.isNotEmpty)
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8,
-                runSpacing: 8,
-                children: roles.map((r) => RoleChip(role: r)).toList(),
-              ),
-
             const SizedBox(height: 32),
 
             // Action Buttons Row

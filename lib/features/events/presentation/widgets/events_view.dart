@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../bloc/event_bloc.dart';
+import '../bloc/event_event.dart';
 import '../bloc/event_state.dart';
 import 'event_card.dart';
-import 'schedule_bar.dart';
 
 class EventsView extends StatelessWidget {
   const EventsView({super.key});
@@ -57,7 +58,15 @@ class EventsView extends StatelessWidget {
                     itemCount: events.length,
                     itemBuilder: (context, index) {
                       final item = events[index];
-                      return EventCard(item: item);
+                      return InkWell(
+                        onTap: () async {
+                          await context.push('/files/event', extra: item);
+                          if (context.mounted) {
+                            context.read<EventBloc>().add(FetchEvents());
+                          }
+                        },
+                        child: EventCard(item: item),
+                      );
                     },
                   ),
                 ),
@@ -65,9 +74,8 @@ class EventsView extends StatelessWidget {
           );
         }
 
-        return const Center(child: Text("Initializing..."));
+        return const Center(child: Text("Loading events..."));
       },
     );
   }
 }
-

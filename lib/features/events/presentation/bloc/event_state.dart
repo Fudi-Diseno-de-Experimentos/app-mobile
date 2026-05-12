@@ -33,6 +33,24 @@ class EventMembersLoaded extends EventState {
 
 class EventCreateSuccess extends EventState {}
 
+class EventUpdateSuccess extends EventState {
+  final EventEntity event;
+
+  const EventUpdateSuccess(this.event);
+
+  @override
+  List<Object> get props => [event];
+}
+
+class EventDeleteSuccess extends EventState {
+  final String id;
+
+  const EventDeleteSuccess(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
+
 class EventError extends EventState {
   final String message;
 
