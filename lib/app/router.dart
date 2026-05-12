@@ -15,7 +15,9 @@ import '../features/chat/presentation/pages/chat_page.dart';
 import '../features/feed/presentation/pages/company_feed_page.dart';
 import '../features/announcements/presentation/pages/create_announcement_page.dart';
 import '../features/announcements/presentation/bloc/announcement_bloc.dart';
+import '../features/events/domain/entities/event_entity.dart';
 import '../features/events/presentation/pages/create_event_page.dart';
+import '../features/events/presentation/pages/event_page.dart';
 import '../features/events/presentation/bloc/event_bloc.dart';
 import '../features/iam/presentation/bloc/iam_bloc.dart';
 
@@ -82,6 +84,31 @@ final GoRouter appRouter = GoRouter(
                     create: (context) => sl<EventBloc>(),
                     child: const CreateEventPage(),
                   ),
+                ),
+                GoRoute(
+                  path: 'event',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    final event = state.extra as EventEntity;
+                    return CustomTransitionPage(
+                      key: state.pageKey,
+                      child: BlocProvider(
+                        create: (context) => sl<EventBloc>(),
+                        child: EventPage(event: event),
+                      ),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        final tween = Tween<Offset>(
+                          begin: const Offset(1, 0),
+                          end: Offset.zero,
+                        ).chain(CurveTween(curve: Curves.easeInOut));
+                        return SlideTransition(
+                          position: animation.drive(tween),
+                          child: child,
+                        );
+                      },
+                    );
+                  },
                 ),
               ],
             ),
