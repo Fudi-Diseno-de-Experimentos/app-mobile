@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/usecases/get_events_usecase.dart';
 import '../../domain/usecases/create_event_usecase.dart';
+import '../../domain/usecases/delete_event_usecase.dart';
+import '../../domain/usecases/update_event_usecase.dart';
 import '../../../profile/domain/usecases/get_company_members_usecase.dart';
 import 'event_event.dart';
 import 'event_state.dart';
@@ -8,16 +10,22 @@ import 'event_state.dart';
 class EventBloc extends Bloc<EventEvent, EventState> {
   final GetEventsUseCase getEventsUseCase;
   final CreateEventUseCase createEventUseCase;
+  final UpdateEventUseCase updateEventUseCase;
+  final DeleteEventUseCase deleteEventUseCase;
   final GetCompanyMembersUseCase getCompanyMembersUseCase;
 
   EventBloc({
     required this.getEventsUseCase,
     required this.createEventUseCase,
+    required this.updateEventUseCase,
+    required this.deleteEventUseCase,
     required this.getCompanyMembersUseCase,
   }) : super(EventInitial()) {
     on<FetchEvents>(_onFetchEvents);
     on<FetchCompanyMembers>(_onFetchCompanyMembers);
     on<CreateEventRequested>(_onCreateEventRequested);
+    on<UpdateEventRequested>(_onUpdateEventRequested);
+    on<DeleteEventRequested>(_onDeleteEventRequested);
   }
 
   Future<void> _onFetchEvents(
@@ -64,6 +72,37 @@ class EventBloc extends Bloc<EventEvent, EventState> {
         emit(EventCreateSuccess());
         add(FetchEvents()); // Refresh list
       },
+    );
+  }
+
+  Future<void> _onUpdateEventRequested(
+    UpdateEventRequested event,
+    Emitter<EventState> emit,
+  ) async {
+    emit(EventLoading());
+    final result = await updateEventUseCase(
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      date: event.date,
+      location: event.location,
+      recipientIds: event.recipientIds,
+    );
+    result.fold(
+      (failure) => emit(EventError(failure.message)),
+      (updated) => emit(EventUpdateSuccess(updated)),
+    );
+  }
+
+  Future<void> _onDeleteEventRequested(
+    DeleteEventRequested event,
+    Emitter<EventState> emit,
+  ) async {
+    emit(EventLoading());
+    final result = await deleteEventUseCase(event.id);
+    result.fold(
+      (failure) => emit(EventError(failure.message)),
+      (_) => emit(EventDeleteSuccess(event.id)),
     );
   }
 }

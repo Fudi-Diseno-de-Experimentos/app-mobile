@@ -38,3 +38,34 @@ class CreateEventRequested extends EventEvent {
   @override
   List<Object> get props => [title, description, date, location, createdBy, recipientIds];
 }
+
+class UpdateEventRequested extends EventEvent {
+  final String id;
+  final String title;
+  final String description;
+  final String date;
+  final String location;
+  final List<String> recipientIds;
+
+  const UpdateEventRequested({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.date,
+    required this.location,
+    required this.recipientIds,
+  });
+
+  @override
+  List<Object> get props =>
+      [id, title, description, date, location, recipientIds];
+}
+
+class DeleteEventRequested extends EventEvent {
+  final String id;
+
+  const DeleteEventRequested(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
