@@ -9,17 +9,20 @@ import '../features/profile/presentation/pages/profile_page.dart';
 import '../features/profile/presentation/pages/settings_page.dart';
 import '../features/profile/presentation/pages/update_profile_page.dart';
 import '../features/profile/domain/entities/profile_entity.dart';
-import '../shared/widgets/main_app_bar.dart';
 import '../shared/widgets/main_layout.dart';
 import '../features/chat/presentation/pages/chat_page.dart';
 import '../features/feed/presentation/pages/company_feed_page.dart';
+import '../features/announcements/presentation/pages/announcement_page.dart';
 import '../features/announcements/presentation/pages/create_announcement_page.dart';
 import '../features/announcements/presentation/bloc/announcement_bloc.dart';
+import '../features/announcements/domain/entities/announcement_entity.dart';
 import '../features/events/domain/entities/event_entity.dart';
 import '../features/events/presentation/pages/create_event_page.dart';
 import '../features/events/presentation/pages/event_page.dart';
 import '../features/events/presentation/bloc/event_bloc.dart';
+import '../features/home/presentation/pages/home_page.dart';
 import '../features/iam/presentation/bloc/iam_bloc.dart';
+import '../shared/widgets/main_app_bar.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -34,6 +37,26 @@ final GlobalKey<NavigatorState> _messagesNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'messages');
 final GlobalKey<NavigatorState> _profileNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'profile');
+
+CustomTransitionPage<T> _slideFromRight<T>({
+  required LocalKey key,
+  required Widget child,
+}) {
+  return CustomTransitionPage<T>(
+    key: key,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final tween = Tween<Offset>(
+        begin: const Offset(1, 0),
+        end: Offset.zero,
+      ).chain(CurveTween(curve: Curves.easeInOut));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -55,10 +78,20 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/home',
-              builder: (context, state) => const Scaffold(
-                appBar: MainAppBar(title: 'Home'),
-                body: Center(child: Text('Home Placeholder')),
-              ),
+              builder: (context, state) => const HomePage(),
+              routes: [
+                GoRoute(
+                  path: 'announcement',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    final item = state.extra as AnnouncementEntity;
+                    return _slideFromRight(
+                      key: state.pageKey,
+                      child: AnnouncementPage(announcement: item),
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -86,27 +119,27 @@ final GoRouter appRouter = GoRouter(
                   ),
                 ),
                 GoRoute(
+                  path: 'announcement',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    final item = state.extra as AnnouncementEntity;
+                    return _slideFromRight(
+                      key: state.pageKey,
+                      child: AnnouncementPage(announcement: item),
+                    );
+                  },
+                ),
+                GoRoute(
                   path: 'event',
                   parentNavigatorKey: _rootNavigatorKey,
                   pageBuilder: (context, state) {
                     final event = state.extra as EventEntity;
-                    return CustomTransitionPage(
+                    return _slideFromRight(
                       key: state.pageKey,
                       child: BlocProvider(
                         create: (context) => sl<EventBloc>(),
                         child: EventPage(event: event),
                       ),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        final tween = Tween<Offset>(
-                          begin: const Offset(1, 0),
-                          end: Offset.zero,
-                        ).chain(CurveTween(curve: Curves.easeInOut));
-                        return SlideTransition(
-                          position: animation.drive(tween),
-                          child: child,
-                        );
-                      },
                     );
                   },
                 ),

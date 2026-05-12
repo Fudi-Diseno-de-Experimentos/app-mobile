@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../bloc/announcement_bloc.dart';
 import '../bloc/announcement_state.dart';
@@ -38,7 +39,10 @@ class AnnouncementsView extends StatelessWidget {
             itemCount: announcements.length,
             itemBuilder: (context, index) {
               final item = announcements[index];
-              return AnnouncementCard(item: item);
+              return InkWell(
+                onTap: () => context.push('/files/announcement', extra: item),
+                child: AnnouncementCard(item: item),
+              );
             },
           );
         }
