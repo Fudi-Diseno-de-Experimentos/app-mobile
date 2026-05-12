@@ -49,9 +49,16 @@ dependencies:
   cloudinary_public: ^0.23.1
   image: ^4.3.0
   path_provider: ^2.1.5
+  patrol: ^4.5.0
+
+patrol:
+  test_directory: integration_test
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+
+  integration_test:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
