@@ -9,6 +9,9 @@ import 'package:patrol/src/platform/contracts/contracts.dart';
 import 'package:test_api/src/backend/invoker.dart';
 
 // START: GENERATED TEST IMPORTS
+import 'anuncio_test.dart' as anuncio_test;
+import 'evento_delete_test.dart' as evento_delete_test;
+import 'evento_edit_test.dart' as evento_edit_test;
 import 'evento_test.dart' as evento_test;
 // END: GENERATED TEST IMPORTS
 
@@ -72,6 +75,9 @@ Future<void> main() async {
   });
 
 // START: GENERATED TEST GROUPS
+  group('anuncio_test', anuncio_test.main);
+  group('evento_delete_test', evento_delete_test.main);
+  group('evento_edit_test', evento_edit_test.main);
   group('evento_test', evento_test.main);
 // END: GENERATED TEST GROUPS
 
