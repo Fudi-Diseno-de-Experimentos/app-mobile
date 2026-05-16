@@ -214,7 +214,12 @@ class _AnnouncementMiniCard extends StatelessWidget {
     };
 
     return GestureDetector(
-      onTap: () => context.push('/home/announcement', extra: item),
+      onTap: () async {
+        await context.push('/home/announcement', extra: item);
+        if (context.mounted) {
+          context.read<AnnouncementBloc>().add(FetchAnnouncements());
+        }
+      },
       child: Container(
         width: 200,
         margin: const EdgeInsets.only(right: 12, bottom: 4, top: 2),

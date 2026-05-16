@@ -21,7 +21,34 @@ class AnnouncementLoaded extends AnnouncementState {
   List<Object> get props => [announcements];
 }
 
+class AnnouncementDetailLoaded extends AnnouncementState {
+  final AnnouncementEntity announcement;
+
+  const AnnouncementDetailLoaded(this.announcement);
+
+  @override
+  List<Object> get props => [announcement];
+}
+
 class AnnouncementCreateSuccess extends AnnouncementState {}
+
+class AnnouncementUpdateSuccess extends AnnouncementState {
+  final AnnouncementEntity announcement;
+
+  const AnnouncementUpdateSuccess(this.announcement);
+
+  @override
+  List<Object> get props => [announcement];
+}
+
+class AnnouncementDeleteSuccess extends AnnouncementState {
+  final String id;
+
+  const AnnouncementDeleteSuccess(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
 
 class AnnouncementError extends AnnouncementState {
   final String message;

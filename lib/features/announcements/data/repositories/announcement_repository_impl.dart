@@ -20,6 +20,29 @@ class AnnouncementRepositoryImpl implements AnnouncementRepository {
   }
 
   @override
+  Future<Either<Failure, AnnouncementEntity>> getAnnouncementById(
+      String id) async {
+    try {
+      final announcement = await remoteDataSource.getAnnouncementById(id);
+      return Right(announcement);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<AnnouncementEntity>>> getAnnouncementsByPriority(
+      String priority) async {
+    try {
+      final announcements =
+          await remoteDataSource.getAnnouncementsByPriority(priority);
+      return Right(announcements);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, AnnouncementEntity>> createAnnouncement({
     required String title,
     required String description,
@@ -36,6 +59,38 @@ class AnnouncementRepositoryImpl implements AnnouncementRepository {
         createdBy: createdBy,
       );
       return Right(announcement);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AnnouncementEntity>> updateAnnouncement({
+    required String id,
+    required String title,
+    required String description,
+    String? image,
+    required String priority,
+  }) async {
+    try {
+      final announcement = await remoteDataSource.updateAnnouncement(
+        id: id,
+        title: title,
+        description: description,
+        image: image,
+        priority: priority,
+      );
+      return Right(announcement);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteAnnouncement(String id) async {
+    try {
+      await remoteDataSource.deleteAnnouncement(id);
+      return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

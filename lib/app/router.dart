@@ -15,6 +15,7 @@ import '../features/feed/presentation/pages/company_feed_page.dart';
 import '../features/announcements/presentation/pages/announcement_page.dart';
 import '../features/announcements/presentation/pages/create_announcement_page.dart';
 import '../features/announcements/presentation/bloc/announcement_bloc.dart';
+import '../features/announcements/presentation/bloc/comment_bloc.dart';
 import '../features/announcements/domain/entities/announcement_entity.dart';
 import '../features/events/domain/entities/event_entity.dart';
 import '../features/events/presentation/pages/create_event_page.dart';
@@ -58,6 +59,16 @@ CustomTransitionPage<T> _slideFromRight<T>({
   );
 }
 
+Widget _announcementDetail(AnnouncementEntity item) {
+  return MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (_) => sl<AnnouncementBloc>()),
+      BlocProvider(create: (_) => sl<CommentBloc>()),
+    ],
+    child: AnnouncementPage(announcement: item),
+  );
+}
+
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/sign-in',
@@ -87,7 +98,7 @@ final GoRouter appRouter = GoRouter(
                     final item = state.extra as AnnouncementEntity;
                     return _slideFromRight(
                       key: state.pageKey,
-                      child: AnnouncementPage(announcement: item),
+                      child: _announcementDetail(item),
                     );
                   },
                 ),
@@ -107,7 +118,9 @@ final GoRouter appRouter = GoRouter(
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => BlocProvider(
                     create: (context) => sl<AnnouncementBloc>(),
-                    child: const CreateAnnouncementPage(),
+                    child: CreateAnnouncementPage(
+                      announcement: state.extra as AnnouncementEntity?,
+                    ),
                   ),
                 ),
                 GoRoute(
@@ -115,7 +128,9 @@ final GoRouter appRouter = GoRouter(
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => BlocProvider(
                     create: (context) => sl<EventBloc>(),
-                    child: const CreateEventPage(),
+                    child: CreateEventPage(
+                      event: state.extra as EventEntity?,
+                    ),
                   ),
                 ),
                 GoRoute(
@@ -125,7 +140,7 @@ final GoRouter appRouter = GoRouter(
                     final item = state.extra as AnnouncementEntity;
                     return _slideFromRight(
                       key: state.pageKey,
-                      child: AnnouncementPage(announcement: item),
+                      child: _announcementDetail(item),
                     );
                   },
                 ),

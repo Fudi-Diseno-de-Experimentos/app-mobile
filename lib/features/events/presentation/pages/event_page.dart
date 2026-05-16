@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/di.dart';
+import '../../../analytics/presentation/bloc/analytics_bloc.dart';
+import '../../../analytics/presentation/bloc/analytics_event.dart';
 import '../../domain/entities/event_entity.dart';
 import '../../../profile/domain/entities/profile_entity.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
@@ -29,6 +32,23 @@ class _EventPageState extends State<EventPage> {
       _fetchRecipients();
     } else {
       _recipientsLoaded = true;
+    }
+    _registerView();
+  }
+
+  void _registerView() {
+    final profileState = context.read<ProfileBloc>().state;
+    String? actorId;
+    if (profileState is ProfileLoaded) {
+      actorId = profileState.profile.id;
+    } else if (profileState is ProfileUpdateSuccess) {
+      actorId = profileState.profile.id;
+    }
+    if (actorId != null && actorId.isNotEmpty) {
+      sl<AnalyticsBloc>().add(RegisterEventView(
+        eventId: widget.event.id,
+        userId: actorId,
+      ));
     }
   }
 
@@ -305,9 +325,7 @@ class _EventPageState extends State<EventPage> {
   void _onMenuSelected(BuildContext context, String value) {
     switch (value) {
       case 'edit':
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Edit coming soon')),
-        );
+        context.push('/files/create-event', extra: widget.event);
         break;
       case 'delete':
         _confirmDelete(context);
