@@ -15,6 +15,15 @@ abstract class ChatRemoteDataSource {
     required String createdBy,
   });
 
+  /// `PUT /api/v1/groups/{id}` — update group name/description/image
+  /// (`UpdateGroupResource`).
+  Future<GroupModel> updateGroup(
+    String groupId, {
+    String? name,
+    String? description,
+    String? imageUrl,
+  });
+
   /// `GET /api/v1/conversations` — my direct conversations (DMs).
   Future<List<ConversationModel>> getMyConversations();
 
@@ -24,6 +33,27 @@ abstract class ChatRemoteDataSource {
 
   /// `GET /api/v1/conversations/{id}/messages` — DM history.
   Future<List<MessageModel>> getConversationMessages(String conversationId);
+
+  /// `POST /api/v1/groups/{id}/messages` — persist a group message.
+  /// `senderId` is ignored server-side (derived from the JWT).
+  Future<MessageModel> sendGroupMessage(String groupId, String body);
+
+  /// `POST /api/v1/conversations/{id}/messages` — persist a DM message.
+  Future<MessageModel> sendConversationMessage(
+    String conversationId,
+    String body,
+  );
+
+  /// `PUT /api/v1/groups/{id}/messages/{messageId}` — edit body.
+  /// DM ids are DIRECT-group ids, so this serves both.
+  Future<MessageModel> editMessage(
+    String groupId,
+    String messageId,
+    String body,
+  );
+
+  /// `DELETE /api/v1/groups/{id}/messages/{messageId}` — soft delete.
+  Future<void> deleteMessage(String groupId, String messageId);
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -85,6 +115,26 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
+  Future<GroupModel> updateGroup(
+    String groupId, {
+    String? name,
+    String? description,
+    String? imageUrl,
+  }) async {
+    final response = await apiClient.put(
+      '/groups/$groupId',
+      data: {
+        'name': name,
+        'description': description,
+        'imageUrl': imageUrl,
+      },
+    );
+    return GroupModel.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+    );
+  }
+
+  @override
   Future<List<ConversationModel>> getMyConversations() async {
     final response = await apiClient.get('/conversations');
     if (response.data is List) {
@@ -122,5 +172,53 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
           .toList();
     }
     return [];
+  }
+
+  @override
+  Future<MessageModel> sendGroupMessage(String groupId, String body) async {
+    final response = await apiClient.post(
+      '/groups/$groupId/messages',
+      data: {'body': body},
+    );
+    return MessageModel.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+      fallbackGroupId: groupId,
+    );
+  }
+
+  @override
+  Future<MessageModel> sendConversationMessage(
+    String conversationId,
+    String body,
+  ) async {
+    final response = await apiClient.post(
+      '/conversations/$conversationId/messages',
+      data: {'body': body},
+    );
+    return MessageModel.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+      fallbackGroupId: conversationId,
+    );
+  }
+
+  @override
+  Future<MessageModel> editMessage(
+    String groupId,
+    String messageId,
+    String body,
+  ) async {
+    final response = await apiClient.put(
+      '/groups/$groupId/messages/$messageId',
+      data: {'body': body},
+    );
+    return MessageModel.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+      fallbackGroupId: groupId,
+    );
+  }
+
+  @override
+  Future<void> deleteMessage(String groupId, String messageId) async {
+    await apiClient.delete('/groups/$groupId/messages/$messageId');
   }
 }

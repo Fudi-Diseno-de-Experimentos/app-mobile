@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/group_entity.dart';
 
+/// A single chat preview row. Flat (no card/border) so the list reads as one
+/// seamless surface separated only by hairline dividers — WhatsApp style.
 class ChatItem extends StatelessWidget {
   final GroupEntity group;
   final bool archived;
@@ -23,20 +25,12 @@ class ChatItem extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       onLongPress: onToggleArchive,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: colorScheme.surface,
-          border: Border.all(
-            color: colorScheme.secondary.withValues(alpha: 0.2),
-          ),
-        ),
-        padding: const EdgeInsets.all(14),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
             CircleAvatar(
-              radius: 24,
+              radius: 26,
               backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
               backgroundImage:
                   (group.imageUrl != null && group.imageUrl!.isNotEmpty)
@@ -60,7 +54,7 @@ class ChatItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -78,22 +72,11 @@ class ChatItem extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  _relative(group.updatedAt),
-                  style: textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha: 0.5),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Icon(
-                  archived ? Icons.unarchive_outlined : Icons.archive_outlined,
-                  size: 18,
-                  color: colorScheme.onSurface.withValues(alpha: 0.4),
-                ),
-              ],
+            Text(
+              _relative(group.updatedAt),
+              style: textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
             ),
           ],
         ),

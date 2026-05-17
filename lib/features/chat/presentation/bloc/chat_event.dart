@@ -84,3 +84,21 @@ class CreateGroupRequested extends ChatEvent {
         createdBy,
       ];
 }
+
+/// Edit an existing group's name/description/image (`PUT /groups/{id}`).
+class UpdateGroupRequested extends ChatEvent {
+  final String groupId;
+  final String name;
+  final String? description;
+  final String? imageUrl;
+
+  const UpdateGroupRequested({
+    required this.groupId,
+    required this.name,
+    this.description,
+    this.imageUrl,
+  });
+
+  @override
+  List<Object?> get props => [groupId, name, description, imageUrl];
+}

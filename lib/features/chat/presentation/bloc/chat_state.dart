@@ -55,3 +55,16 @@ class GroupCreated extends ChatState {
   @override
   List<Object?> get props => [group];
 }
+
+// ─── Group editing states ────────────────────────────────────────────────────
+
+class GroupUpdating extends ChatState {}
+
+class GroupUpdated extends ChatState {
+  final GroupEntity group;
+
+  const GroupUpdated(this.group);
+
+  @override
+  List<Object?> get props => [group];
+}

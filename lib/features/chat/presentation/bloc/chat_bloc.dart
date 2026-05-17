@@ -8,6 +8,7 @@ import '../../domain/usecases/create_group_usecase.dart';
 import '../../domain/usecases/get_my_conversations_usecase.dart';
 import '../../domain/usecases/get_my_groups_usecase.dart';
 import '../../domain/usecases/start_conversation_usecase.dart';
+import '../../domain/usecases/update_group_usecase.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
 
@@ -17,6 +18,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final StartConversationUseCase startConversationUseCase;
   final GetCompanyMembersUseCase getCompanyMembersUseCase;
   final CreateGroupUseCase createGroupUseCase;
+  final UpdateGroupUseCase updateGroupUseCase;
   final ChatArchiveStore archiveStore;
 
   List<GroupEntity> _groups = const [];
@@ -27,6 +29,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     required this.startConversationUseCase,
     required this.getCompanyMembersUseCase,
     required this.createGroupUseCase,
+    required this.updateGroupUseCase,
     required this.archiveStore,
   }) : super(ChatInitial()) {
     on<LoadGroups>(_onLoadGroups);
@@ -34,6 +37,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ToggleArchive>(_onToggleArchive);
     on<LoadCompanyMembers>(_onLoadCompanyMembers);
     on<CreateGroupRequested>(_onCreateGroupRequested);
+    on<UpdateGroupRequested>(_onUpdateGroupRequested);
   }
 
   /// Synthesize a `DIRECT` [GroupEntity] from a DM so the feed/UI stay uniform.
@@ -168,6 +172,23 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     result.fold(
       (failure) => emit(ChatError(failure.message)),
       (group) => emit(GroupCreated(group)),
+    );
+  }
+
+  Future<void> _onUpdateGroupRequested(
+    UpdateGroupRequested event,
+    Emitter<ChatState> emit,
+  ) async {
+    emit(GroupUpdating());
+    final result = await updateGroupUseCase(
+      groupId: event.groupId,
+      name: event.name,
+      description: event.description,
+      imageUrl: event.imageUrl,
+    );
+    result.fold(
+      (failure) => emit(ChatError(failure.message)),
+      (group) => emit(GroupUpdated(group)),
     );
   }
 }

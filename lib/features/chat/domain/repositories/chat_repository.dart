@@ -33,13 +33,38 @@ abstract class ChatRepository {
     required String createdBy,
   });
 
+  /// Updates group name/description/image (`PUT /api/v1/groups/{id}`).
+  Future<Either<Failure, GroupEntity>> updateGroup({
+    required String groupId,
+    String? name,
+    String? description,
+    String? imageUrl,
+  });
+
   /// Live message stream for [groupId] over the STOMP websocket.
   Stream<MessageEntity> watchMessages(String groupId);
 
-  void sendMessage({
-    required String groupId,
-    required String senderId,
+  /// Persists a message over REST (reliable, returns the stored
+  /// [MessageEntity]). Groups hit `/groups/{id}/messages`; DMs hit
+  /// `/conversations/{id}/messages`. The live WS echo is a bonus, not the
+  /// source of truth.
+  Future<Either<Failure, MessageEntity>> sendMessage({
+    required String chatId,
+    required bool isDirect,
     required String body,
+  });
+
+  /// Edits a message body (`PUT /groups/{id}/messages/{messageId}`).
+  Future<Either<Failure, MessageEntity>> editMessage({
+    required String chatId,
+    required String messageId,
+    required String body,
+  });
+
+  /// Soft-deletes a message (`DELETE /groups/{id}/messages/{messageId}`).
+  Future<Either<Failure, Unit>> deleteMessage({
+    required String chatId,
+    required String messageId,
   });
 
   Future<void> disconnect();

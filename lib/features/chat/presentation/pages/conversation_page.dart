@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_event.dart';
 import '../../../profile/presentation/bloc/profile_state.dart';
 import '../../domain/entities/group_entity.dart';
+import '../../domain/entities/message_entity.dart';
 import '../bloc/message_bloc.dart';
 import '../bloc/message_event.dart';
 import '../bloc/message_state.dart';
@@ -24,17 +26,10 @@ class _ConversationPageState extends State<ConversationPage> {
   final TextEditingController _input = TextEditingController();
   final ScrollController _scroll = ScrollController();
   bool _profileRequested = false;
+  bool _convoRequested = false;
 
-  @override
-  void initState() {
-    super.initState();
-    context.read<MessageBloc>().add(
-          LoadConversation(
-            widget.group.id,
-            isDirect: widget.group.isDirect,
-          ),
-        );
-  }
+  // Mutable so an in-place group edit (3-dot) refreshes the title.
+  late GroupEntity _group = widget.group;
 
   @override
   void dispose() {
@@ -60,19 +55,145 @@ class _ConversationPageState extends State<ConversationPage> {
     if (text.isEmpty || senderId.isEmpty) return;
     context.read<MessageBloc>().add(
           SendChatMessage(
-            groupId: widget.group.id,
+            groupId: _group.id,
             senderId: senderId,
             body: text,
+            isDirect: _group.isDirect,
           ),
         );
     _input.clear();
     _scrollToBottom();
   }
 
+  Future<void> _openMessageMenu(MessageEntity m, Offset globalPos) async {
+    final overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+    final selected = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromRect(
+        globalPos & const Size(40, 40),
+        Offset.zero & overlay.size,
+      ),
+      items: const [
+        PopupMenuItem(
+          value: 'edit',
+          child: ListTile(
+            leading: Icon(Icons.edit_outlined),
+            title: Text('Edit'),
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+        PopupMenuItem(
+          value: 'delete',
+          child: ListTile(
+            leading: Icon(Icons.delete_outline, color: AppColors.destructive),
+            title: Text(
+              'Delete',
+              style: TextStyle(color: AppColors.destructive),
+            ),
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+      ],
+    );
+    if (!mounted) return;
+    if (selected == 'edit') _editDialog(m);
+    if (selected == 'delete') _confirmDelete(m);
+  }
+
+  void _editDialog(MessageEntity m) {
+    final controller = TextEditingController(text: m.body);
+    showDialog<void>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text('Edit message'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          minLines: 1,
+          maxLines: 5,
+          decoration: const InputDecoration(hintText: 'Message'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              final body = controller.text.trim();
+              Navigator.of(dialogCtx).pop();
+              if (body.isEmpty || body == m.body) return;
+              context
+                  .read<MessageBloc>()
+                  .add(EditMessage(messageId: m.messageId, body: body));
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDelete(MessageEntity m) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text('Delete message?'),
+        content: const Text('This message will be removed for everyone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogCtx).pop();
+              context
+                  .read<MessageBloc>()
+                  .add(DeleteMessage(m.messageId));
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _editGroup() async {
+    final updated = await context.push<GroupEntity>(
+      '/messages/edit-group',
+      extra: _group,
+    );
+    if (!mounted || updated == null) return;
+    setState(() => _group = updated);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.group.name)),
+      appBar: AppBar(
+        title: Text(_group.name),
+        actions: [
+          if (!_group.isDirect)
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              onSelected: (v) {
+                if (v == 'edit-group') _editGroup();
+              },
+              itemBuilder: (context) => const [
+                PopupMenuItem(
+                  value: 'edit-group',
+                  child: ListTile(
+                    leading: Icon(Icons.edit_outlined),
+                    title: Text('Edit group'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
       body: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, profileState) {
           if (profileState is ProfileInitial && !_profileRequested) {
@@ -84,12 +205,36 @@ class _ConversationPageState extends State<ConversationPage> {
                   ? profileState.profile.userId
                   : '';
 
+          if (profileState is ProfileLoaded && !_convoRequested) {
+            _convoRequested = true;
+            final companyId = profileState.profile.companyId ?? '';
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                context.read<MessageBloc>().add(
+                      LoadConversation(
+                        _group.id,
+                        isDirect: _group.isDirect,
+                        companyId: companyId,
+                      ),
+                    );
+              }
+            });
+          }
+
           return Column(
             children: [
               Expanded(
                 child: BlocConsumer<MessageBloc, MessageState>(
                   listener: (context, state) {
                     if (state is ConversationLoaded) _scrollToBottom();
+                    if (state is MessageActionFailed) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.message),
+                          backgroundColor: AppColors.destructive,
+                        ),
+                      );
+                    }
                   },
                   builder: (context, state) {
                     if (state is MessageLoading ||
@@ -106,8 +251,18 @@ class _ConversationPageState extends State<ConversationPage> {
                         ),
                       );
                     }
-                    if (state is ConversationLoaded) {
-                      if (state.messages.isEmpty) {
+                    final messages = state is ConversationLoaded
+                        ? state.messages
+                        : state is MessageActionFailed
+                            ? state.messages
+                            : null;
+                    final senderNames = state is ConversationLoaded
+                        ? state.senderNames
+                        : state is MessageActionFailed
+                            ? state.senderNames
+                            : const <String, String>{};
+                    if (messages != null) {
+                      if (messages.isEmpty) {
                         return const Center(
                           child: Text(
                             'No messages yet. Say hi 👋',
@@ -118,12 +273,31 @@ class _ConversationPageState extends State<ConversationPage> {
                       return ListView.builder(
                         controller: _scroll,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        itemCount: state.messages.length,
+                        itemCount: messages.length,
                         itemBuilder: (context, i) {
-                          final m = state.messages[i];
-                          return MessageBubble(
+                          final m = messages[i];
+                          final prev = i > 0 ? messages[i - 1] : null;
+                          final mine = m.senderId == currentUserId;
+                          final canModify = mine &&
+                              !m.isPending &&
+                              m.isVisible &&
+                              m.status != 'DELETED';
+                          // WhatsApp: show the sender label only on the
+                          // first message of a consecutive run, groups only.
+                          final showName = !_group.isDirect &&
+                              !mine &&
+                              (prev == null ||
+                                  prev.senderId != m.senderId);
+                          final name = showName
+                              ? (senderNames[m.senderId] ?? '')
+                              : '';
+                          return _MessageRow(
+                            key: ValueKey(m.messageId),
                             message: m,
-                            isMine: m.senderId == currentUserId,
+                            isMine: mine,
+                            senderName: name.isEmpty ? null : name,
+                            canModify: canModify,
+                            onMenu: (pos) => _openMessageMenu(m, pos),
                           );
                         },
                       );
@@ -189,6 +363,57 @@ class _ConversationPageState extends State<ConversationPage> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A message row that "pops" (brief scale-up) on long-press, then surfaces a
+/// dropdown of actions at the press point — WhatsApp-style. The pop plays for
+/// every message; the menu only opens when [canModify] is true.
+class _MessageRow extends StatefulWidget {
+  final MessageEntity message;
+  final bool isMine;
+  final String? senderName;
+  final bool canModify;
+  final void Function(Offset globalPosition) onMenu;
+
+  const _MessageRow({
+    super.key,
+    required this.message,
+    required this.isMine,
+    required this.senderName,
+    required this.canModify,
+    required this.onMenu,
+  });
+
+  @override
+  State<_MessageRow> createState() => _MessageRowState();
+}
+
+class _MessageRowState extends State<_MessageRow> {
+  bool _popped = false;
+
+  Future<void> _onLongPressStart(LongPressStartDetails d) async {
+    setState(() => _popped = true);
+    await Future<void>.delayed(const Duration(milliseconds: 140));
+    if (mounted) setState(() => _popped = false);
+    if (widget.canModify) widget.onMenu(d.globalPosition);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onLongPressStart: _onLongPressStart,
+      child: AnimatedScale(
+        scale: _popped ? 1.06 : 1.0,
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOut,
+        child: MessageBubble(
+          message: widget.message,
+          isMine: widget.isMine,
+          senderName: widget.senderName,
         ),
       ),
     );

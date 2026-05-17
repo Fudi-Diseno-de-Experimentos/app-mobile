@@ -14,6 +14,7 @@ import '../features/chat/presentation/pages/chat_page.dart';
 import '../features/chat/presentation/pages/conversation_page.dart';
 import '../features/chat/presentation/pages/new_chat_page.dart';
 import '../features/chat/presentation/pages/create_group_page.dart';
+import '../features/chat/presentation/pages/edit_group_page.dart';
 import '../features/chat/presentation/bloc/chat_bloc.dart';
 import '../features/chat/presentation/bloc/message_bloc.dart';
 import '../features/chat/domain/entities/group_entity.dart';
@@ -200,6 +201,20 @@ final GoRouter appRouter = GoRouter(
                       child: BlocProvider(
                         create: (_) => sl<ChatBloc>(),
                         child: const NewChatPage(),
+                      ),
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: 'edit-group',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    final group = state.extra as GroupEntity;
+                    return _slideFromRight(
+                      key: state.pageKey,
+                      child: BlocProvider(
+                        create: (_) => sl<ChatBloc>(),
+                        child: EditGroupPage(group: group),
                       ),
                     );
                   },

@@ -102,21 +102,72 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<Either<Failure, GroupEntity>> updateGroup({
+    required String groupId,
+    String? name,
+    String? description,
+    String? imageUrl,
+  }) async {
+    try {
+      final group = await remoteDataSource.updateGroup(
+        groupId,
+        name: name,
+        description: description,
+        imageUrl: imageUrl,
+      );
+      return Right(group);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Stream<MessageEntity> watchMessages(String groupId) {
     return socketDataSource.connect(groupId);
   }
 
   @override
-  void sendMessage({
-    required String groupId,
-    required String senderId,
+  Future<Either<Failure, MessageEntity>> sendMessage({
+    required String chatId,
+    required bool isDirect,
     required String body,
-  }) {
-    socketDataSource.sendMessage(
-      groupId: groupId,
-      senderId: senderId,
-      body: body,
-    );
+  }) async {
+    try {
+      final message = isDirect
+          ? await remoteDataSource.sendConversationMessage(chatId, body)
+          : await remoteDataSource.sendGroupMessage(chatId, body);
+      return Right(message);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, MessageEntity>> editMessage({
+    required String chatId,
+    required String messageId,
+    required String body,
+  }) async {
+    try {
+      final message =
+          await remoteDataSource.editMessage(chatId, messageId, body);
+      return Right(message);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteMessage({
+    required String chatId,
+    required String messageId,
+  }) async {
+    try {
+      await remoteDataSource.deleteMessage(chatId, messageId);
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override

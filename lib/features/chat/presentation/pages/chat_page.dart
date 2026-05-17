@@ -176,10 +176,20 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                         );
                       }
-                      return ListView.builder(
+                      return ListView.separated(
                         padding:
-                            const EdgeInsets.only(top: 8, bottom: 24),
+                            const EdgeInsets.only(top: 4, bottom: 24),
                         itemCount: items.length,
+                        separatorBuilder: (context, _) => Divider(
+                          height: 1,
+                          thickness: 1,
+                          indent: 86,
+                          endIndent: 16,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .secondary
+                              .withValues(alpha: 0.15),
+                        ),
                         itemBuilder: (context, i) {
                           final group = items[i];
                           return ChatItem(
