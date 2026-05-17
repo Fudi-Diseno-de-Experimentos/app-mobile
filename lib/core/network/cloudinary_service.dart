@@ -80,10 +80,32 @@ class CloudinaryService {
     }
   }
 
-  /// 🗜️ Comprimir imagen si excede el tamaño máximo o es muy grande
-  Future<String> _compressImageIfNeeded(String imagePath, ImageConfig config, ImageType imageType) async {
+  /// 🗜️ Comprimir imagen si excede el tamaño máximo o es muy grande.
+  ///
+  /// Preserva el formato de origen para evitar corrupción:
+  /// - GIF/WebP nunca se transcodifican (un GIF perdería su animación y
+  ///   WebP suele fallar al decodificar). El chequeo de tamaño duro previo
+  ///   ya garantiza `fileSize <= config.maxSize`, así que el original es
+  ///   seguro de subir tal cual.
+  /// - PNG se re-encoda como PNG (encodear PNG→JPG vuelve negra la
+  ///   transparencia).
+  /// - JPEG/otros usan el bucle de calidad JPG.
+  /// - Avatares se recortan a cuadrado (sin estirar/distorsionar).
+  Future<String> _compressImageIfNeeded(
+    String imagePath,
+    ImageConfig config,
+    ImageType imageType,
+  ) async {
     final file = File(imagePath);
     final fileSize = await file.length();
+    final ext = imagePath.split('.').last.toLowerCase();
+
+    // Formatos animados / con alfa por intención: no transcodificar.
+    if (ext == 'gif' || ext == 'webp') {
+      return imagePath;
+    }
+
+    final isPng = ext == 'png';
 
     // Si el archivo ya es pequeño, retornar el original
     if (fileSize <= config.maxSize && fileSize < 512 * 1024) {
@@ -98,47 +120,62 @@ class CloudinaryService {
       img.Image? image = img.decodeImage(imageBytes);
 
       if (image == null) {
-        throw Exception('Could not decode the image');
+        // No se pudo decodificar → no arriesgar un re-encode corrupto.
+        print('⚠️ No se pudo decodificar; subiendo original sin tocar.');
+        return imagePath;
       }
 
-      // 📐 Calcular nuevas dimensiones según el tipo
-      final (targetWidth, targetHeight) = _getTargetDimensions(imageType, image);
-
-      // ✂️ Redimensionar imagen manteniendo proporción
-      if (image.width > targetWidth || image.height > targetHeight) {
-        image = img.copyResize(
-          image,
-          width: targetWidth,
-          height: targetHeight,
-          interpolation: img.Interpolation.linear,
-        );
-        print('📐 Redimensionada a: ${image.width}x${image.height}');
-      }
-
-      // 💾 Comprimir con calidad variable hasta alcanzar tamaño objetivo
-      int quality = 85;
-      Uint8List? compressedBytes;
-
-      do {
-        compressedBytes = Uint8List.fromList(
-          img.encodeJpg(image, quality: quality)
-        );
-
-        print('🎛️ Calidad $quality: ${(compressedBytes.length / 1024 / 1024).toStringAsFixed(2)} MB');
-
-        if (compressedBytes.length <= config.maxSize || quality <= 30) {
-          break;
+      if (imageType == ImageType.avatar) {
+        // ✂️ Recorte cuadrado centrado (sin estirar) y tamaño 512.
+        image = img.copyResizeCropSquare(image, size: 512);
+      } else {
+        // 📐 Redimensionar manteniendo proporción
+        final (targetWidth, targetHeight) =
+            _getTargetDimensions(imageType, image);
+        if (image.width > targetWidth || image.height > targetHeight) {
+          image = img.copyResize(
+            image,
+            width: targetWidth,
+            height: targetHeight,
+            interpolation: img.Interpolation.linear,
+          );
+          print('📐 Redimensionada a: ${image.width}x${image.height}');
         }
+      }
 
-        quality -= 15; // Reducir calidad gradualmente
-      } while (compressedBytes.length > config.maxSize);
+      late Uint8List outBytes;
+      late String outExt;
+
+      if (isPng) {
+        // Mantener alfa — PNG→JPG volvería negra la transparencia.
+        outBytes = Uint8List.fromList(img.encodePng(image));
+        outExt = 'png';
+      } else {
+        // 💾 Comprimir con calidad variable hasta alcanzar tamaño objetivo
+        int quality = 85;
+        Uint8List bytes;
+        do {
+          bytes = Uint8List.fromList(img.encodeJpg(image, quality: quality));
+          print(
+            '🎛️ Calidad $quality: ${(bytes.length / 1024 / 1024).toStringAsFixed(2)} MB',
+          );
+          if (bytes.length <= config.maxSize || quality <= 30) break;
+          quality -= 15;
+        } while (bytes.length > config.maxSize);
+        outBytes = bytes;
+        outExt = 'jpg';
+      }
 
       // 📁 Guardar archivo comprimido temporalmente
       final tempDir = await getTemporaryDirectory();
-      final compressedFile = File('${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg');
-      await compressedFile.writeAsBytes(compressedBytes);
+      final compressedFile = File(
+        '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.$outExt',
+      );
+      await compressedFile.writeAsBytes(outBytes);
 
-      print('✅ Imagen comprimida final: ${(compressedBytes.length / 1024 / 1024).toStringAsFixed(2)} MB');
+      print(
+        '✅ Imagen comprimida final: ${(outBytes.length / 1024 / 1024).toStringAsFixed(2)} MB ($outExt)',
+      );
 
       return compressedFile.path;
     } catch (e) {

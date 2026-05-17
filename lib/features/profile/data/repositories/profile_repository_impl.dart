@@ -30,6 +30,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
     try {
       final profileModel = ProfileModel(
         id: profile.id,
+        userId: profile.userId,
         username: profile.username,
         name: profile.name,
         lastname: profile.lastname,

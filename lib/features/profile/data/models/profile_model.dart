@@ -3,6 +3,7 @@ import '../../domain/entities/profile_entity.dart';
 class ProfileModel extends ProfileEntity {
   const ProfileModel({
     required super.id,
+    super.userId,
     required super.username,
     required super.name,
     required super.lastname,
@@ -15,6 +16,7 @@ class ProfileModel extends ProfileEntity {
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
       id: json['profileId']?.toString() ?? json['id']?.toString() ?? '',
+      userId: json['userId']?.toString() ?? '',
       username: json['username'] ?? '',
       name: json['firstName'] ?? json['name'] ?? '',
       lastname: json['lastName'] ?? json['lastname'] ?? '',

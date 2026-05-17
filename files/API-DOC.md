@@ -1,4 +1,4 @@
-de# API endpoints (resumen basico)
+# API endpoints (resumen basico)
 
 ## Convenciones
 - Base path: `/api/v1`
@@ -106,6 +106,14 @@ de# API endpoints (resumen basico)
 - `PUT /api/v1/groups/{groupId}/messages/{messageId}` auth: Bearer + company. Body: `UpdateMessageBodyResource`. Resp: `MessageResource`
 - `PATCH /api/v1/groups/{groupId}/messages/{messageId}/status` auth: Bearer + company. Body: `UpdateMessageStatusResource`. Resp: `MessageResource`
 - `DELETE /api/v1/groups/{groupId}/messages/{messageId}` auth: Bearer + company. Resp: 204
+
+### Chat - Direct Conversations (1 a 1, estilo WhatsApp)
+- Conversación directa = grupo interno de tipo `DIRECT` (2 miembros, misma compañía). No aparece en los endpoints de `/api/v1/groups`.
+- `POST /api/v1/conversations` auth: Bearer + company. Body: `CreateConversationResource`. Resp: `ConversationResource` (201). Idempotente (get-or-create). El iniciador se deriva del JWT; el destino debe ser de la misma compañía.
+- `GET /api/v1/conversations` auth: Bearer + company. Resp: `ConversationResource[]` (mis conversaciones directas)
+- `GET /api/v1/conversations/{conversationId}/messages` auth: Bearer + company + participante. Resp: `MessageResource[]`
+- `POST /api/v1/conversations/{conversationId}/messages` auth: Bearer + company + participante. Body: `CreateMessageResource` (`senderId` ignorado, se toma del JWT). Resp: `MessageResource` (201)
+- Tiempo real: igual que grupos, vía WebSocket `/ws-chat` y `/topic/group.{conversationId}`.
 
 ### Chat - Images
 - `POST /api/v1/groups/{groupId}/images` auth: Bearer. Body: `CreateChatImageResource`. Resp: `ChatImageResource` (201)
@@ -581,9 +589,28 @@ de# API endpoints (resumen basico)
   "description": "string|null",
   "imageUrl": "string|null",
   "visibility": "string",
+  "type": "string (GROUP|DIRECT)",
   "memberIds": "array<uuid>",
   "memberCount": "number",
   "createdBy": "uuid",
+  "createdAt": "date",
+  "updatedAt": "date"
+}
+```
+
+### Chat - Direct Conversations
+**CreateConversationResource**
+```json
+{
+  "targetUserId": "uuid"
+}
+```
+**ConversationResource**
+```json
+{
+  "id": "uuid",
+  "otherUserId": "uuid",
+  "memberIds": "array<uuid>",
   "createdAt": "date",
   "updatedAt": "date"
 }
@@ -593,7 +620,7 @@ de# API endpoints (resumen basico)
 **CreateMessageResource**
 ```json
 {
-  "senderId": "uuid",
+  "senderId": "uuid (DEPRECATED, ignorado: el remitente se deriva del JWT)",
   "body": "string"
 }
 ```
