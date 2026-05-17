@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/announcement_entity.dart';
+import 'priority_dot.dart';
 
 class AnnouncementCard extends StatelessWidget {
   final AnnouncementEntity item;
@@ -34,8 +35,12 @@ class AnnouncementCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 6, right: 10),
+                  child: PriorityDot(priority: item.priority),
+                ),
                 Expanded(
                   child: Text(
                     item.title,
@@ -45,7 +50,6 @@ class AnnouncementCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                _buildPriorityBadge(context, item.priority),
               ],
             ),
             const SizedBox(height: 12),
@@ -94,39 +98,6 @@ class AnnouncementCard extends StatelessWidget {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriorityBadge(BuildContext context, String priority) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
-    Color badgeColor;
-    switch (priority.toUpperCase()) {
-      case 'URGENT':
-        badgeColor = colorScheme.error;
-        break;
-      case 'HIGH':
-        badgeColor = Colors.orange;
-        break;
-      default:
-        badgeColor = colorScheme.primary;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: badgeColor.withValues(alpha: 0.5)),
-      ),
-      child: Text(
-        priority,
-        style: TextStyle(
-          color: badgeColor,
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
         ),
       ),
     );

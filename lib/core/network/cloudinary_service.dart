@@ -33,7 +33,7 @@ class CloudinaryService {
 
       if (fileSize > config.maxSize) {
         print('❌ Archivo demasiado grande: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB > ${(config.maxSize / 1024 / 1024).toStringAsFixed(2)} MB');
-        throw Exception('Imagen demasiado grande. Máximo ${(config.maxSize / 1024 / 1024).toStringAsFixed(1)}MB');
+        throw Exception('Image too large. Maximum ${(config.maxSize / 1024 / 1024).toStringAsFixed(1)}MB');
       }
 
       // 🗜️ Comprimir imagen si es necesario (opcional, podrías omitirlo si prefieres subir el original)
@@ -98,7 +98,7 @@ class CloudinaryService {
       img.Image? image = img.decodeImage(imageBytes);
 
       if (image == null) {
-        throw Exception('No se pudo decodificar la imagen');
+        throw Exception('Could not decode the image');
       }
 
       // 📐 Calcular nuevas dimensiones según el tipo

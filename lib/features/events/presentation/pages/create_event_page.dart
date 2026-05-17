@@ -4,12 +4,15 @@ import 'package:go_router/go_router.dart';
 import '../../../profile/domain/entities/profile_entity.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_state.dart';
+import '../../domain/entities/event_entity.dart';
 import '../bloc/event_bloc.dart';
 import '../bloc/event_event.dart';
 import '../bloc/event_state.dart';
 
 class CreateEventPage extends StatefulWidget {
-  const CreateEventPage({super.key});
+  final EventEntity? event;
+
+  const CreateEventPage({super.key, this.event});
 
   @override
   State<CreateEventPage> createState() => _CreateEventPageState();
@@ -27,9 +30,23 @@ class _CreateEventPageState extends State<CreateEventPage> {
   List<ProfileEntity> _members = [];
   final Set<String> _selectedRecipientIds = {};
 
+  bool get _isEditMode => widget.event != null;
+
   @override
   void initState() {
     super.initState();
+    final existing = widget.event;
+    if (existing != null) {
+      _titleController.text = existing.title;
+      _descriptionController.text = existing.description;
+      _locationController.text = existing.location;
+      _selectedRecipientIds.addAll(existing.recipientIds);
+      try {
+        final parsed = DateTime.parse(existing.date);
+        _selectedDate = DateTime(parsed.year, parsed.month, parsed.day);
+        _selectedTime = TimeOfDay(hour: parsed.hour, minute: parsed.minute);
+      } catch (_) {}
+    }
     final profileState = context.read<ProfileBloc>().state;
     String? companyId;
     if (profileState is ProfileLoaded) {
@@ -52,11 +69,18 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
   Future<void> _selectDate() async {
     final colorScheme = Theme.of(context).colorScheme;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final initial = _selectedDate ?? now;
+    final firstDate =
+        _selectedDate != null && _selectedDate!.isBefore(today)
+            ? _selectedDate!
+            : today;
     final pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDate: initial,
+      firstDate: firstDate,
+      lastDate: now.add(const Duration(days: 365)),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -77,7 +101,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
     final colorScheme = Theme.of(context).colorScheme;
     final pickedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: _selectedTime ?? TimeOfDay.now(),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -125,6 +149,21 @@ class _CreateEventPageState extends State<CreateEventPage> {
       _selectedTime!.minute,
     );
 
+    final existing = widget.event;
+    if (existing != null) {
+      context.read<EventBloc>().add(
+            UpdateEventRequested(
+              id: existing.id,
+              title: _titleController.text,
+              description: _descriptionController.text,
+              date: scheduled.toIso8601String(),
+              location: _locationController.text,
+              recipientIds: _selectedRecipientIds.toList(),
+            ),
+          );
+      return;
+    }
+
     final profileState = context.read<ProfileBloc>().state;
     String userId = '00000000-0000-0000-0000-000000000000';
     if (profileState is ProfileLoaded) {
@@ -166,6 +205,11 @@ class _CreateEventPageState extends State<CreateEventPage> {
             const SnackBar(content: Text('Event created successfully!')),
           );
           context.pop();
+        } else if (state is EventUpdateSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Event updated successfully!')),
+          );
+          context.pop();
         } else if (state is EventError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -178,7 +222,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
       child: Scaffold(
         backgroundColor: colorScheme.surface,
         appBar: AppBar(
-          title: Text('Create Event', style: TextStyle(color: colorScheme.onSurface)),
+          title: Text(
+            _isEditMode ? 'Edit Event' : 'Create Event',
+            style: TextStyle(color: colorScheme.onSurface),
+          ),
           backgroundColor: colorScheme.surface,
           elevation: 0,
           leading: IconButton(
@@ -195,7 +242,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'New Event Details',
+                    _isEditMode ? 'Edit Event Details' : 'New Event Details',
                     style: textTheme.headlineSmall?.copyWith(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
@@ -203,7 +250,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Establish a new official company event. Only Admins and Managers can perform this action.',
+                    _isEditMode
+                        ? 'Update the event details below and save your changes.'
+                        : 'Establish a new official company event. Only Admins and Managers can perform this action.',
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
@@ -314,9 +363,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
                                     color: colorScheme.surface,
                                   ),
                                 )
-                              : const Text(
-                                  'Create Event',
-                                  style: TextStyle(
+                              : Text(
+                                  _isEditMode ? 'Save Changes' : 'Create Event',
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),

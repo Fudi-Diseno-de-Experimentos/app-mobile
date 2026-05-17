@@ -24,6 +24,9 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         if (userResponse.data != null && userResponse.data is Map) {
           final userData = userResponse.data as Map<String, dynamic>;
           profileData['roles'] = userData['roles'];
+          // ProfileResource has no `username`; UserResource does. Merge it
+          // so ProfileEntity.username is populated.
+          profileData['username'] = userData['username'];
         }
       } catch (e) {
         // Fallback if user details endpoint fails

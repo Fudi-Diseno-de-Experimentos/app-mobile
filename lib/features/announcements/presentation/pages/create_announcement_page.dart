@@ -5,12 +5,15 @@ import '../../../../shared/widgets/image_upload_picker.dart';
 import '../../../../core/network/cloudinary_config.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_state.dart';
+import '../../domain/entities/announcement_entity.dart';
 import '../bloc/announcement_bloc.dart';
 import '../bloc/announcement_event.dart';
 import '../bloc/announcement_state.dart';
 
 class CreateAnnouncementPage extends StatefulWidget {
-  const CreateAnnouncementPage({super.key});
+  final AnnouncementEntity? announcement;
+
+  const CreateAnnouncementPage({super.key, this.announcement});
 
   @override
   State<CreateAnnouncementPage> createState() => _CreateAnnouncementPageState();
@@ -25,6 +28,22 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
 
   final List<String> _priorities = ['NORMAL', 'HIGH', 'URGENT'];
 
+  bool get _isEditMode => widget.announcement != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final existing = widget.announcement;
+    if (existing != null) {
+      _titleController.text = existing.title;
+      _descriptionController.text = existing.description;
+      _priority = _priorities.contains(existing.priority)
+          ? existing.priority
+          : 'NORMAL';
+      _uploadedImageUrl = existing.image;
+    }
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -33,26 +52,40 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      final profileState = context.read<ProfileBloc>().state;
-      String userId = '00000000-0000-0000-0000-000000000000'; // Fallback
+    if (!_formKey.currentState!.validate()) return;
 
-      if (profileState is ProfileLoaded) {
-        userId = profileState.profile.id;
-      } else if (profileState is ProfileUpdateSuccess) {
-        userId = profileState.profile.id;
-      }
-
+    final existing = widget.announcement;
+    if (existing != null) {
       context.read<AnnouncementBloc>().add(
-            CreateAnnouncementRequested(
+            UpdateAnnouncementRequested(
+              id: existing.id,
               title: _titleController.text,
               description: _descriptionController.text,
               priority: _priority,
               image: _uploadedImageUrl,
-              createdBy: userId,
             ),
           );
+      return;
     }
+
+    final profileState = context.read<ProfileBloc>().state;
+    String userId = '00000000-0000-0000-0000-000000000000'; // Fallback
+
+    if (profileState is ProfileLoaded) {
+      userId = profileState.profile.id;
+    } else if (profileState is ProfileUpdateSuccess) {
+      userId = profileState.profile.id;
+    }
+
+    context.read<AnnouncementBloc>().add(
+          CreateAnnouncementRequested(
+            title: _titleController.text,
+            description: _descriptionController.text,
+            priority: _priority,
+            image: _uploadedImageUrl,
+            createdBy: userId,
+          ),
+        );
   }
 
   @override
@@ -67,6 +100,11 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
             const SnackBar(content: Text('Announcement published successfully!')),
           );
           context.pop();
+        } else if (state is AnnouncementUpdateSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Announcement updated successfully!')),
+          );
+          context.pop();
         } else if (state is AnnouncementError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: colorScheme.error),
@@ -77,7 +115,7 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
         backgroundColor: colorScheme.surface,
         appBar: AppBar(
           title: Text(
-            'Create Announcement',
+            _isEditMode ? 'Edit Announcement' : 'Create Announcement',
             style: TextStyle(color: colorScheme.onSurface),
           ),
           backgroundColor: colorScheme.surface,
@@ -96,7 +134,7 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "New Announcement",
+                    _isEditMode ? "Edit Announcement" : "New Announcement",
                     style: textTheme.headlineSmall?.copyWith(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
@@ -104,7 +142,9 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Fill out the details below to broadcast a new announcement to your company feed.",
+                    _isEditMode
+                        ? "Update the details below and save your changes."
+                        : "Fill out the details below to broadcast a new announcement to your company feed.",
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
@@ -201,9 +241,11 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                                     color: colorScheme.surface,
                                   ),
                                 )
-                              : const Text(
-                                  'Publish Announcement',
-                                  style: TextStyle(
+                              : Text(
+                                  _isEditMode
+                                      ? 'Save Changes'
+                                      : 'Publish Announcement',
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
