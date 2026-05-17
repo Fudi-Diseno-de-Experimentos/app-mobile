@@ -8,6 +8,7 @@ import '../domain/repositories/comment_repository.dart';
 import '../domain/usecases/get_announcements_usecase.dart';
 import '../domain/usecases/get_announcement_by_id_usecase.dart';
 import '../domain/usecases/get_announcements_by_priority_usecase.dart';
+import '../domain/usecases/get_announcements_by_creator_usecase.dart';
 import '../domain/usecases/create_announcement_usecase.dart';
 import '../domain/usecases/update_announcement_usecase.dart';
 import '../domain/usecases/delete_announcement_usecase.dart';
@@ -38,6 +39,7 @@ void initAnnouncementDependencies() {
   sl.registerLazySingleton(() => GetAnnouncementsUseCase(sl()));
   sl.registerLazySingleton(() => GetAnnouncementByIdUseCase(sl()));
   sl.registerLazySingleton(() => GetAnnouncementsByPriorityUseCase(sl()));
+  sl.registerLazySingleton(() => GetAnnouncementsByCreatorUseCase(sl()));
   sl.registerLazySingleton(() => CreateAnnouncementUseCase(sl()));
   sl.registerLazySingleton(() => UpdateAnnouncementUseCase(sl()));
   sl.registerLazySingleton(() => DeleteAnnouncementUseCase(sl()));
@@ -51,6 +53,7 @@ void initAnnouncementDependencies() {
       getAnnouncementsUseCase: sl(),
       getAnnouncementByIdUseCase: sl(),
       getAnnouncementsByPriorityUseCase: sl(),
+      getAnnouncementsByCreatorUseCase: sl(),
       createAnnouncementUseCase: sl(),
       updateAnnouncementUseCase: sl(),
       deleteAnnouncementUseCase: sl(),

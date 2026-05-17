@@ -5,6 +5,7 @@ abstract class AnnouncementRemoteDataSource {
   Future<List<AnnouncementModel>> getAnnouncements();
   Future<AnnouncementModel> getAnnouncementById(String id);
   Future<List<AnnouncementModel>> getAnnouncementsByPriority(String priority);
+  Future<List<AnnouncementModel>> getAnnouncementsByCreator(String createdBy);
   Future<AnnouncementModel> createAnnouncement({
     required String title,
     required String description,
@@ -49,6 +50,18 @@ class AnnouncementRemoteDataSourceImpl implements AnnouncementRemoteDataSource {
   Future<List<AnnouncementModel>> getAnnouncementsByPriority(
       String priority) async {
     final response = await apiClient.get('/announcements/priority/$priority');
+    if (response.data != null && response.data is List) {
+      return (response.data as List)
+          .map((json) => AnnouncementModel.fromJson(json))
+          .toList();
+    }
+    return [];
+  }
+
+  @override
+  Future<List<AnnouncementModel>> getAnnouncementsByCreator(
+      String createdBy) async {
+    final response = await apiClient.get('/announcements/creator/$createdBy');
     if (response.data != null && response.data is List) {
       return (response.data as List)
           .map((json) => AnnouncementModel.fromJson(json))

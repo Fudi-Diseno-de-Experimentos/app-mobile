@@ -52,7 +52,7 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
       if (!status.isGranted) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Se requiere permiso de cámara')),
+            const SnackBar(content: Text('Camera permission required')),
           );
         }
         return;
@@ -65,7 +65,7 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
           if (!storageStatus.isGranted) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Se requiere permiso de galería')),
+                const SnackBar(content: Text('Gallery permission required')),
               );
             }
             return;
@@ -104,7 +104,7 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
           } else {
             _currentImageUrl = widget.initialImageUrl;
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Error al subir la imagen a la nube')),
+              const SnackBar(content: Text('Failed to upload image to the cloud')),
             );
           }
         });
@@ -120,7 +120,7 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Galería'),
+              title: const Text('Gallery'),
               onTap: () {
                 Navigator.of(context).pop();
                 _pickImage(ImageSource.gallery);
@@ -128,7 +128,7 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_camera),
-              title: const Text('Cámara'),
+              title: const Text('Camera'),
               onTap: () {
                 Navigator.of(context).pop();
                 _pickImage(ImageSource.camera);
@@ -150,7 +150,7 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
       children: [
         if (!isAvatar) ...[
           Text(
-            'Imagen del Anuncio',
+            'Announcement Image',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: colorScheme.onSurface,
                 ),
@@ -228,7 +228,7 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
                           if (!isAvatar) ...[
                             const SizedBox(height: 8),
                             Text(
-                              'Toca para subir una imagen',
+                              'Tap to upload an image',
                               style: TextStyle(color: colorScheme.primary),
                             ),
                           ],

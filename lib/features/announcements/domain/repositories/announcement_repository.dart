@@ -8,6 +8,9 @@ abstract class AnnouncementRepository {
   Future<Either<Failure, List<AnnouncementEntity>>> getAnnouncementsByPriority(
     String priority,
   );
+  Future<Either<Failure, List<AnnouncementEntity>>> getAnnouncementsByCreator(
+    String createdBy,
+  );
   Future<Either<Failure, AnnouncementEntity>> createAnnouncement({
     required String title,
     required String description,

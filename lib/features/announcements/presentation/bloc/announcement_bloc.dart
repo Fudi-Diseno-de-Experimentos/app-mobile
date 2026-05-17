@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/usecases/get_announcements_usecase.dart';
 import '../../domain/usecases/get_announcement_by_id_usecase.dart';
 import '../../domain/usecases/get_announcements_by_priority_usecase.dart';
+import '../../domain/usecases/get_announcements_by_creator_usecase.dart';
 import '../../domain/usecases/create_announcement_usecase.dart';
 import '../../domain/usecases/update_announcement_usecase.dart';
 import '../../domain/usecases/delete_announcement_usecase.dart';
@@ -12,6 +13,7 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
   final GetAnnouncementsUseCase getAnnouncementsUseCase;
   final GetAnnouncementByIdUseCase getAnnouncementByIdUseCase;
   final GetAnnouncementsByPriorityUseCase getAnnouncementsByPriorityUseCase;
+  final GetAnnouncementsByCreatorUseCase getAnnouncementsByCreatorUseCase;
   final CreateAnnouncementUseCase createAnnouncementUseCase;
   final UpdateAnnouncementUseCase updateAnnouncementUseCase;
   final DeleteAnnouncementUseCase deleteAnnouncementUseCase;
@@ -20,12 +22,14 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
     required this.getAnnouncementsUseCase,
     required this.getAnnouncementByIdUseCase,
     required this.getAnnouncementsByPriorityUseCase,
+    required this.getAnnouncementsByCreatorUseCase,
     required this.createAnnouncementUseCase,
     required this.updateAnnouncementUseCase,
     required this.deleteAnnouncementUseCase,
   }) : super(AnnouncementInitial()) {
     on<FetchAnnouncements>(_onFetchAnnouncements);
     on<FetchAnnouncementsByPriority>(_onFetchAnnouncementsByPriority);
+    on<FetchAnnouncementsByCreator>(_onFetchAnnouncementsByCreator);
     on<FetchAnnouncementById>(_onFetchAnnouncementById);
     on<CreateAnnouncementRequested>(_onCreateAnnouncementRequested);
     on<UpdateAnnouncementRequested>(_onUpdateAnnouncementRequested);
@@ -53,6 +57,21 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
     final result = (priority == null || priority.isEmpty)
         ? await getAnnouncementsUseCase()
         : await getAnnouncementsByPriorityUseCase(priority);
+    result.fold(
+      (failure) => emit(AnnouncementError(failure.message)),
+      (announcements) => emit(AnnouncementLoaded(announcements)),
+    );
+  }
+
+  Future<void> _onFetchAnnouncementsByCreator(
+    FetchAnnouncementsByCreator event,
+    Emitter<AnnouncementState> emit,
+  ) async {
+    emit(AnnouncementLoading());
+    final createdBy = event.createdBy;
+    final result = (createdBy == null || createdBy.isEmpty)
+        ? await getAnnouncementsUseCase()
+        : await getAnnouncementsByCreatorUseCase(createdBy);
     result.fold(
       (failure) => emit(AnnouncementError(failure.message)),
       (announcements) => emit(AnnouncementLoaded(announcements)),

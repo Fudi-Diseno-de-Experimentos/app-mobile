@@ -10,6 +10,7 @@ import '../../../events/presentation/bloc/event_bloc.dart';
 import '../../../events/presentation/bloc/event_event.dart';
 import '../../../events/presentation/bloc/event_state.dart';
 import '../../../events/domain/entities/event_entity.dart';
+import '../../../announcements/presentation/widgets/priority_dot.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -48,7 +49,7 @@ class _HomeContent extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
                 child: Text(
-                  'Inicio',
+                  'Home',
                   style: textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
@@ -59,19 +60,19 @@ class _HomeContent extends StatelessWidget {
 
             // Latest Chats
             SliverToBoxAdapter(
-              child: _SectionHeader(title: 'CHATS RECIENTES'),
+              child: _SectionHeader(title: 'RECENT CHATS'),
             ),
             const SliverToBoxAdapter(child: _LatestChatsSection()),
 
             // Company Announcements
             SliverToBoxAdapter(
-              child: _SectionHeader(title: 'ANUNCIOS DE LA EMPRESA'),
+              child: _SectionHeader(title: 'COMPANY ANNOUNCEMENTS'),
             ),
             const SliverToBoxAdapter(child: _AnnouncementsSection()),
 
             // Events
             SliverToBoxAdapter(
-              child: _SectionHeader(title: 'EVENTOS'),
+              child: _SectionHeader(title: 'EVENTS'),
             ),
             const _EventsSection(),
 
@@ -132,7 +133,7 @@ class _LatestChatsSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Sin chats recientes',
+                  'No recent chats',
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurface.withValues(alpha: 0.45),
                   ),
@@ -174,7 +175,7 @@ class _AnnouncementsSection extends StatelessWidget {
           if (state.announcements.isEmpty) {
             return _EmptyHint(
               icon: Icons.campaign_outlined,
-              label: 'Sin anuncios recientes',
+              label: 'No recent announcements',
             );
           }
           return SizedBox(
@@ -207,12 +208,6 @@ class _AnnouncementMiniCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final badgeColor = switch (item.priority.toUpperCase()) {
-      'URGENT' => colorScheme.error,
-      'HIGH' => Colors.orange,
-      _ => colorScheme.primary,
-    };
-
     return GestureDetector(
       onTap: () async {
         await context.push('/home/announcement', extra: item);
@@ -241,28 +236,9 @@ class _AnnouncementMiniCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: badgeColor,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    item.priority,
-                    style: textTheme.labelSmall?.copyWith(
-                      color: badgeColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+            Align(
+              alignment: Alignment.centerLeft,
+              child: PriorityDot(priority: item.priority, size: 10),
             ),
             const SizedBox(height: 8),
             Text(
@@ -323,7 +299,7 @@ class _EventsSection extends StatelessWidget {
             return SliverToBoxAdapter(
               child: _EmptyHint(
                 icon: Icons.event_outlined,
-                label: 'Sin eventos próximos',
+                label: 'No upcoming events',
               ),
             );
           }
@@ -425,7 +401,7 @@ class _EventMiniCard extends StatelessWidget {
                       const SizedBox(width: 3),
                       Expanded(
                         child: Text(
-                          item.location.isEmpty ? 'Sin ubicación' : item.location,
+                          item.location.isEmpty ? 'No location' : item.location,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: textTheme.bodySmall?.copyWith(

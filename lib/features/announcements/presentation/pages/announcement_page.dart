@@ -14,6 +14,7 @@ import '../bloc/announcement_state.dart';
 import '../bloc/comment_bloc.dart';
 import '../bloc/comment_event.dart';
 import '../bloc/comment_state.dart';
+import '../widgets/priority_dot.dart';
 
 class AnnouncementPage extends StatefulWidget {
   final AnnouncementEntity announcement;
@@ -209,7 +210,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             onPressed: () => context.pop(),
           ),
           title: Text(
-            'Anuncio',
+            'Announcement',
             style: TextStyle(color: colorScheme.onSurface),
           ),
           actions: [
@@ -257,6 +258,13 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6, right: 12),
+                      child: PriorityDot(
+                        priority: announcement.priority,
+                        size: 14,
+                      ),
+                    ),
                     Expanded(
                       child: Text(
                         announcement.title,
@@ -266,8 +274,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    _PriorityBadge(priority: announcement.priority),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -315,7 +321,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                 const SizedBox(height: 16),
 
                 Text(
-                  'Comentarios',
+                  'Comments',
                   style: textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
@@ -476,13 +482,35 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             ),
           ),
           if (_canDeleteComment(context, comment))
-            InkWell(
-              onTap: () => _confirmDeleteComment(context, comment),
-              child: Icon(
-                Icons.delete_outline,
+            PopupMenuButton<String>(
+              icon: Icon(
+                Icons.more_vert,
                 size: 18,
-                color: colorScheme.error,
+                color: colorScheme.onSurface.withValues(alpha: 0.5),
               ),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+              onSelected: (value) {
+                if (value == 'delete') {
+                  _confirmDeleteComment(context, comment);
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_outline,
+                          size: 20, color: colorScheme.error),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Delete',
+                        style: TextStyle(color: colorScheme.error),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
         ],
       ),
@@ -503,35 +531,3 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   }
 }
 
-class _PriorityBadge extends StatelessWidget {
-  final String priority;
-
-  const _PriorityBadge({required this.priority});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final color = switch (priority.toUpperCase()) {
-      'URGENT' => colorScheme.error,
-      'HIGH' => Colors.orange,
-      _ => colorScheme.primary,
-    };
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
-      ),
-      child: Text(
-        priority,
-        style: TextStyle(
-          color: color,
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-}

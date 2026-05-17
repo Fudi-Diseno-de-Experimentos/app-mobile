@@ -20,6 +20,18 @@ class FetchAnnouncementsByPriority extends AnnouncementEvent {
   List<Object> get props => [priority ?? ''];
 }
 
+/// Fetch announcements filtered by creator
+/// (`GET /announcements/creator/{createdBy}`). A null/empty [createdBy] loads
+/// all (`GET /announcements`).
+class FetchAnnouncementsByCreator extends AnnouncementEvent {
+  final String? createdBy;
+
+  const FetchAnnouncementsByCreator(this.createdBy);
+
+  @override
+  List<Object> get props => [createdBy ?? ''];
+}
+
 /// Fetch a single announcement (`GET /announcements/{id}`) for a fresh detail
 /// view instead of relying on possibly-stale route-passed data.
 class FetchAnnouncementById extends AnnouncementEvent {
