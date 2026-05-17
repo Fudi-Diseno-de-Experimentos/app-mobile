@@ -11,6 +11,12 @@ import '../features/profile/presentation/pages/update_profile_page.dart';
 import '../features/profile/domain/entities/profile_entity.dart';
 import '../shared/widgets/main_layout.dart';
 import '../features/chat/presentation/pages/chat_page.dart';
+import '../features/chat/presentation/pages/conversation_page.dart';
+import '../features/chat/presentation/pages/new_chat_page.dart';
+import '../features/chat/presentation/pages/create_group_page.dart';
+import '../features/chat/presentation/bloc/chat_bloc.dart';
+import '../features/chat/presentation/bloc/message_bloc.dart';
+import '../features/chat/domain/entities/group_entity.dart';
 import '../features/feed/presentation/pages/company_feed_page.dart';
 import '../features/announcements/presentation/pages/announcement_page.dart';
 import '../features/announcements/presentation/pages/create_announcement_page.dart';
@@ -23,7 +29,6 @@ import '../features/events/presentation/pages/event_page.dart';
 import '../features/events/presentation/bloc/event_bloc.dart';
 import '../features/home/presentation/pages/home_page.dart';
 import '../features/iam/presentation/bloc/iam_bloc.dart';
-import '../shared/widgets/main_app_bar.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -167,10 +172,52 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/messages',
-              builder: (context, state) => Scaffold(
-                appBar: const MainAppBar(title: 'Messages'),
-                body: const ChatPage(),
+              builder: (context, state) => BlocProvider(
+                create: (_) => sl<ChatBloc>(),
+                child: const ChatPage(),
               ),
+              routes: [
+                GoRoute(
+                  path: 'conversation',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    final group = state.extra as GroupEntity;
+                    return _slideFromRight(
+                      key: state.pageKey,
+                      child: BlocProvider(
+                        create: (_) => sl<MessageBloc>(),
+                        child: ConversationPage(group: group),
+                      ),
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: 'new-chat',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    return _slideFromRight(
+                      key: state.pageKey,
+                      child: BlocProvider(
+                        create: (_) => sl<ChatBloc>(),
+                        child: const NewChatPage(),
+                      ),
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: 'new-group',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  pageBuilder: (context, state) {
+                    return _slideFromRight(
+                      key: state.pageKey,
+                      child: BlocProvider(
+                        create: (_) => sl<ChatBloc>(),
+                        child: const CreateGroupPage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         ),

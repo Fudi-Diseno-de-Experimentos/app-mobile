@@ -15,6 +15,7 @@ import '../features/profile/di/profile_dependency_injector.dart';
 import '../features/announcements/di/announcement_dependency_injector.dart';
 import '../features/events/di/event_dependency_injector.dart';
 import '../features/analytics/di/analytics_dependency_injector.dart';
+import '../features/chat/di/chat_dependency_injector.dart';
 
 final sl = GetIt.instance;
 
@@ -64,4 +65,5 @@ Future<void> initDependencies() async {
   initAnnouncementDependencies();
   initEventDependencies();
   initAnalyticsDependencies();
+  initChatDependencies();
 }
