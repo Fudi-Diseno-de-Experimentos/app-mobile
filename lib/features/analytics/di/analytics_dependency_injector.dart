@@ -4,6 +4,12 @@ import '../data/repositories/analytics_repository_impl.dart';
 import '../domain/repositories/analytics_repository.dart';
 import '../domain/usecases/register_announcement_view_usecase.dart';
 import '../domain/usecases/register_event_view_usecase.dart';
+import '../domain/usecases/get_announcement_stats_usecase.dart';
+import '../domain/usecases/get_event_stats_usecase.dart';
+import '../domain/usecases/get_announcement_viewers_usecase.dart';
+import '../domain/usecases/get_event_viewers_usecase.dart';
+import '../domain/usecases/get_user_announcement_views_usecase.dart';
+import '../domain/usecases/get_user_event_views_usecase.dart';
 import '../presentation/bloc/analytics_bloc.dart';
 
 void initAnalyticsDependencies() {
@@ -20,12 +26,25 @@ void initAnalyticsDependencies() {
   // UseCases
   sl.registerLazySingleton(() => RegisterAnnouncementViewUseCase(sl()));
   sl.registerLazySingleton(() => RegisterEventViewUseCase(sl()));
+  sl.registerLazySingleton(() => GetAnnouncementStatsUseCase(sl()));
+  sl.registerLazySingleton(() => GetEventStatsUseCase(sl()));
+  sl.registerLazySingleton(() => GetAnnouncementViewersUseCase(sl()));
+  sl.registerLazySingleton(() => GetEventViewersUseCase(sl()));
+  sl.registerLazySingleton(() => GetUserAnnouncementViewsUseCase(sl()));
+  sl.registerLazySingleton(() => GetUserEventViewsUseCase(sl()));
 
-  // BLoC — singleton: telemetry sink shared app-wide, invoked directly via sl.
-  sl.registerLazySingleton(
+  // BLoC — factory: isolated instance per detail page and member profile page to avoid state collision.
+  sl.registerFactory(
     () => AnalyticsBloc(
       registerAnnouncementViewUseCase: sl(),
       registerEventViewUseCase: sl(),
+      getAnnouncementStatsUseCase: sl(),
+      getEventStatsUseCase: sl(),
+      getAnnouncementViewersUseCase: sl(),
+      getEventViewersUseCase: sl(),
+      getUserAnnouncementViewsUseCase: sl(),
+      getUserEventViewsUseCase: sl(),
     ),
   );
 }
+

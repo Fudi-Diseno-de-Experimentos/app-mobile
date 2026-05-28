@@ -32,3 +32,32 @@ class RegisterEventView extends AnalyticsEvent {
   @override
   List<Object> get props => [eventId, userId];
 }
+
+class FetchStatsAndViewersRequested extends AnalyticsEvent {
+  final String contentId;
+  final bool isEvent;
+  final bool forceRefresh;
+
+  const FetchStatsAndViewersRequested({
+    required this.contentId,
+    required this.isEvent,
+    this.forceRefresh = false,
+  });
+
+  @override
+  List<Object> get props => [contentId, isEvent, forceRefresh];
+}
+
+class FetchUserViewHistoryRequested extends AnalyticsEvent {
+  final String userId;
+  final bool forceRefresh;
+
+  const FetchUserViewHistoryRequested({
+    required this.userId,
+    this.forceRefresh = false,
+  });
+
+  @override
+  List<Object> get props => [userId, forceRefresh];
+}
+

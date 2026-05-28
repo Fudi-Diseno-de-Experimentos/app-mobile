@@ -1,4 +1,8 @@
 import 'package:equatable/equatable.dart';
+import '../../domain/entities/content_stats_entity.dart';
+import '../../domain/entities/viewer_entity.dart';
+import '../../domain/entities/user_announcement_view_entity.dart';
+import '../../domain/entities/user_event_view_entity.dart';
 
 abstract class AnalyticsState extends Equatable {
   const AnalyticsState();
@@ -9,8 +13,6 @@ abstract class AnalyticsState extends Equatable {
 
 class AnalyticsInitial extends AnalyticsState {}
 
-/// Emitted on a successful view registration. No UI listens to this today;
-/// it exists so the fire-and-forget flow remains observable/testable.
 class AnalyticsViewRegistered extends AnalyticsState {
   final String contentId;
   final bool isNewView;
@@ -23,3 +25,52 @@ class AnalyticsViewRegistered extends AnalyticsState {
   @override
   List<Object> get props => [contentId, isNewView];
 }
+
+class AnalyticsStatsAndViewersLoading extends AnalyticsState {}
+
+class AnalyticsStatsAndViewersLoaded extends AnalyticsState {
+  final ContentStatsEntity stats;
+  final List<ViewerEntity> viewers;
+
+  const AnalyticsStatsAndViewersLoaded({
+    required this.stats,
+    required this.viewers,
+  });
+
+  @override
+  List<Object> get props => [stats, viewers];
+}
+
+class AnalyticsStatsAndViewersError extends AnalyticsState {
+  final String message;
+
+  const AnalyticsStatsAndViewersError({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
+class AnalyticsUserHistoryLoading extends AnalyticsState {}
+
+class AnalyticsUserHistoryLoaded extends AnalyticsState {
+  final List<UserAnnouncementViewEntity> announcementViews;
+  final List<UserEventViewEntity> eventViews;
+
+  const AnalyticsUserHistoryLoaded({
+    required this.announcementViews,
+    required this.eventViews,
+  });
+
+  @override
+  List<Object> get props => [announcementViews, eventViews];
+}
+
+class AnalyticsUserHistoryError extends AnalyticsState {
+  final String message;
+
+  const AnalyticsUserHistoryError({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
