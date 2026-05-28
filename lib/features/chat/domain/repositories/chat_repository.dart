@@ -68,4 +68,5 @@ abstract class ChatRepository {
   });
 
   Future<void> disconnect();
+  Future<void> clearCache();
 }

@@ -13,7 +13,15 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required this.updateProfileUseCase,
   }) : super(ProfileInitial()) {
     on<ProfileLoadRequested>(_onProfileLoadRequested);
+    on<ProfileReset>(_onProfileReset);
     on<ProfileUpdateRequested>(_onProfileUpdateRequested);
+  }
+
+  void _onProfileReset(
+    ProfileReset event,
+    Emitter<ProfileState> emit,
+  ) {
+    emit(ProfileInitial());
   }
 
   Future<void> _onProfileLoadRequested(

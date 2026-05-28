@@ -21,4 +21,5 @@ abstract class EventRepository {
     required List<String> recipientIds,
   });
   Future<Either<Failure, Unit>> deleteEvent(String id);
+  Future<void> clearCache();
 }

@@ -6,6 +6,8 @@ import '../../../../features/iam/presentation/bloc/iam_event.dart';
 import '../../../../features/iam/presentation/bloc/iam_state.dart';
 import '../../domain/entities/profile_entity.dart';
 import '../widgets/settings_tile.dart';
+import '../bloc/profile_bloc.dart';
+import '../bloc/profile_event.dart';
 
 class SettingsPage extends StatelessWidget {
   final ProfileEntity profile;
@@ -20,6 +22,7 @@ class SettingsPage extends StatelessWidget {
     return BlocListener<IamBloc, IamState>(
       listener: (context, state) {
         if (state is IamSignOutSuccess) {
+          context.read<ProfileBloc>().add(ProfileReset());
           context.go('/sign-in');
         }
       },

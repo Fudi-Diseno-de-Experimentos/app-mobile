@@ -10,6 +10,8 @@ abstract class ProfileEvent extends Equatable {
 
 class ProfileLoadRequested extends ProfileEvent {}
 
+class ProfileReset extends ProfileEvent {}
+
 class ProfileUpdateRequested extends ProfileEvent {
   final ProfileEntity profile;
 

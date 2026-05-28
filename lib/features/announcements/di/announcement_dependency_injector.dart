@@ -29,7 +29,10 @@ void initAnnouncementDependencies() {
 
   // Repositories
   sl.registerLazySingleton<AnnouncementRepository>(
-    () => AnnouncementRepositoryImpl(remoteDataSource: sl()),
+    () => AnnouncementRepositoryImpl(
+      remoteDataSource: sl(),
+      sharedPreferences: sl(),
+    ),
   );
   sl.registerLazySingleton<CommentRepository>(
     () => CommentRepositoryImpl(remoteDataSource: sl()),

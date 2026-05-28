@@ -36,4 +36,20 @@ class GroupModel extends GroupEntity {
       updatedAt: (json['updatedAt'] ?? json['createdAt'] ?? '').toString(),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'imageUrl': imageUrl,
+      'visibility': visibility,
+      'type': type,
+      'memberIds': memberIds,
+      'memberCount': memberCount,
+      'createdBy': createdBy,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+    };
+  }
 }

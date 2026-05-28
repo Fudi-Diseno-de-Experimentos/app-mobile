@@ -26,4 +26,5 @@ abstract class AnnouncementRepository {
     required String priority,
   });
   Future<Either<Failure, void>> deleteAnnouncement(String id);
+  Future<void> clearCache();
 }
