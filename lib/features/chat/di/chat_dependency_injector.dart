@@ -35,6 +35,7 @@ void initChatDependencies() {
     () => ChatRepositoryImpl(
       remoteDataSource: sl(),
       socketDataSource: sl(),
+      sharedPreferences: sl(),
     ),
   );
 

@@ -20,7 +20,10 @@ void initProfileDependencies() {
   // Repositories
   if (!sl.isRegistered<ProfileRepository>()) {
     sl.registerLazySingleton<ProfileRepository>(
-      () => ProfileRepositoryImpl(remoteDataSource: sl()),
+      () => ProfileRepositoryImpl(
+        remoteDataSource: sl(),
+        sharedPreferences: sl(),
+      ),
     );
   }
 

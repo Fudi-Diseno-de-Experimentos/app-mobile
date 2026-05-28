@@ -22,4 +22,14 @@ class ConversationModel extends ConversationEntity {
       updatedAt: (json['updatedAt'] ?? json['createdAt'] ?? '').toString(),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'otherUserId': otherUserId,
+      'memberIds': memberIds,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+    };
+  }
 }

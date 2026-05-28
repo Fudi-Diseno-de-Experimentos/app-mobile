@@ -8,6 +8,8 @@ import '../../../../shared/widgets/primary_button.dart';
 import '../bloc/iam_bloc.dart';
 import '../bloc/iam_event.dart';
 import '../bloc/iam_state.dart';
+import '../../../profile/presentation/bloc/profile_bloc.dart';
+import '../../../profile/presentation/bloc/profile_event.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -41,6 +43,8 @@ class _SignInPageState extends State<SignInPage> {
     return BlocListener<IamBloc, IamState>(
       listener: (context, state) {
         if (state is IamSignInSuccess) {
+          // Immediately load profile for the new user
+          context.read<ProfileBloc>().add(ProfileLoadRequested());
           if (state.user.companyId == null || state.user.companyId!.isEmpty) {
             context.go('/join-company');
           } else {

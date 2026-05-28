@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'di.dart';
 import '../features/iam/presentation/pages/sign_up_page.dart';
 import '../features/iam/presentation/pages/sign_in_page.dart';
@@ -77,7 +78,7 @@ Widget _announcementDetail(AnnouncementEntity item) {
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/sign-in',
+  initialLocation: sl<SharedPreferences>().getString('auth_token') != null ? '/home' : '/sign-in',
   routes: [
     GoRoute(path: '/sign-in', builder: (context, state) => const SignInPage()),
     GoRoute(path: '/register', builder: (context, state) => const SignUpPage()),

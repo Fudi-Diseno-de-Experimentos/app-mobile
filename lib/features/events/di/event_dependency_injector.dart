@@ -16,7 +16,10 @@ void initEventDependencies() {
 
   // Repositories
   sl.registerLazySingleton<EventRepository>(
-    () => EventRepositoryImpl(remoteDataSource: sl()),
+    () => EventRepositoryImpl(
+      remoteDataSource: sl(),
+      sharedPreferences: sl(),
+    ),
   );
 
   // UseCases

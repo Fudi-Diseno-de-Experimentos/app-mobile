@@ -8,6 +8,8 @@ import '../../../../shared/widgets/primary_button.dart';
 import '../bloc/iam_bloc.dart';
 import '../bloc/iam_event.dart';
 import '../bloc/iam_state.dart';
+import '../../../profile/presentation/bloc/profile_bloc.dart';
+import '../../../profile/presentation/bloc/profile_event.dart';
 
 class VerificationPage extends StatefulWidget {
   const VerificationPage({super.key});
@@ -36,8 +38,9 @@ class _VerificationPageState extends State<VerificationPage> {
     return BlocListener<IamBloc, IamState>(
       listener: (context, state) {
         if (state is IamJoinCompanySuccess) {
-          // Success joining company, proceed to home
-          context.go('/home'); // Will implement later
+          // Success joining company, reload profile and proceed to home
+          context.read<ProfileBloc>().add(ProfileLoadRequested());
+          context.go('/home');
         } else if (state is IamError) {
           ScaffoldMessenger.of(
             context,

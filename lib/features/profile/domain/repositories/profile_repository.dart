@@ -6,4 +6,5 @@ abstract class ProfileRepository {
   Future<Either<Failure, ProfileEntity>> getProfile();
   Future<Either<Failure, ProfileEntity>> updateProfile(ProfileEntity profile);
   Future<Either<Failure, List<ProfileEntity>>> getCompanyMembers(String companyId);
+  Future<void> clearCache();
 }

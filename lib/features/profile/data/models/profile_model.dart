@@ -35,4 +35,18 @@ class ProfileModel extends ProfileEntity {
       'avatarUrl': avatarUrl,
     };
   }
+
+  Map<String, dynamic> toCacheJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'username': username,
+      'name': name,
+      'lastname': lastname,
+      'email': email,
+      'roles': roles,
+      'companyId': companyId,
+      'avatarUrl': avatarUrl,
+    };
+  }
 }
