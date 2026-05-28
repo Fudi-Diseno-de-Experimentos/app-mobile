@@ -10,6 +10,8 @@ import '../../../announcements/domain/repositories/announcement_repository.dart'
 import '../../../events/domain/repositories/event_repository.dart';
 import '../../../profile/domain/repositories/profile_repository.dart';
 import '../../../chat/domain/repositories/chat_repository.dart';
+import '../../../analytics/domain/repositories/analytics_repository.dart';
+import '../../../announcements/domain/repositories/comment_repository.dart';
 
 class IamRepositoryImpl implements IamRepository {
   final IamRemoteDataSource remoteDataSource;
@@ -42,7 +44,18 @@ class IamRepositoryImpl implements IamRepository {
         await sl<ChatRepository>().clearCache();
       }
     } catch (_) {}
+    try {
+      if (sl.isRegistered<AnalyticsRepository>()) {
+        await sl<AnalyticsRepository>().clearCache();
+      }
+    } catch (_) {}
+    try {
+      if (sl.isRegistered<CommentRepository>()) {
+        await sl<CommentRepository>().clearCache();
+      }
+    } catch (_) {}
   }
+
 
   @override
   Future<Either<Failure, UserEntity>> signIn(

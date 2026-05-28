@@ -4,13 +4,17 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/di.dart';
 import '../../../analytics/presentation/bloc/analytics_bloc.dart';
 import '../../../analytics/presentation/bloc/analytics_event.dart';
+import '../../../analytics/presentation/bloc/analytics_state.dart';
 import '../../domain/entities/event_entity.dart';
+import '../../domain/repositories/event_repository.dart';
 import '../../../profile/domain/entities/profile_entity.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_state.dart';
+import '../../../profile/domain/usecases/get_company_members_usecase.dart';
 import '../bloc/event_bloc.dart';
 import '../bloc/event_event.dart';
 import '../bloc/event_state.dart';
+import '../../../announcements/presentation/pages/announcement_page.dart'; // To reuse PercentagePainter
 
 class EventPage extends StatefulWidget {
   final EventEntity event;
@@ -24,16 +28,46 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   List<ProfileEntity> _recipients = [];
   bool _recipientsLoaded = false;
+  late AnalyticsBloc _analyticsBloc;
+  List<ProfileEntity> _companyMembers = [];
 
   @override
   void initState() {
     super.initState();
+    _analyticsBloc = sl<AnalyticsBloc>();
+
     if (widget.event.recipientIds.isNotEmpty) {
       _fetchRecipients();
     } else {
       _recipientsLoaded = true;
     }
     _registerView();
+
+    final roles = _currentUserRoles();
+    final isManagerOrAdmin = roles.contains('ROLE_ADMIN') || roles.contains('ROLE_MANAGER');
+    if (isManagerOrAdmin) {
+      _fetchCompanyMembers();
+      _analyticsBloc.add(FetchStatsAndViewersRequested(
+        contentId: widget.event.id,
+        isEvent: true,
+      ));
+    }
+  }
+
+  @override
+  void dispose() {
+    _analyticsBloc.close();
+    super.dispose();
+  }
+
+  List<String> _currentUserRoles() {
+    final profileState = context.read<ProfileBloc>().state;
+    if (profileState is ProfileLoaded) {
+      return profileState.profile.roles ?? const [];
+    } else if (profileState is ProfileUpdateSuccess) {
+      return profileState.profile.roles ?? const [];
+    }
+    return const [];
   }
 
   void _registerView() {
@@ -45,7 +79,7 @@ class _EventPageState extends State<EventPage> {
       actorId = profileState.profile.id;
     }
     if (actorId != null && actorId.isNotEmpty) {
-      sl<AnalyticsBloc>().add(RegisterEventView(
+      _analyticsBloc.add(RegisterEventView(
         eventId: widget.event.id,
         userId: actorId,
       ));
@@ -64,6 +98,30 @@ class _EventPageState extends State<EventPage> {
       context.read<EventBloc>().add(FetchCompanyMembers(companyId));
     } else {
       setState(() => _recipientsLoaded = true);
+    }
+  }
+
+  void _fetchCompanyMembers() async {
+    final profileState = context.read<ProfileBloc>().state;
+    String? companyId;
+    if (profileState is ProfileLoaded) {
+      companyId = profileState.profile.companyId;
+    } else if (profileState is ProfileUpdateSuccess) {
+      companyId = profileState.profile.companyId;
+    }
+    if (companyId != null) {
+      final usecase = sl<GetCompanyMembersUseCase>();
+      final result = await usecase(companyId);
+      result.fold(
+        (_) {},
+        (members) {
+          if (mounted) {
+            setState(() {
+              _companyMembers = members;
+            });
+          }
+        },
+      );
     }
   }
 
@@ -88,6 +146,39 @@ class _EventPageState extends State<EventPage> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final canManage = _canManage(context);
+
+    final roles = _currentUserRoles();
+    final isManagerOrAdmin = roles.contains('ROLE_ADMIN') || roles.contains('ROLE_MANAGER');
+
+    Widget pageBody;
+    if (isManagerOrAdmin) {
+      pageBody = DefaultTabController(
+        length: 2,
+        child: Column(
+          children: [
+            TabBar(
+              labelColor: colorScheme.primary,
+              unselectedLabelColor: colorScheme.onSurface.withOpacity(0.6),
+              indicatorColor: colorScheme.primary,
+              tabs: const [
+                Tab(text: 'Details'),
+                Tab(text: 'Analytics'),
+              ],
+            ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _buildDetailsView(colorScheme, textTheme, canManage),
+                  _buildAnalyticsView(colorScheme, textTheme),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      pageBody = _buildDetailsView(colorScheme, textTheme, canManage);
+    }
 
     return BlocListener<EventBloc, EventState>(
       listener: (context, state) {
@@ -160,78 +251,345 @@ class _EventPageState extends State<EventPage> {
               ),
           ],
         ),
-        body: SafeArea(
-          child: BlocBuilder<EventBloc, EventState>(
-            builder: (context, state) {
-              final isLoading = state is EventLoading;
-              return Stack(
+        body: SafeArea(child: pageBody),
+      ),
+    );
+  }
+
+  Widget _buildDetailsView(
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+    bool canManage,
+  ) {
+    return BlocBuilder<EventBloc, EventState>(
+      builder: (context, state) {
+        final isLoading = state is EventLoading;
+        return Stack(
+          children: [
+            RefreshIndicator(
+              onRefresh: () async {
+                await sl<EventRepository>().clearCache();
+                if (mounted) {
+                  if (widget.event.recipientIds.isNotEmpty) {
+                    _fetchRecipients();
+                  }
+                  final roles = _currentUserRoles();
+                  final isManagerOrAdmin = roles.contains('ROLE_ADMIN') || roles.contains('ROLE_MANAGER');
+                  if (isManagerOrAdmin) {
+                    _fetchCompanyMembers();
+                    _analyticsBloc.add(FetchStatsAndViewersRequested(
+                      contentId: widget.event.id,
+                      isEvent: true,
+                      forceRefresh: true,
+                    ));
+                  }
+                }
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.event.title,
+                      style: textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _InfoRow(
+                      icon: Icons.access_time,
+                      label: _formatDate(widget.event.date),
+                    ),
+                    const SizedBox(height: 8),
+                    _InfoRow(
+                      icon: Icons.location_on_outlined,
+                      label: widget.event.location.isEmpty
+                          ? 'No location'
+                          : widget.event.location,
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Description',
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.event.description.isEmpty
+                          ? 'No description'
+                          : widget.event.description,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface.withOpacity(0.8),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Invited',
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _buildInvitedSection(colorScheme, textTheme),
+                  ],
+                ),
+              ),
+            ),
+            if (isLoading)
+              Container(
+                color: colorScheme.surface.withOpacity(0.5),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildAnalyticsView(ColorScheme colorScheme, TextTheme textTheme) {
+    return BlocBuilder<AnalyticsBloc, AnalyticsState>(
+      bloc: _analyticsBloc,
+      builder: (context, state) {
+        if (state is AnalyticsStatsAndViewersLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is AnalyticsStatsAndViewersError) {
+          return RefreshIndicator(
+            onRefresh: () async {
+              _analyticsBloc.add(FetchStatsAndViewersRequested(
+                contentId: widget.event.id,
+                isEvent: true,
+                forceRefresh: true,
+              ));
+              await _analyticsBloc.stream.firstWhere((state) => state is! AnalyticsStatsAndViewersLoading);
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(24),
+              child: SizedBox(
+                height: 300,
+                child: Center(
+                  child: Text(
+                    state.message,
+                    style: TextStyle(color: colorScheme.error),
+                  ),
+                ),
+              ),
+            ),
+          );
+        } else if (state is AnalyticsStatsAndViewersLoaded) {
+          final stats = state.stats;
+          final viewers = state.viewers;
+
+          final pendingCount = (stats.totalUsers - viewers.length).clamp(0, stats.totalUsers);
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              _analyticsBloc.add(FetchStatsAndViewersRequested(
+                contentId: widget.event.id,
+                isEvent: true,
+                forceRefresh: true,
+              ));
+              await _analyticsBloc.stream.firstWhere((state) => state is! AnalyticsStatsAndViewersLoading);
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  // Premium Percentage Card
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: colorScheme.secondary.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: colorScheme.outline.withOpacity(0.1),
+                      ),
+                    ),
+                    child: Row(
                       children: [
-                        Text(
-                          widget.event.title,
-                          style: textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface,
+                        // Native circular progress percentage
+                        SizedBox(
+                          width: 90,
+                          height: 90,
+                          child: CustomPaint(
+                            painter: PercentagePainter(
+                              percentage: stats.viewPercentage,
+                              primaryColor: colorScheme.primary,
+                              backgroundColor: colorScheme.primary.withOpacity(0.15),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${stats.viewPercentage.toStringAsFixed(0)}%',
+                                style: textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.primary,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        _InfoRow(
-                          icon: Icons.access_time,
-                          label: _formatDate(widget.event.date),
-                        ),
-                        const SizedBox(height: 8),
-                        _InfoRow(
-                          icon: Icons.location_on_outlined,
-                          label: widget.event.location.isEmpty
-                              ? 'No location'
-                              : widget.event.location,
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          'Description',
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface,
+                        const SizedBox(width: 24),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Visualizations',
+                                style: textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Viewed: ${viewers.length} / ${stats.totalUsers} users',
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurface.withOpacity(0.8),
+                                ),
+                              ),
+                              Text(
+                                'Pending: $pendingCount users',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurface.withOpacity(0.55),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          widget.event.description.isEmpty
-                              ? 'No description'
-                              : widget.event.description,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface.withValues(alpha: 0.8),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          'Invited',
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        _buildInvitedSection(colorScheme, textTheme),
                       ],
                     ),
                   ),
-                  if (isLoading)
-                    Container(
-                      color: colorScheme.surface.withValues(alpha: 0.5),
-                      child: const Center(child: CircularProgressIndicator()),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Viewers List',
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (viewers.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Center(
+                        child: Text(
+                          'No readers logged yet.',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface.withOpacity(0.5),
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    ...viewers.map((viewer) {
+                      final matchedMember = _companyMembers.cast<ProfileEntity>().firstWhere(
+                        (m) => m.id == viewer.userId,
+                        orElse: () => ProfileEntity(
+                          id: viewer.userId,
+                          userId: viewer.userId,
+                          username: viewer.userEmail,
+                          name: viewer.userFullName.split(' ').first,
+                          lastname: viewer.userFullName.split(' ').skip(1).join(' '),
+                          email: viewer.userEmail,
+                          avatarUrl: viewer.userImageUrl,
+                        ),
+                      );
+
+                      final initials = '${matchedMember.name.isNotEmpty ? matchedMember.name[0] : ''}${matchedMember.lastname.isNotEmpty ? matchedMember.lastname[0] : ''}'
+                          .toUpperCase();
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: colorScheme.secondary.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 20,
+                              backgroundColor: colorScheme.primary.withOpacity(0.1),
+                              backgroundImage: matchedMember.avatarUrl != null && matchedMember.avatarUrl!.isNotEmpty
+                                  ? NetworkImage(matchedMember.avatarUrl!)
+                                  : null,
+                              child: matchedMember.avatarUrl == null || matchedMember.avatarUrl!.isEmpty
+                                  ? Text(
+                                      initials,
+                                      style: TextStyle(
+                                        color: colorScheme.primary,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    viewer.userFullName,
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  Text(
+                                    viewer.userEmail,
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurface.withOpacity(0.6),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              _formatViewedAt(viewer.viewedAt),
+                              style: textTheme.labelSmall?.copyWith(
+                                color: colorScheme.onSurface.withOpacity(0.4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
                 ],
-              );
-            },
-          ),
-        ),
-      ),
+              ),
+            ),
+          );
+        }
+
+        return const Center(child: CircularProgressIndicator());
+      },
     );
+  }
+
+  String _formatViewedAt(String isoDate) {
+    try {
+      final date = DateTime.parse(isoDate).toLocal();
+      final hour = date.hour > 12 ? date.hour - 12 : (date.hour == 0 ? 12 : date.hour);
+      final period = date.hour >= 12 ? 'PM' : 'AM';
+      final minute = date.minute.toString().padLeft(2, '0');
+      final day = date.day.toString().padLeft(2, '0');
+      
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      final monthStr = months[date.month - 1];
+
+      return '$monthStr $day, $hour:$minute $period';
+    } catch (_) {
+      return isoDate;
+    }
   }
 
   Widget _buildInvitedSection(ColorScheme colorScheme, TextTheme textTheme) {
@@ -239,7 +597,7 @@ class _EventPageState extends State<EventPage> {
       return Text(
         'No invited people',
         style: textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurface.withValues(alpha: 0.7),
+          color: colorScheme.onSurface.withOpacity(0.7),
         ),
       );
     }
@@ -257,7 +615,7 @@ class _EventPageState extends State<EventPage> {
       return Text(
         '${widget.event.recipientIds.length} invited',
         style: textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurface.withValues(alpha: 0.7),
+          color: colorScheme.onSurface.withOpacity(0.7),
         ),
       );
     }
@@ -271,14 +629,14 @@ class _EventPageState extends State<EventPage> {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: colorScheme.secondary.withValues(alpha: 0.1),
+            color: colorScheme.secondary.withOpacity(0.05),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: colorScheme.secondary.withValues(alpha: 0.3),
+                backgroundColor: colorScheme.secondary.withOpacity(0.2),
                 backgroundImage: member.avatarUrl != null &&
                         member.avatarUrl!.isNotEmpty
                     ? NetworkImage(member.avatarUrl!)
@@ -309,7 +667,7 @@ class _EventPageState extends State<EventPage> {
                     Text(
                       member.email,
                       style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -390,13 +748,13 @@ class _InfoRow extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return Row(
       children: [
-        Icon(icon, size: 18, color: colorScheme.onSurface.withValues(alpha: 0.7)),
+        Icon(icon, size: 18, color: colorScheme.onSurface.withOpacity(0.7)),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             label,
             style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface.withValues(alpha: 0.8),
+              color: colorScheme.onSurface.withOpacity(0.8),
             ),
           ),
         ),

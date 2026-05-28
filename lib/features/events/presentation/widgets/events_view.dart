@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../app/di.dart';
+import '../../domain/repositories/event_repository.dart';
 import '../bloc/event_bloc.dart';
 import '../bloc/event_event.dart';
 import '../bloc/event_state.dart';
@@ -41,35 +43,45 @@ class EventsView extends StatelessWidget {
                 ),
               ),
 
-              if (events.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.only(top: 24),
-                  child: Center(
-                    child: Text(
-                      "No upcoming events",
-                      style: TextStyle(color: AppColors.tertiary),
-                    ),
-                  ),
-                )
-              else
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 64),
-                    itemCount: events.length,
-                    itemBuilder: (context, index) {
-                      final item = events[index];
-                      return InkWell(
-                        onTap: () async {
-                          await context.push('/files/event', extra: item);
-                          if (context.mounted) {
-                            context.read<EventBloc>().add(FetchEvents());
-                          }
-                        },
-                        child: EventCard(item: item),
-                      );
-                    },
-                  ),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await sl<EventRepository>().clearCache();
+                    if (context.mounted) {
+                      context.read<EventBloc>().add(FetchEvents());
+                    }
+                  },
+                  child: events.isEmpty
+                      ? SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Container(
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            alignment: Alignment.center,
+                            child: const Text(
+                              "No upcoming events",
+                              style: TextStyle(color: AppColors.tertiary),
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.only(bottom: 64),
+                          itemCount: events.length,
+                          itemBuilder: (context, index) {
+                            final item = events[index];
+                            return InkWell(
+                              onTap: () async {
+                                await context.push('/files/event', extra: item);
+                                if (context.mounted) {
+                                  context.read<EventBloc>().add(FetchEvents());
+                                }
+                              },
+                              child: EventCard(item: item),
+                            );
+                          },
+                        ),
                 ),
+              ),
             ],
           );
         }

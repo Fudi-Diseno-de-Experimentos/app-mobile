@@ -10,4 +10,5 @@ abstract class CommentRepository {
     required String authorId,
   });
   Future<Either<Failure, void>> deleteComment(String commentId);
+  Future<void> clearCache();
 }

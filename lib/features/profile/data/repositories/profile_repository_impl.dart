@@ -71,7 +71,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
         final lastFetch = DateTime.tryParse(timeStr);
         if (_isCacheValid(lastFetch)) {
           final List<dynamic> decoded = jsonDecode(jsonStr);
-          final list = decoded.map((item) => ProfileModel.fromJson(item)).toList();
+          final list = decoded.map<ProfileEntity>((item) => ProfileModel.fromJson(item)).toList();
           _cachedMembers = list;
           _membersLastFetchTime = lastFetch;
           return list;
@@ -184,8 +184,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
     try {
       final members = await remoteDataSource.getCompanyMembers(companyId);
-      await _saveMembersToCache(members);
-      return Right(members);
+      final List<ProfileEntity> entityList = List<ProfileEntity>.from(members);
+      await _saveMembersToCache(entityList);
+      return Right(entityList);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {

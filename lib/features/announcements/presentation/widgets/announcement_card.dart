@@ -1,16 +1,37 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/announcement_entity.dart';
 import 'priority_dot.dart';
+import '../../../profile/domain/entities/profile_entity.dart';
 
 class AnnouncementCard extends StatelessWidget {
   final AnnouncementEntity item;
+  final List<ProfileEntity> members;
 
-  const AnnouncementCard({super.key, required this.item});
+  const AnnouncementCard({
+    super.key,
+    required this.item,
+    required this.members,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    final matchedMember = members.cast<ProfileEntity>().firstWhere(
+      (m) => m.id == item.createdBy,
+      orElse: () => ProfileEntity(
+        id: item.createdBy,
+        userId: item.createdBy,
+        username: '',
+        name: 'Unknown',
+        lastname: 'User',
+        email: '',
+      ),
+    );
+
+    final initials = '${matchedMember.name.isNotEmpty ? matchedMember.name[0] : ''}${matchedMember.lastname.isNotEmpty ? matchedMember.lastname[0] : ''}'
+        .toUpperCase();
 
     return IntrinsicHeight(
       child: Container(
@@ -48,6 +69,37 @@ class AnnouncementCard extends StatelessWidget {
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                     ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Creator Row
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+                  backgroundImage: matchedMember.avatarUrl != null && matchedMember.avatarUrl!.isNotEmpty
+                      ? NetworkImage(matchedMember.avatarUrl!)
+                      : null,
+                  child: matchedMember.avatarUrl == null || matchedMember.avatarUrl!.isEmpty
+                      ? Text(
+                          initials,
+                          style: TextStyle(
+                            color: colorScheme.primary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : null,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  '${matchedMember.name} ${matchedMember.lastname}',
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.8),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
