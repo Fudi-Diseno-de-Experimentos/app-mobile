@@ -8,6 +8,8 @@ import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_event.dart';
 import '../../../profile/presentation/bloc/profile_state.dart';
 import '../../domain/entities/group_entity.dart';
+import '../../../../app/di.dart';
+import '../../domain/repositories/chat_repository.dart';
 import '../bloc/chat_bloc.dart';
 import '../bloc/chat_event.dart';
 import '../bloc/chat_state.dart';
@@ -166,59 +168,71 @@ class _ChatPageState extends State<ChatPage> {
                     }
                     if (state is GroupsLoaded) {
                       final items = _filter(state);
-                      if (items.isEmpty) {
-                        return Center(
-                          child: Text(
-                            'No ${_tabs[_tab].toLowerCase()} chats',
-                            style: const TextStyle(
-                              color: AppColors.tertiary,
-                            ),
-                          ),
-                        );
-                      }
-                      return ListView.separated(
-                        padding:
-                            const EdgeInsets.only(top: 4, bottom: 24),
-                        itemCount: items.length,
-                        separatorBuilder: (context, _) => Divider(
-                          height: 1,
-                          thickness: 1,
-                          indent: 86,
-                          endIndent: 16,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .secondary
-                              .withValues(alpha: 0.15),
-                        ),
-                        itemBuilder: (context, i) {
-                          final group = items[i];
-                          return ChatItem(
-                            group: group,
-                            archived:
-                                state.archivedIds.contains(group.id),
-                            onTap: () => context.push(
-                              '/messages/conversation',
-                              extra: group,
-                            ),
-                            onToggleArchive: () {
-                              final wasArchived =
-                                  state.archivedIds.contains(group.id);
-                              context
-                                  .read<ChatBloc>()
-                                  .add(ToggleArchive(group.id));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    wasArchived
-                                        ? 'Unarchived'
-                                        : 'Archived',
-                                  ),
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                            },
-                          );
+                      return RefreshIndicator(
+                        onRefresh: () async {
+                          await sl<ChatRepository>().clearCache();
+                          if (context.mounted) {
+                            context.read<ChatBloc>().add(LoadGroups(userId, companyId));
+                          }
                         },
+                        child: items.isEmpty
+                            ? SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                child: Container(
+                                  height: MediaQuery.of(context).size.height * 0.6,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'No ${_tabs[_tab].toLowerCase()} chats',
+                                    style: const TextStyle(
+                                      color: AppColors.tertiary,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : ListView.separated(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.only(top: 4, bottom: 24),
+                                itemCount: items.length,
+                                separatorBuilder: (context, _) => Divider(
+                                  height: 1,
+                                  thickness: 1,
+                                  indent: 86,
+                                  endIndent: 16,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .secondary
+                                      .withValues(alpha: 0.15),
+                                ),
+                                itemBuilder: (context, i) {
+                                  final group = items[i];
+                                  return ChatItem(
+                                    group: group,
+                                    archived:
+                                        state.archivedIds.contains(group.id),
+                                    onTap: () => context.push(
+                                      '/messages/conversation',
+                                      extra: group,
+                                    ),
+                                    onToggleArchive: () {
+                                      final wasArchived =
+                                          state.archivedIds.contains(group.id);
+                                      context
+                                          .read<ChatBloc>()
+                                          .add(ToggleArchive(group.id));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            wasArchived
+                                                ? 'Unarchived'
+                                                : 'Archived',
+                                          ),
+                                          duration: const Duration(seconds: 2),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                       );
                     }
                     return const SizedBox.shrink();

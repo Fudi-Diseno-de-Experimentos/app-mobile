@@ -8,6 +8,7 @@ import '../../../analytics/presentation/bloc/analytics_state.dart';
 import '../../../analytics/domain/entities/user_announcement_view_entity.dart';
 import '../../../analytics/domain/entities/user_event_view_entity.dart';
 import '../../domain/entities/profile_entity.dart';
+import '../../domain/repositories/profile_repository.dart';
 import '../../domain/usecases/get_company_members_usecase.dart';
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_event.dart';
@@ -154,100 +155,109 @@ class _ProfileBody extends StatelessWidget {
     return Container(
       constraints: const BoxConstraints.expand(),
       color: theme.scaffoldBackgroundColor,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Avatar
-            Container(
-              width: 138,
-              height: 138,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.surface,
-                image:
-                    profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
-                    ? DecorationImage(
-                        image: NetworkImage(profile.avatarUrl!),
-                        fit: BoxFit.cover,
+      child: RefreshIndicator(
+        onRefresh: () async {
+          await sl<ProfileRepository>().clearCache();
+          if (context.mounted) {
+            context.read<ProfileBloc>().add(ProfileLoadRequested());
+          }
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Avatar
+              Container(
+                width: 138,
+                height: 138,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: colorScheme.surface,
+                  image:
+                      profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(profile.avatarUrl!),
+                          fit: BoxFit.cover,
+                          )
+                      : null,
+                ),
+                child: profile.avatarUrl == null || profile.avatarUrl!.isEmpty
+                    ? Icon(
+                        Icons.person,
+                        size: 80,
+                        color: colorScheme.onSurface.withOpacity(0.5),
                       )
                     : null,
               ),
-              child: profile.avatarUrl == null || profile.avatarUrl!.isEmpty
-                  ? Icon(
-                      Icons.person,
-                      size: 80,
-                      color: colorScheme.onSurface.withOpacity(0.5),
-                    )
-                  : null,
-            ),
-            const SizedBox(height: 16),
-
-            // Name
-            Text(
-              "${profile.name} ${profile.lastname}",
-              style: textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 4),
-
-            // Position (plain text)
-            if (roles.isNotEmpty)
+              const SizedBox(height: 16),
+  
+              // Name
               Text(
-                roles.map(_positionLabel).join(' · '),
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface.withOpacity(0.7),
-                  fontWeight: FontWeight.w500,
+                "${profile.name} ${profile.lastname}",
+                style: textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
                 ),
               ),
-            const SizedBox(height: 12),
-
-            // Email row
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.mail_outline,
-                  size: 16,
-                  color: colorScheme.onSurface.withOpacity(0.6),
-                ),
-                const SizedBox(width: 6),
-                Flexible(
-                  child: Text(
-                    profile.email,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.7),
-                    ),
+              const SizedBox(height: 4),
+  
+              // Position (plain text)
+              if (roles.isNotEmpty)
+                Text(
+                  roles.map(_positionLabel).join(' · '),
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withOpacity(0.7),
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 32),
-
-            // Action Buttons Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ProfileActionButton(
-                  icon: Icons.phone,
-                  onPressed: () {},
-                ),
-                const SizedBox(width: 18),
-                ProfileActionButton(
-                  icon: Icons.message,
-                  onPressed: () {},
-                ),
-                const SizedBox(width: 18),
-                ProfileActionButton(
-                  icon: Icons.email,
-                  onPressed: () {},
-                ),
-              ],
-            ),
-          ],
+              const SizedBox(height: 12),
+  
+              // Email row
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.mail_outline,
+                    size: 16,
+                    color: colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      profile.email,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+  
+              // Action Buttons Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ProfileActionButton(
+                    icon: Icons.phone,
+                    onPressed: () {},
+                  ),
+                  const SizedBox(width: 18),
+                  ProfileActionButton(
+                    icon: Icons.message,
+                    onPressed: () {},
+                  ),
+                  const SizedBox(width: 18),
+                  ProfileActionButton(
+                    icon: Icons.email,
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -340,76 +350,88 @@ class _MembersTabContentState extends State<_MembersTabContent> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: filtered.isEmpty
-                ? Center(
-                    child: Text(
-                      'No members found',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface.withOpacity(0.5),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await sl<ProfileRepository>().clearCache();
+                _loadMembers();
+              },
+              child: filtered.isEmpty
+                  ? SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * 0.5,
+                        alignment: Alignment.center,
+                        child: Text(
+                          'No members found',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface.withOpacity(0.5),
+                          ),
+                        ),
                       ),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: filtered.length,
-                    itemBuilder: (context, index) {
-                      final member = filtered[index];
-                      final initials =
-                          '${member.name.isNotEmpty ? member.name[0] : ''}${member.lastname.isNotEmpty ? member.lastname[0] : ''}'
-                              .toUpperCase();
+                    )
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final member = filtered[index];
+                        final initials =
+                            '${member.name.isNotEmpty ? member.name[0] : ''}${member.lastname.isNotEmpty ? member.lastname[0] : ''}'
+                                .toUpperCase();
 
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          color: colorScheme.secondary.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            color: colorScheme.secondary.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          leading: CircleAvatar(
-                            radius: 24,
-                            backgroundColor: colorScheme.primary.withOpacity(0.1),
-                            backgroundImage: member.avatarUrl != null &&
-                                    member.avatarUrl!.isNotEmpty
-                                ? NetworkImage(member.avatarUrl!)
-                                : null,
-                            child: member.avatarUrl == null ||
-                                    member.avatarUrl!.isEmpty
-                                ? Text(
-                                    initials,
-                                    style: TextStyle(
-                                      color: colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                          title: Text(
-                            '${member.name} ${member.lastname}',
-                            style: textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
                             ),
-                          ),
-                          subtitle: Text(
-                            member.email,
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurface.withOpacity(0.6),
+                            leading: CircleAvatar(
+                              radius: 24,
+                              backgroundColor: colorScheme.primary.withOpacity(0.1),
+                              backgroundImage: member.avatarUrl != null &&
+                                      member.avatarUrl!.isNotEmpty
+                                  ? NetworkImage(member.avatarUrl!)
+                                  : null,
+                              child: member.avatarUrl == null ||
+                                      member.avatarUrl!.isEmpty
+                                  ? Text(
+                                      initials,
+                                      style: TextStyle(
+                                        color: colorScheme.primary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : null,
                             ),
+                            title: Text(
+                              '${member.name} ${member.lastname}',
+                              style: textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                            subtitle: Text(
+                              member.email,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurface.withOpacity(0.6),
+                              ),
+                            ),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: colorScheme.onSurface.withOpacity(0.4),
+                            ),
+                            onTap: () =>
+                                _showMemberDetail(context, member, colorScheme, textTheme),
                           ),
-                          trailing: Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16,
-                            color: colorScheme.onSurface.withOpacity(0.4),
-                          ),
-                          onTap: () =>
-                              _showMemberDetail(context, member, colorScheme, textTheme),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
+            ),
           ),
         ],
       ),

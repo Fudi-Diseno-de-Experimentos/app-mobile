@@ -8,6 +8,7 @@ class UserAnnouncementViewEntity extends Equatable {
   final String viewedAt;
   final String userId;
   final String userFullName;
+  final String? userImageUrl;
 
   const UserAnnouncementViewEntity({
     required this.viewId,
@@ -17,6 +18,7 @@ class UserAnnouncementViewEntity extends Equatable {
     required this.viewedAt,
     required this.userId,
     required this.userFullName,
+    this.userImageUrl,
   });
 
   @override
@@ -28,5 +30,6 @@ class UserAnnouncementViewEntity extends Equatable {
         viewedAt,
         userId,
         userFullName,
+        userImageUrl,
       ];
 }

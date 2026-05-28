@@ -9,6 +9,7 @@ class ViewerModel extends ViewerEntity {
     required super.viewedAt,
     required super.contentId,
     required super.contentTitle,
+    super.userImageUrl,
   });
 
   factory ViewerModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +21,7 @@ class ViewerModel extends ViewerEntity {
       viewedAt: json['viewedAt']?.toString() ?? '',
       contentId: json['announcementId']?.toString() ?? json['eventId']?.toString() ?? '',
       contentTitle: json['announcementTitle']?.toString() ?? json['eventTitle']?.toString() ?? '',
+      userImageUrl: json['userImageUrl']?.toString(),
     );
   }
 }

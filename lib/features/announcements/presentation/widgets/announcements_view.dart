@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/di.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../profile/domain/entities/profile_entity.dart';
+import '../../../profile/domain/usecases/get_company_members_usecase.dart';
+import '../../../profile/presentation/bloc/profile_bloc.dart';
+import '../../../profile/presentation/bloc/profile_state.dart';
 import '../../domain/entities/announcement_entity.dart';
+import '../../domain/repositories/announcement_repository.dart';
 import '../bloc/announcement_bloc.dart';
 import '../bloc/announcement_event.dart';
 import '../bloc/announcement_state.dart';
@@ -20,6 +26,37 @@ class AnnouncementsView extends StatefulWidget {
 
 class _AnnouncementsViewState extends State<AnnouncementsView> {
   String _selectedPriority = 'ALL';
+  List<ProfileEntity> _companyMembers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCompanyMembers();
+  }
+
+  void _fetchCompanyMembers() async {
+    final profileState = context.read<ProfileBloc>().state;
+    String? companyId;
+    if (profileState is ProfileLoaded) {
+      companyId = profileState.profile.companyId;
+    } else if (profileState is ProfileUpdateSuccess) {
+      companyId = profileState.profile.companyId;
+    }
+    if (companyId != null) {
+      final usecase = sl<GetCompanyMembersUseCase>();
+      final result = await usecase(companyId);
+      result.fold(
+        (_) {},
+        (members) {
+          if (mounted) {
+            setState(() {
+              _companyMembers = members;
+            });
+          }
+        },
+      );
+    }
+  }
 
   DateTime _parse(String iso) =>
       DateTime.tryParse(iso) ?? DateTime.fromMillisecondsSinceEpoch(0);
@@ -107,31 +144,49 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                 ),
               ),
               Expanded(
-                child: announcements.isEmpty
-                    ? Center(
-                        child: Text(
-                          "No ${_selectedPriority == 'ALL' ? '' : _selectedPriority.toLowerCase() + ' '}announcements available",
-                          style: const TextStyle(color: AppColors.tertiary),
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await sl<AnnouncementRepository>().clearCache();
+                    if (context.mounted) {
+                      context.read<AnnouncementBloc>().add(FetchAnnouncements());
+                      _fetchCompanyMembers();
+                    }
+                  },
+                  child: announcements.isEmpty
+                      ? SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Container(
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            alignment: Alignment.center,
+                            child: Text(
+                              "No ${_selectedPriority == 'ALL' ? '' : _selectedPriority.toLowerCase() + ' '}announcements available",
+                              style: const TextStyle(color: AppColors.tertiary),
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.only(bottom: 64),
+                          itemCount: announcements.length,
+                          itemBuilder: (context, index) {
+                            final item = announcements[index];
+                            return InkWell(
+                              onTap: () async {
+                                await context.push('/files/announcement', extra: item);
+                                if (context.mounted) {
+                                  context
+                                      .read<AnnouncementBloc>()
+                                      .add(FetchAnnouncements());
+                                }
+                              },
+                              child: AnnouncementCard(
+                                item: item,
+                                members: _companyMembers,
+                              ),
+                            );
+                          },
                         ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 64),
-                        itemCount: announcements.length,
-                        itemBuilder: (context, index) {
-                          final item = announcements[index];
-                          return InkWell(
-                            onTap: () async {
-                              await context.push('/files/announcement', extra: item);
-                              if (context.mounted) {
-                                context
-                                    .read<AnnouncementBloc>()
-                                    .add(FetchAnnouncements());
-                              }
-                            },
-                            child: AnnouncementCard(item: item),
-                          );
-                        },
-                      ),
+                ),
               ),
             ],
           );

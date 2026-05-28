@@ -6,6 +6,7 @@ import '../../../analytics/presentation/bloc/analytics_bloc.dart';
 import '../../../analytics/presentation/bloc/analytics_event.dart';
 import '../../../analytics/presentation/bloc/analytics_state.dart';
 import '../../domain/entities/event_entity.dart';
+import '../../domain/repositories/event_repository.dart';
 import '../../../profile/domain/entities/profile_entity.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_state.dart';
@@ -265,58 +266,79 @@ class _EventPageState extends State<EventPage> {
         final isLoading = state is EventLoading;
         return Stack(
           children: [
-            SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.event.title,
-                    style: textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
+            RefreshIndicator(
+              onRefresh: () async {
+                await sl<EventRepository>().clearCache();
+                if (mounted) {
+                  if (widget.event.recipientIds.isNotEmpty) {
+                    _fetchRecipients();
+                  }
+                  final roles = _currentUserRoles();
+                  final isManagerOrAdmin = roles.contains('ROLE_ADMIN') || roles.contains('ROLE_MANAGER');
+                  if (isManagerOrAdmin) {
+                    _fetchCompanyMembers();
+                    _analyticsBloc.add(FetchStatsAndViewersRequested(
+                      contentId: widget.event.id,
+                      isEvent: true,
+                      forceRefresh: true,
+                    ));
+                  }
+                }
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.event.title,
+                      style: textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  _InfoRow(
-                    icon: Icons.access_time,
-                    label: _formatDate(widget.event.date),
-                  ),
-                  const SizedBox(height: 8),
-                  _InfoRow(
-                    icon: Icons.location_on_outlined,
-                    label: widget.event.location.isEmpty
-                        ? 'No location'
-                        : widget.event.location,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Description',
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
+                    const SizedBox(height: 12),
+                    _InfoRow(
+                      icon: Icons.access_time,
+                      label: _formatDate(widget.event.date),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    widget.event.description.isEmpty
-                        ? 'No description'
-                        : widget.event.description,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.8),
+                    const SizedBox(height: 8),
+                    _InfoRow(
+                      icon: Icons.location_on_outlined,
+                      label: widget.event.location.isEmpty
+                          ? 'No location'
+                          : widget.event.location,
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Invited',
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
+                    const SizedBox(height: 24),
+                    Text(
+                      'Description',
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildInvitedSection(colorScheme, textTheme),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.event.description.isEmpty
+                          ? 'No description'
+                          : widget.event.description,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface.withOpacity(0.8),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Invited',
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _buildInvitedSection(colorScheme, textTheme),
+                  ],
+                ),
               ),
             ),
             if (isLoading)
@@ -477,6 +499,7 @@ class _EventPageState extends State<EventPage> {
                           name: viewer.userFullName.split(' ').first,
                           lastname: viewer.userFullName.split(' ').skip(1).join(' '),
                           email: viewer.userEmail,
+                          avatarUrl: viewer.userImageUrl,
                         ),
                       );
 

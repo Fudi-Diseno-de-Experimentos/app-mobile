@@ -11,6 +11,7 @@ class UserEventViewModel extends UserEventViewEntity {
     required super.viewedAt,
     required super.userId,
     required super.userFullName,
+    super.userImageUrl,
   });
 
   factory UserEventViewModel.fromJson(Map<String, dynamic> json) {
@@ -24,6 +25,7 @@ class UserEventViewModel extends UserEventViewEntity {
       viewedAt: json['viewedAt']?.toString() ?? '',
       userId: json['userId']?.toString() ?? '',
       userFullName: json['userFullName']?.toString() ?? '',
+      userImageUrl: json['userImageUrl']?.toString(),
     );
   }
 }

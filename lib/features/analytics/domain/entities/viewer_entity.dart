@@ -8,6 +8,7 @@ class ViewerEntity extends Equatable {
   final String viewedAt;
   final String contentId;
   final String contentTitle;
+  final String? userImageUrl;
 
   const ViewerEntity({
     required this.viewId,
@@ -17,6 +18,7 @@ class ViewerEntity extends Equatable {
     required this.viewedAt,
     required this.contentId,
     required this.contentTitle,
+    this.userImageUrl,
   });
 
   @override
@@ -28,5 +30,6 @@ class ViewerEntity extends Equatable {
         viewedAt,
         contentId,
         contentTitle,
+        userImageUrl,
       ];
 }

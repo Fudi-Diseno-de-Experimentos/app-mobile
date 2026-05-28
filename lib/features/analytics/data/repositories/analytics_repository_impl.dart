@@ -14,7 +14,7 @@ class _CacheEntry<T> {
 
   _CacheEntry(this.data) : timestamp = DateTime.now();
 
-  bool get isValid => DateTime.now().difference(timestamp).inMinutes < 2;
+  bool get isValid => DateTime.now().difference(timestamp).inMinutes < 5;
 }
 
 class AnalyticsRepositoryImpl implements AnalyticsRepository {
@@ -37,6 +37,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
         announcementId: announcementId,
         userId: userId,
       );
+      _statsCache.remove(announcementId);
+      _viewersCache.remove(announcementId);
       return Right(result);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -53,6 +55,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
         eventId: eventId,
         userId: userId,
       );
+      _statsCache.remove(eventId);
+      _viewersCache.remove(eventId);
       return Right(result);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

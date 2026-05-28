@@ -18,6 +18,8 @@ import '../bloc/comment_bloc.dart';
 import '../bloc/comment_event.dart';
 import '../bloc/comment_state.dart';
 import '../widgets/priority_dot.dart';
+import '../../domain/repositories/announcement_repository.dart';
+import '../../domain/repositories/comment_repository.dart';
 
 class AnnouncementPage extends StatefulWidget {
   final AnnouncementEntity announcement;
@@ -335,83 +337,98 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 6, right: 12),
-                child: PriorityDot(
-                  priority: announcement.priority,
-                  size: 14,
+    return RefreshIndicator(
+      onRefresh: () async {
+        await sl<CommentRepository>().clearCache();
+        await sl<AnnouncementRepository>().clearCache();
+        if (mounted) {
+          context.read<CommentBloc>().add(FetchComments(widget.announcement.id));
+          context
+              .read<AnnouncementBloc>()
+              .add(FetchAnnouncementById(widget.announcement.id));
+        }
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 6, right: 12),
+                  child: PriorityDot(
+                    priority: announcement.priority,
+                    size: 14,
+                  ),
                 ),
+                Expanded(
+                  child: Text(
+                    announcement.title,
+                    style: textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _formatRelativeDate(announcement.createdAt),
+              style: textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurface.withOpacity(0.5),
               ),
-              Expanded(
-                child: Text(
-                  announcement.title,
-                  style: textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
+            ),
+            const SizedBox(height: 12),
+            _buildAuthorRow(announcement.createdBy, colorScheme, textTheme),
+            if (announcement.image != null &&
+                announcement.image!.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  announcement.image!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 200,
+                    width: double.infinity,
+                    color: colorScheme.secondary.withOpacity(0.1),
+                    child: Icon(
+                      Icons.image_not_supported,
+                      color: colorScheme.secondary,
+                    ),
                   ),
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _formatRelativeDate(announcement.createdAt),
-            style: textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.5),
-            ),
-          ),
-          if (announcement.image != null &&
-              announcement.image!.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                announcement.image!,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 200,
-                  width: double.infinity,
-                  color: colorScheme.secondary.withOpacity(0.1),
-                  child: Icon(
-                    Icons.image_not_supported,
-                    color: colorScheme.secondary,
-                  ),
-                ),
+            const SizedBox(height: 24),
+            Text(
+              announcement.description,
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface.withOpacity(0.85),
+                height: 1.6,
               ),
             ),
+            const SizedBox(height: 32),
+            Divider(color: colorScheme.secondary.withOpacity(0.3)),
+            const SizedBox(height: 16),
+            Text(
+              'Comments',
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 12),
+            _buildCommentInput(colorScheme),
+            const SizedBox(height: 16),
+            _buildCommentList(colorScheme, textTheme),
           ],
-          const SizedBox(height: 24),
-          Text(
-            announcement.description,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.85),
-              height: 1.6,
-            ),
-          ),
-          const SizedBox(height: 32),
-          Divider(color: colorScheme.secondary.withOpacity(0.3)),
-          const SizedBox(height: 16),
-          Text(
-            'Comments',
-            style: textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _buildCommentInput(colorScheme),
-          const SizedBox(height: 16),
-          _buildCommentList(colorScheme, textTheme),
-        ],
+        ),
       ),
     );
   }
@@ -518,6 +535,21 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
+    final matchedMember = _companyMembers.cast<ProfileEntity>().firstWhere(
+      (m) => m.id == comment.authorId,
+      orElse: () => ProfileEntity(
+        id: comment.authorId,
+        userId: comment.authorId,
+        username: '',
+        name: 'Unknown',
+        lastname: 'User',
+        email: '',
+      ),
+    );
+
+    final initials = '${matchedMember.name.isNotEmpty ? matchedMember.name[0] : ''}${matchedMember.lastname.isNotEmpty ? matchedMember.lastname[0] : ''}'
+        .toUpperCase();
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -531,28 +563,48 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
           CircleAvatar(
             radius: 16,
             backgroundColor: colorScheme.secondary.withOpacity(0.3),
-            child: Icon(
-              Icons.person,
-              size: 18,
-              color: colorScheme.onSurface,
-            ),
+            backgroundImage: matchedMember.avatarUrl != null && matchedMember.avatarUrl!.isNotEmpty
+                ? NetworkImage(matchedMember.avatarUrl!)
+                : null,
+            child: matchedMember.avatarUrl == null || matchedMember.avatarUrl!.isEmpty
+                ? Text(
+                    initials,
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${matchedMember.name} ${matchedMember.lastname}',
+                      style: textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      _formatRelativeDate(comment.createdAt),
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurface.withOpacity(0.55),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
                 Text(
                   comment.content,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _formatRelativeDate(comment.createdAt),
-                  style: textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.5),
                   ),
                 ),
               ],
@@ -591,6 +643,53 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildAuthorRow(String authorId, ColorScheme colorScheme, TextTheme textTheme) {
+    final matchedMember = _companyMembers.cast<ProfileEntity>().firstWhere(
+      (m) => m.id == authorId,
+      orElse: () => ProfileEntity(
+        id: authorId,
+        userId: authorId,
+        username: '',
+        name: 'Unknown',
+        lastname: 'User',
+        email: '',
+      ),
+    );
+
+    final initials = '${matchedMember.name.isNotEmpty ? matchedMember.name[0] : ''}${matchedMember.lastname.isNotEmpty ? matchedMember.lastname[0] : ''}'
+        .toUpperCase();
+
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 22,
+          backgroundColor: colorScheme.primary.withOpacity(0.1),
+          backgroundImage: matchedMember.avatarUrl != null && matchedMember.avatarUrl!.isNotEmpty
+              ? NetworkImage(matchedMember.avatarUrl!)
+              : null,
+          child: matchedMember.avatarUrl == null || matchedMember.avatarUrl!.isEmpty
+              ? Text(
+                  initials,
+                  style: TextStyle(
+                    color: colorScheme.primary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              : null,
+        ),
+        const SizedBox(width: 12),
+        Text(
+          'By ${matchedMember.name} ${matchedMember.lastname}',
+          style: textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onSurface.withOpacity(0.9),
+          ),
+        ),
+      ],
     );
   }
 
@@ -741,6 +840,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                           name: viewer.userFullName.split(' ').first,
                           lastname: viewer.userFullName.split(' ').skip(1).join(' '),
                           email: viewer.userEmail,
+                          avatarUrl: viewer.userImageUrl,
                         ),
                       );
 
