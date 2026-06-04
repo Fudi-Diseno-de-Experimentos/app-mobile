@@ -72,16 +72,16 @@ class _EventPageState extends State<EventPage> {
 
   void _registerView() {
     final profileState = context.read<ProfileBloc>().state;
-    String? actorId;
+    String? actualUserId;
     if (profileState is ProfileLoaded) {
-      actorId = profileState.profile.id;
+      actualUserId = profileState.profile.userId;
     } else if (profileState is ProfileUpdateSuccess) {
-      actorId = profileState.profile.id;
+      actualUserId = profileState.profile.userId;
     }
-    if (actorId != null && actorId.isNotEmpty) {
+    if (actualUserId != null && actualUserId.isNotEmpty) {
       _analyticsBloc.add(RegisterEventView(
         eventId: widget.event.id,
-        userId: actorId,
+        userId: actualUserId,
       ));
     }
   }
