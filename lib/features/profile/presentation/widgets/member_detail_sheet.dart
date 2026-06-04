@@ -24,7 +24,7 @@ class _MemberDetailSheetState extends State<MemberDetailSheet> {
   void initState() {
     super.initState();
     _analyticsBloc = sl<AnalyticsBloc>();
-    _analyticsBloc.add(FetchUserViewHistoryRequested(userId: widget.member.id));
+    _analyticsBloc.add(FetchUserViewHistoryRequested(userId: widget.member.userId));
   }
 
   @override
@@ -250,7 +250,7 @@ class _MemberDetailSheetState extends State<MemberDetailSheet> {
     return RefreshIndicator(
       onRefresh: () async {
         _analyticsBloc.add(FetchUserViewHistoryRequested(
-          userId: widget.member.id,
+          userId: widget.member.userId,
           forceRefresh: true,
         ));
         await _analyticsBloc.stream.firstWhere(
@@ -394,7 +394,7 @@ class _MemberDetailSheetState extends State<MemberDetailSheet> {
     return RefreshIndicator(
       onRefresh: () async {
         _analyticsBloc.add(FetchUserViewHistoryRequested(
-          userId: widget.member.id,
+          userId: widget.member.userId,
           forceRefresh: true,
         ));
         await _analyticsBloc.stream.firstWhere(

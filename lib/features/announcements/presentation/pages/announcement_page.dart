@@ -49,11 +49,18 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
         .read<AnnouncementBloc>()
         .add(FetchAnnouncementById(widget.announcement.id));
 
-    final actorId = _currentUser(context).userId;
-    if (actorId != null && actorId.isNotEmpty) {
+    final profileState = context.read<ProfileBloc>().state;
+    String? actualUserId;
+    if (profileState is ProfileLoaded) {
+      actualUserId = profileState.profile.userId;
+    } else if (profileState is ProfileUpdateSuccess) {
+      actualUserId = profileState.profile.userId;
+    }
+
+    if (actualUserId != null && actualUserId.isNotEmpty) {
       _analyticsBloc.add(RegisterAnnouncementView(
         announcementId: widget.announcement.id,
-        userId: actorId,
+        userId: actualUserId,
       ));
     }
 
