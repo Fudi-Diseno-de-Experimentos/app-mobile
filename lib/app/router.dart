@@ -5,12 +5,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'di.dart';
 import '../features/iam/presentation/pages/sign_up_page.dart';
 import '../features/iam/presentation/pages/sign_in_page.dart';
-import '../features/iam/presentation/pages/verification_page.dart';
+import '../features/iam/presentation/pages/company_setup_page.dart';
+import '../features/company/presentation/bloc/company_bloc.dart';
 import '../features/profile/presentation/pages/profile_page.dart';
 import '../features/profile/presentation/pages/settings_page.dart';
 import '../features/profile/presentation/pages/update_profile_page.dart';
 import '../features/profile/domain/entities/profile_entity.dart';
 import '../shared/widgets/main_layout.dart';
+import '../features/company/domain/entities/company_entity.dart';
+import '../features/profile/presentation/pages/company_edit_page.dart';
 import '../features/chat/presentation/pages/chat_page.dart';
 import '../features/chat/presentation/pages/conversation_page.dart';
 import '../features/chat/presentation/pages/new_chat_page.dart';
@@ -84,7 +87,13 @@ final GoRouter appRouter = GoRouter(
     GoRoute(path: '/register', builder: (context, state) => const SignUpPage()),
     GoRoute(
       path: '/join-company',
-      builder: (context, state) => const VerificationPage(),
+      builder: (context, state) => MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => sl<CompanyBloc>()),
+          BlocProvider(create: (_) => sl<IamBloc>()),
+        ],
+        child: const CompanySetupPage(),
+      ),
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
@@ -261,6 +270,17 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final profile = state.extra as ProfileEntity;
                     return UpdateProfilePage(profile: profile);
+                  },
+                ),
+                GoRoute(
+                  path: 'company-edit',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final company = state.extra as CompanyEntity;
+                    return BlocProvider(
+                      create: (_) => sl<CompanyBloc>(),
+                      child: CompanyEditPage(company: company),
+                    );
                   },
                 ),
               ],

@@ -85,6 +85,7 @@ class IamRepositoryImpl implements IamRepository {
     required String name,
     required String lastname,
     required String email,
+    List<String>? roles,
   }) async {
     try {
       await remoteDataSource.signUp(
@@ -93,6 +94,7 @@ class IamRepositoryImpl implements IamRepository {
         name: name,
         lastname: lastname,
         email: email,
+        roles: roles,
       );
       return const Right(null);
     } on ServerException catch (e) {

@@ -5,6 +5,8 @@ import '../domain/repositories/profile_repository.dart';
 import '../domain/usecases/get_company_members_usecase.dart';
 import '../domain/usecases/get_profile_usecase.dart';
 import '../domain/usecases/update_profile_usecase.dart';
+import '../domain/usecases/get_profiles_without_company_usecase.dart';
+import '../domain/usecases/assign_company_to_user_usecase.dart';
 import '../presentation/bloc/profile_bloc.dart';
 
 final sl = GetIt.instance;
@@ -36,6 +38,12 @@ void initProfileDependencies() {
   }
   if (!sl.isRegistered<GetCompanyMembersUseCase>()) {
     sl.registerLazySingleton(() => GetCompanyMembersUseCase(sl()));
+  }
+  if (!sl.isRegistered<GetProfilesWithoutCompanyUseCase>()) {
+    sl.registerLazySingleton(() => GetProfilesWithoutCompanyUseCase(sl()));
+  }
+  if (!sl.isRegistered<AssignCompanyToUserUseCase>()) {
+    sl.registerLazySingleton(() => AssignCompanyToUserUseCase(sl()));
   }
 
   // Blocs

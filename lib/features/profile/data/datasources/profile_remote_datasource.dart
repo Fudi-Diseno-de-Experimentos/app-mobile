@@ -5,6 +5,8 @@ abstract class ProfileRemoteDataSource {
   Future<ProfileModel> getProfile();
   Future<ProfileModel> updateProfile(ProfileModel profile);
   Future<List<ProfileModel>> getCompanyMembers(String companyId);
+  Future<List<ProfileModel>> getProfilesWithoutCompany();
+  Future<void> assignCompanyToUser(String userId, String companyId);
 }
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -54,5 +56,24 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
           .toList();
     }
     return [];
+  }
+
+  @override
+  Future<List<ProfileModel>> getProfilesWithoutCompany() async {
+    final response = await apiClient.get('/profiles/no-company');
+    if (response.data != null && response.data is List) {
+      return (response.data as List)
+          .map((json) => ProfileModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+    }
+    return [];
+  }
+
+  @override
+  Future<void> assignCompanyToUser(String userId, String companyId) async {
+    await apiClient.put(
+      '/users/$userId/company',
+      data: {'companyId': companyId},
+    );
   }
 }

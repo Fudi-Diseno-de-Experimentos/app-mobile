@@ -23,6 +23,7 @@ class SignUpSubmitted extends IamEvent {
   final String name;
   final String lastname;
   final String email;
+  final List<String>? roles;
 
   const SignUpSubmitted({
     required this.username,
@@ -30,10 +31,11 @@ class SignUpSubmitted extends IamEvent {
     required this.name,
     required this.lastname,
     required this.email,
+    this.roles,
   });
 
   @override
-  List<Object> get props => [username, password, name, lastname, email];
+  List<Object> get props => [username, password, name, lastname, email, roles ?? []];
 }
 
 class JoinCompanySubmitted extends IamEvent {

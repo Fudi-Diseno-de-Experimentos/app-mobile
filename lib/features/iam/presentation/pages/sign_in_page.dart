@@ -19,12 +19,12 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -32,7 +32,7 @@ class _SignInPageState extends State<SignInPage> {
   void _onSignIn() {
     context.read<IamBloc>().add(
       SignInSubmitted(
-        username: _emailController.text,
+        username: _usernameController.text,
         password: _passwordController.text,
       ),
     );
@@ -63,8 +63,8 @@ class _SignInPageState extends State<SignInPage> {
             const LogoHeader(),
             const SizedBox(height: 64),
             CustomTextField(
-              hintText: 'Enter your email',
-              controller: _emailController,
+              hintText: 'User Name',
+              controller: _usernameController,
             ),
             const SizedBox(height: 16),
             CustomTextField(
