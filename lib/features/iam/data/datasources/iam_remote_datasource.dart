@@ -9,6 +9,7 @@ abstract class IamRemoteDataSource {
     required String name,
     required String lastname,
     required String email,
+    List<String>? roles,
   });
   Future<void> joinCompany(String joinCode);
 }
@@ -34,6 +35,7 @@ class IamRemoteDataSourceImpl implements IamRemoteDataSource {
     required String name,
     required String lastname,
     required String email,
+    List<String>? roles,
   }) async {
     await apiClient.post(
       '/auth/sign-up',
@@ -43,7 +45,7 @@ class IamRemoteDataSourceImpl implements IamRemoteDataSource {
         'name': name,
         'lastname': lastname,
         'email': email,
-        'roles': ['ROLE_USER'],
+        'roles': roles ?? ['ROLE_USER'],
       },
     );
   }

@@ -63,12 +63,16 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
 
   List<AnnouncementEntity> _sorted(List<AnnouncementEntity> items) {
     final list = [...items];
-    list.sort((a, b) {
-      final byPriority = PriorityStyle.rank(a.priority)
-          .compareTo(PriorityStyle.rank(b.priority));
-      if (byPriority != 0) return byPriority;
-      return _parse(b.createdAt).compareTo(_parse(a.createdAt));
-    });
+    if (_selectedPriority == 'ALL') {
+      list.sort((a, b) => _parse(b.createdAt).compareTo(_parse(a.createdAt)));
+    } else {
+      list.sort((a, b) {
+        final byPriority = PriorityStyle.rank(a.priority)
+            .compareTo(PriorityStyle.rank(b.priority));
+        if (byPriority != 0) return byPriority;
+        return _parse(b.createdAt).compareTo(_parse(a.createdAt));
+      });
+    }
     return list;
   }
 

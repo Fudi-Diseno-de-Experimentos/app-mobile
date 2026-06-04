@@ -13,6 +13,7 @@ class SignUpUseCase {
     required String name,
     required String lastname,
     required String email,
+    List<String>? roles,
   }) {
     return repository.signUp(
       username: username,
@@ -20,6 +21,7 @@ class SignUpUseCase {
       name: name,
       lastname: lastname,
       email: email,
+      roles: roles,
     );
   }
 }

@@ -47,6 +47,7 @@ class IamBloc extends Bloc<IamEvent, IamState> {
       name: event.name,
       lastname: event.lastname,
       email: event.email,
+      roles: event.roles,
     );
     result.fold(
       (failure) => emit(IamError(failure.message)),

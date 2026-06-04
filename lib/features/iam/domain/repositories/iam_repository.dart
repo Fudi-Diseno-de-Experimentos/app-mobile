@@ -10,6 +10,7 @@ abstract class IamRepository {
     required String name,
     required String lastname,
     required String email,
+    List<String>? roles,
   });
   Future<Either<Failure, void>> joinCompany(String joinCode);
   Future<Either<Failure, void>> signOut();

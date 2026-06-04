@@ -8,6 +8,8 @@ import '../../../../shared/widgets/primary_button.dart';
 import '../bloc/iam_bloc.dart';
 import '../bloc/iam_event.dart';
 import '../bloc/iam_state.dart';
+import '../../../profile/presentation/bloc/profile_bloc.dart';
+import '../../../profile/presentation/bloc/profile_event.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -23,6 +25,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  bool _isManager = false;
 
   @override
   void dispose() {
@@ -50,6 +53,7 @@ class _SignUpPageState extends State<SignUpPage> {
         name: _nameController.text,
         lastname: _lastnameController.text,
         email: _emailController.text,
+        roles: _isManager ? const ['ROLE_MANAGER'] : const ['ROLE_USER'],
       ),
     );
   }
@@ -59,11 +63,22 @@ class _SignUpPageState extends State<SignUpPage> {
     return BlocListener<IamBloc, IamState>(
       listener: (context, state) {
         if (state is IamSignUpSuccess) {
-          // After successful signup, user can sign in
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Account created. Please sign in.')),
+            const SnackBar(content: Text('Account created. Logging in...')),
           );
-          context.pop(); // back to login
+          context.read<IamBloc>().add(
+            SignInSubmitted(
+              username: _usernameController.text,
+              password: _passwordController.text,
+            ),
+          );
+        } else if (state is IamSignInSuccess) {
+          context.read<ProfileBloc>().add(ProfileLoadRequested());
+          if (state.user.companyId == null || state.user.companyId!.isEmpty) {
+            context.go('/join-company');
+          } else {
+            context.go('/home');
+          }
         } else if (state is IamError) {
           ScaffoldMessenger.of(
             context,
@@ -108,7 +123,29 @@ class _SignUpPageState extends State<SignUpPage> {
                 isPassword: true,
                 controller: _confirmPasswordController,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Register as Manager',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  Switch(
+                    value: _isManager,
+                    activeColor: const Color(0xFF007AFF),
+                    onChanged: (value) {
+                      setState(() {
+                        _isManager = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
               BlocBuilder<IamBloc, IamState>(
                 builder: (context, state) {
                   return PrimaryButton(

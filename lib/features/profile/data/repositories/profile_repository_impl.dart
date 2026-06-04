@@ -18,11 +18,16 @@ class ProfileRepositoryImpl implements ProfileRepository {
   List<ProfileEntity>? _cachedMembers;
   DateTime? _membersLastFetchTime;
 
+  List<ProfileEntity>? _cachedNoCompanyProfiles;
+  DateTime? _noCompanyLastFetchTime;
+
   static const Duration _cacheTtl = Duration(minutes: 5);
   static const String _profileCacheKey = 'profile_cache';
   static const String _profileTimeKey = 'profile_cache_time';
   static const String _membersCacheKey = 'company_members_cache';
   static const String _membersTimeKey = 'company_members_cache_time';
+  static const String _noCompanyCacheKey = 'no_company_cache';
+  static const String _noCompanyTimeKey = 'no_company_cache_time';
 
   ProfileRepositoryImpl({
     required this.remoteDataSource,
@@ -109,16 +114,66 @@ class ProfileRepositoryImpl implements ProfileRepository {
     } catch (_) {}
   }
 
+  Future<List<ProfileEntity>?> _loadNoCompanyFromCache() async {
+    try {
+      final jsonStr = sharedPreferences.getString(_noCompanyCacheKey);
+      final timeStr = sharedPreferences.getString(_noCompanyTimeKey);
+      if (jsonStr != null && timeStr != null) {
+        final lastFetch = DateTime.tryParse(timeStr);
+        if (_isCacheValid(lastFetch)) {
+          final List<dynamic> decoded = jsonDecode(jsonStr);
+          final list = decoded.map<ProfileEntity>((item) => ProfileModel.fromJson(item)).toList();
+          _cachedNoCompanyProfiles = list;
+          _noCompanyLastFetchTime = lastFetch;
+          return list;
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  Future<void> _saveNoCompanyToCache(List<ProfileEntity> list) async {
+    try {
+      final now = DateTime.now();
+      _cachedNoCompanyProfiles = list;
+      _noCompanyLastFetchTime = now;
+      
+      final jsonList = list.map((item) {
+        if (item is ProfileModel) {
+          return item.toCacheJson();
+        } else {
+          return ProfileModel(
+            id: item.id,
+            userId: item.userId,
+            username: item.username,
+            name: item.name,
+            lastname: item.lastname,
+            email: item.email,
+            roles: item.roles,
+            companyId: item.companyId,
+            avatarUrl: item.avatarUrl,
+          ).toCacheJson();
+        }
+      }).toList();
+      await sharedPreferences.setString(_noCompanyCacheKey, jsonEncode(jsonList));
+      await sharedPreferences.setString(_noCompanyTimeKey, now.toIso8601String());
+    } catch (_) {}
+  }
+
   @override
   Future<void> clearCache() async {
     _cachedProfile = null;
     _profileLastFetchTime = null;
     _cachedMembers = null;
     _membersLastFetchTime = null;
+    _cachedNoCompanyProfiles = null;
+    _noCompanyLastFetchTime = null;
     await sharedPreferences.remove(_profileCacheKey);
     await sharedPreferences.remove(_profileTimeKey);
     await sharedPreferences.remove(_membersCacheKey);
     await sharedPreferences.remove(_membersTimeKey);
+    await sharedPreferences.remove(_noCompanyCacheKey);
+    await sharedPreferences.remove(_noCompanyTimeKey);
   }
 
   @override
@@ -187,6 +242,50 @@ class ProfileRepositoryImpl implements ProfileRepository {
       final List<ProfileEntity> entityList = List<ProfileEntity>.from(members);
       await _saveMembersToCache(entityList);
       return Right(entityList);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return const Left(ServerFailure('An unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ProfileEntity>>> getProfilesWithoutCompany({bool forceRefresh = false}) async {
+    if (!forceRefresh && _cachedNoCompanyProfiles != null && _isCacheValid(_noCompanyLastFetchTime)) {
+      return Right(_cachedNoCompanyProfiles!);
+    }
+
+    if (!forceRefresh) {
+      final cached = await _loadNoCompanyFromCache();
+      if (cached != null) {
+        return Right(cached);
+      }
+    }
+
+    try {
+      final profiles = await remoteDataSource.getProfilesWithoutCompany();
+      final List<ProfileEntity> entityList = List<ProfileEntity>.from(profiles);
+      await _saveNoCompanyToCache(entityList);
+      return Right(entityList);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return const Left(ServerFailure('An unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> assignCompanyToUser(String userId, String companyId) async {
+    try {
+      await remoteDataSource.assignCompanyToUser(userId, companyId);
+      // Remove the assigned user from local cache list if it exists
+      if (_cachedNoCompanyProfiles != null) {
+        _cachedNoCompanyProfiles = _cachedNoCompanyProfiles!
+            .where((profile) => profile.userId != userId)
+            .toList();
+        await _saveNoCompanyToCache(_cachedNoCompanyProfiles!);
+      }
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
