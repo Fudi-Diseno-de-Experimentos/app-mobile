@@ -1,5 +1,4 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:get_it/get_it.dart';
 import 'package:app_mobile/core/error/failures.dart';
 
 import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
@@ -414,10 +413,7 @@ class FakeAssignCompanyToUserUseCase implements AssignCompanyToUserUseCase {
   ProfileRepository get repository => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, void>> call({
-    required String userId,
-    required String companyId,
-  }) async {
+  Future<Either<Failure, void>> call(String userId, String companyId) async {
     return const Right(null);
   }
 }

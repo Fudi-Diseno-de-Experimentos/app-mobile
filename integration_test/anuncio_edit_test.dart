@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol/patrol.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_mobile/app/app.dart';
 import 'package:app_mobile/app/di.dart';
 import 'helpers/mock_test_helpers.dart';
@@ -17,6 +18,7 @@ void main() {
       await dotenv.load(fileName: ".env");
       await initDependencies();
       setupAllMockDependencies();
+      await sl<SharedPreferences>().remove('auth_token');
 
       await $.pumpWidgetAndSettle(const MyApp());
 
@@ -26,11 +28,8 @@ void main() {
       await $('Sign in').tap();
       await $.pumpAndSettle();
 
-      // Navegar al Feed de anuncios
+      // Navegar al Feed de anuncios (Announcements ya está seleccionado por defecto)
       await $('Files').tap();
-      await $.pumpAndSettle();
-
-      await $('Announcements').tap();
       await $.pumpAndSettle();
 
       // Assert - Verificar que los anuncios mock se muestran
@@ -44,12 +43,13 @@ void main() {
       await $(Icons.more_vert).tap();
       await $.pumpAndSettle();
 
-      // Seleccionar Edit
+      // Seleccionar Edit del PopupMenu
       await $('Edit').tap();
       await $.pumpAndSettle();
 
       // Assert - Verificar que se muestra la pantalla de edición
-      expect($('Edit Announcement'), findsOneWidget);
+      // 'Edit Announcement' aparece en el AppBar y como encabezado de la página
+      expect($('Edit Announcement'), findsWidgets);
     },
   );
 }

@@ -4,7 +4,6 @@ import 'package:patrol/patrol.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:app_mobile/app/app.dart';
 import 'package:app_mobile/app/di.dart';
-import 'helpers/test_helpers.dart';
 
 void main() {
   patrolTest('Crear evento e intentar editar desde el detalle', ($) async {

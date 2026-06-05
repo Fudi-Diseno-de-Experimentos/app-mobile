@@ -1,5 +1,4 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:get_it/get_it.dart';
 import 'package:app_mobile/core/error/failures.dart';
 
 import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
