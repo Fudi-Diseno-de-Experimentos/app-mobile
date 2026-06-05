@@ -88,6 +88,18 @@ const _tAnnouncementHigh = AnnouncementEntity(
   updatedAt: '2024-01-02T00:00:00Z',
 );
 
+const _tEvent = EventEntity(
+  id: 'evt-1',
+  title: 'Evento de Prueba',
+  description: 'Descripción del evento para pruebas patrol',
+  date: '2024-06-15T10:00:00Z',
+  location: 'Sala de Conferencias A',
+  createdBy: 'user-1',
+  recipientIds: [],
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+);
+
 // --- Fake Use Cases ---
 
 class FakeSignInUseCase implements SignInUseCase {
