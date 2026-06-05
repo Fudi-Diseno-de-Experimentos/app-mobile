@@ -332,7 +332,7 @@ class FakeGetEventsUseCase implements GetEventsUseCase {
 
   @override
   Future<Either<Failure, List<EventEntity>>> call({void params}) async {
-    return const Right([]);
+    return const Right([_tEvent]);
   }
 }
 
