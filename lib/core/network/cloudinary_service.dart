@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:cloudinary_public/cloudinary_public.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'cloudinary_config.dart';
@@ -20,25 +20,25 @@ class CloudinaryService {
     Function(double)? onProgress,
   }) async {
     try {
-      print('🚀 CloudinaryService: Iniciando subida de imagen...');
-      print('📁 Archivo: $imagePath');
-      print('🎯 Tipo: $imageType');
+      debugPrint('🚀 CloudinaryService: Iniciando subida de imagen...');
+      debugPrint('📁 Archivo: $imagePath');
+      debugPrint('🎯 Tipo: $imageType');
 
       final config = CloudinaryConfig.getConfigForType(imageType);
 
       // 📏 Validar tamaño del archivo
       final file = File(imagePath);
       final fileSize = await file.length();
-      print('📊 Tamaño del archivo: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint('📊 Tamaño del archivo: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
 
       if (fileSize > config.maxSize) {
-        print('❌ Archivo demasiado grande: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB > ${(config.maxSize / 1024 / 1024).toStringAsFixed(2)} MB');
+        debugPrint('❌ Archivo demasiado grande: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB > ${(config.maxSize / 1024 / 1024).toStringAsFixed(2)} MB');
         throw Exception('Image too large. Maximum ${(config.maxSize / 1024 / 1024).toStringAsFixed(1)}MB');
       }
 
       // 🗜️ Comprimir imagen si es necesario (opcional, podrías omitirlo si prefieres subir el original)
       final compressedPath = await _compressImageIfNeeded(imagePath, config, imageType);
-      print('🗜️ Imagen comprimida: $compressedPath');
+      debugPrint('🗜️ Imagen comprimida: $compressedPath');
 
       // 🔄 Configurar cloudinary para este tipo específico
       final cloudinary = CloudinaryPublic(
@@ -60,22 +60,22 @@ class CloudinaryService {
 
       onProgress?.call(1.0); // 100% - Completado
 
-      print('✅ Imagen subida exitosamente');
-      print('🔗 URL: ${response.secureUrl}');
+      debugPrint('✅ Imagen subida exitosamente');
+      debugPrint('🔗 URL: ${response.secureUrl}');
 
       // 🧹 Limpiar archivo temporal si se creó uno comprimido
       if (compressedPath != imagePath) {
         try {
           await File(compressedPath).delete();
-          print('🧹 Archivo temporal eliminado');
+          debugPrint('🧹 Archivo temporal eliminado');
         } catch (e) {
-          print('⚠️ Error al eliminar archivo temporal: $e');
+          debugPrint('⚠️ Error al eliminar archivo temporal: $e');
         }
       }
 
       return response.secureUrl;
     } catch (e) {
-      print('❌ Error en CloudinaryService.uploadImage: $e');
+      debugPrint('❌ Error en CloudinaryService.uploadImage: $e');
       return null;
     }
   }
@@ -113,7 +113,7 @@ class CloudinaryService {
     }
 
     try {
-      print('🗜️ Comprimiendo imagen...');
+      debugPrint('🗜️ Comprimiendo imagen...');
 
       // 📖 Leer imagen
       final imageBytes = await file.readAsBytes();
@@ -121,7 +121,7 @@ class CloudinaryService {
 
       if (image == null) {
         // No se pudo decodificar → no arriesgar un re-encode corrupto.
-        print('⚠️ No se pudo decodificar; subiendo original sin tocar.');
+        debugPrint('⚠️ No se pudo decodificar; subiendo original sin tocar.');
         return imagePath;
       }
 
@@ -139,7 +139,7 @@ class CloudinaryService {
             height: targetHeight,
             interpolation: img.Interpolation.linear,
           );
-          print('📐 Redimensionada a: ${image.width}x${image.height}');
+          debugPrint('📐 Redimensionada a: ${image.width}x${image.height}');
         }
       }
 
@@ -156,7 +156,7 @@ class CloudinaryService {
         Uint8List bytes;
         do {
           bytes = Uint8List.fromList(img.encodeJpg(image, quality: quality));
-          print(
+          debugPrint(
             '🎛️ Calidad $quality: ${(bytes.length / 1024 / 1024).toStringAsFixed(2)} MB',
           );
           if (bytes.length <= config.maxSize || quality <= 30) break;
@@ -173,13 +173,13 @@ class CloudinaryService {
       );
       await compressedFile.writeAsBytes(outBytes);
 
-      print(
+      debugPrint(
         '✅ Imagen comprimida final: ${(outBytes.length / 1024 / 1024).toStringAsFixed(2)} MB ($outExt)',
       );
 
       return compressedFile.path;
     } catch (e) {
-      print('❌ Error al comprimir imagen: $e');
+      debugPrint('❌ Error al comprimir imagen: $e');
       // En caso de error, retornar el archivo original
       return imagePath;
     }
@@ -223,9 +223,9 @@ class CloudinaryService {
         }
       }
 
-      print('🧹 Archivos temporales limpiados');
+      debugPrint('🧹 Archivos temporales limpiados');
     } catch (e) {
-      print('⚠️ Error al limpiar archivos temporales: $e');
+      debugPrint('⚠️ Error al limpiar archivos temporales: $e');
     }
   }
 }

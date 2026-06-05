@@ -17,7 +17,6 @@ import '../../../company/presentation/bloc/company_state.dart';
 import '../bloc/iam_bloc.dart';
 import '../bloc/iam_event.dart';
 import '../bloc/iam_state.dart';
-import '../widgets/auth_scaffold.dart';
 
 class CompanySetupPage extends StatefulWidget {
   const CompanySetupPage({super.key});

@@ -125,11 +125,11 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? activeColor.withOpacity(0.12)
-                              : colorScheme.secondary.withOpacity(0.05),
+                              ? activeColor.withValues(alpha:0.12)
+                              : colorScheme.secondary.withValues(alpha:0.05),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: isSelected ? activeColor : colorScheme.outline.withOpacity(0.15),
+                            color: isSelected ? activeColor : colorScheme.outline.withValues(alpha:0.15),
                             width: 1.5,
                           ),
                         ),
@@ -137,7 +137,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                           child: Text(
                             priority,
                             style: textTheme.labelLarge?.copyWith(
-                              color: isSelected ? activeColor : colorScheme.onSurface.withOpacity(0.6),
+                              color: isSelected ? activeColor : colorScheme.onSurface.withValues(alpha:0.6),
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                             ),
                           ),
@@ -163,7 +163,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                             height: MediaQuery.of(context).size.height * 0.6,
                             alignment: Alignment.center,
                             child: Text(
-                              "No ${_selectedPriority == 'ALL' ? '' : _selectedPriority.toLowerCase() + ' '}announcements available",
+                              "No ${_selectedPriority == 'ALL' ? '' : '${_selectedPriority.toLowerCase()} '}announcements available",
                               style: const TextStyle(color: AppColors.tertiary),
                             ),
                           ),

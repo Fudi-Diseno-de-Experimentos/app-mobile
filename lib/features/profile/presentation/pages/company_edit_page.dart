@@ -97,7 +97,7 @@ class _CompanyEditPageState extends State<CompanyEditPage> {
                 Text(
                   "Modify the name, tax ID (RUC) or change the brand logo.",
                   style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.7),
+                    color: colorScheme.onSurface.withValues(alpha:0.7),
                   ),
                 ),
                 const SizedBox(height: 32),

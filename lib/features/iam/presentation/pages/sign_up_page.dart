@@ -136,7 +136,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   Switch(
                     value: _isManager,
-                    activeColor: const Color(0xFF007AFF),
+                    activeTrackColor: const Color(0xFF007AFF),
                     onChanged: (value) {
                       setState(() {
                         _isManager = value;

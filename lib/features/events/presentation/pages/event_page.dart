@@ -158,7 +158,7 @@ class _EventPageState extends State<EventPage> {
           children: [
             TabBar(
               labelColor: colorScheme.primary,
-              unselectedLabelColor: colorScheme.onSurface.withOpacity(0.6),
+              unselectedLabelColor: colorScheme.onSurface.withValues(alpha:0.6),
               indicatorColor: colorScheme.primary,
               tabs: const [
                 Tab(text: 'Details'),
@@ -324,7 +324,7 @@ class _EventPageState extends State<EventPage> {
                           ? 'No description'
                           : widget.event.description,
                       style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface.withOpacity(0.8),
+                        color: colorScheme.onSurface.withValues(alpha:0.8),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -343,7 +343,7 @@ class _EventPageState extends State<EventPage> {
             ),
             if (isLoading)
               Container(
-                color: colorScheme.surface.withOpacity(0.5),
+                color: colorScheme.surface.withValues(alpha:0.5),
                 child: const Center(child: CircularProgressIndicator()),
               ),
           ],
@@ -407,10 +407,10 @@ class _EventPageState extends State<EventPage> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: colorScheme.secondary.withOpacity(0.05),
+                      color: colorScheme.secondary.withValues(alpha:0.05),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: colorScheme.outline.withOpacity(0.1),
+                        color: colorScheme.outline.withValues(alpha:0.1),
                       ),
                     ),
                     child: Row(
@@ -423,7 +423,7 @@ class _EventPageState extends State<EventPage> {
                             painter: PercentagePainter(
                               percentage: stats.viewPercentage,
                               primaryColor: colorScheme.primary,
-                              backgroundColor: colorScheme.primary.withOpacity(0.15),
+                              backgroundColor: colorScheme.primary.withValues(alpha:0.15),
                             ),
                             child: Center(
                               child: Text(
@@ -452,13 +452,13 @@ class _EventPageState extends State<EventPage> {
                               Text(
                                 'Viewed: ${viewers.length} / ${stats.totalUsers} users',
                                 style: textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onSurface.withOpacity(0.8),
+                                  color: colorScheme.onSurface.withValues(alpha:0.8),
                                 ),
                               ),
                               Text(
                                 'Pending: $pendingCount users',
                                 style: textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurface.withOpacity(0.55),
+                                  color: colorScheme.onSurface.withValues(alpha:0.55),
                                 ),
                               ),
                             ],
@@ -483,7 +483,7 @@ class _EventPageState extends State<EventPage> {
                         child: Text(
                           'No readers logged yet.',
                           style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface.withOpacity(0.5),
+                            color: colorScheme.onSurface.withValues(alpha:0.5),
                           ),
                         ),
                       ),
@@ -510,14 +510,14 @@ class _EventPageState extends State<EventPage> {
                         margin: const EdgeInsets.only(bottom: 8),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: colorScheme.secondary.withOpacity(0.05),
+                          color: colorScheme.secondary.withValues(alpha:0.05),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
                           children: [
                             CircleAvatar(
                               radius: 20,
-                              backgroundColor: colorScheme.primary.withOpacity(0.1),
+                              backgroundColor: colorScheme.primary.withValues(alpha:0.1),
                               backgroundImage: matchedMember.avatarUrl != null && matchedMember.avatarUrl!.isNotEmpty
                                   ? NetworkImage(matchedMember.avatarUrl!)
                                   : null,
@@ -547,7 +547,7 @@ class _EventPageState extends State<EventPage> {
                                   Text(
                                     viewer.userEmail,
                                     style: textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurface.withOpacity(0.6),
+                                      color: colorScheme.onSurface.withValues(alpha:0.6),
                                     ),
                                   ),
                                 ],
@@ -557,7 +557,7 @@ class _EventPageState extends State<EventPage> {
                             Text(
                               _formatViewedAt(viewer.viewedAt),
                               style: textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onSurface.withOpacity(0.4),
+                                color: colorScheme.onSurface.withValues(alpha:0.4),
                               ),
                             ),
                           ],
@@ -597,7 +597,7 @@ class _EventPageState extends State<EventPage> {
       return Text(
         'No invited people',
         style: textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurface.withOpacity(0.7),
+          color: colorScheme.onSurface.withValues(alpha:0.7),
         ),
       );
     }
@@ -615,7 +615,7 @@ class _EventPageState extends State<EventPage> {
       return Text(
         '${widget.event.recipientIds.length} invited',
         style: textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurface.withOpacity(0.7),
+          color: colorScheme.onSurface.withValues(alpha:0.7),
         ),
       );
     }
@@ -629,14 +629,14 @@ class _EventPageState extends State<EventPage> {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: colorScheme.secondary.withOpacity(0.05),
+            color: colorScheme.secondary.withValues(alpha:0.05),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: colorScheme.secondary.withOpacity(0.2),
+                backgroundColor: colorScheme.secondary.withValues(alpha:0.2),
                 backgroundImage: member.avatarUrl != null &&
                         member.avatarUrl!.isNotEmpty
                     ? NetworkImage(member.avatarUrl!)
@@ -667,7 +667,7 @@ class _EventPageState extends State<EventPage> {
                     Text(
                       member.email,
                       style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurface.withOpacity(0.6),
+                        color: colorScheme.onSurface.withValues(alpha:0.6),
                       ),
                     ),
                   ],
@@ -748,13 +748,13 @@ class _InfoRow extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return Row(
       children: [
-        Icon(icon, size: 18, color: colorScheme.onSurface.withOpacity(0.7)),
+        Icon(icon, size: 18, color: colorScheme.onSurface.withValues(alpha:0.7)),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             label,
             style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.8),
+              color: colorScheme.onSurface.withValues(alpha:0.8),
             ),
           ),
         ),
