@@ -9,7 +9,6 @@ import 'package:app_mobile/features/iam/domain/usecases/sign_up_usecase.dart';
 import 'package:app_mobile/features/iam/domain/usecases/sign_out_usecase.dart';
 
 import '../../mocks/generate_mocks.mocks.dart';
-import '../../mocks/mock_helpers.dart';
 
 void main() {
   late MockIamRemoteDataSource mockDataSource;

@@ -9,7 +9,6 @@ import 'package:app_mobile/features/company/domain/usecases/update_company_useca
 import 'package:app_mobile/features/company/domain/usecases/get_company_by_user_id_usecase.dart';
 
 import '../../mocks/generate_mocks.mocks.dart';
-import '../../mocks/mock_helpers.dart';
 
 void main() {
   late MockCompanyRemoteDataSource mockDataSource;

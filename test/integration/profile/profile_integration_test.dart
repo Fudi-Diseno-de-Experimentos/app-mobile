@@ -10,7 +10,6 @@ import 'package:app_mobile/features/profile/domain/usecases/get_company_members_
 import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
 
 import '../../mocks/generate_mocks.mocks.dart';
-import '../../mocks/mock_helpers.dart';
 
 void main() {
   late MockProfileRemoteDataSource mockDataSource;

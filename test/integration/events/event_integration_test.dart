@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:mockito/mockito.dart';
 
 import 'package:app_mobile/core/error/exceptions.dart';
@@ -11,7 +10,6 @@ import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.
 import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart';
 
 import '../../mocks/generate_mocks.mocks.dart';
-import '../../mocks/mock_helpers.dart';
 
 void main() {
   late MockEventRemoteDataSource mockDataSource;
