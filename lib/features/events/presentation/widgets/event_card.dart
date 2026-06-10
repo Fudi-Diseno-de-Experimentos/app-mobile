@@ -61,7 +61,7 @@ class EventCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Container(
+                SizedBox(
                   width: double.infinity,
                   child: Text(
                     item.description,
@@ -93,7 +93,7 @@ class EventCard extends StatelessWidget {
                 const Spacer(),
                 const Icon(Icons.location_on_outlined, size: 20, color: AppColors.tertiary),
                 const SizedBox(width: 8),
-                Container(
+                SizedBox(
                   width: 80,
                   child: Text(
                     item.location,

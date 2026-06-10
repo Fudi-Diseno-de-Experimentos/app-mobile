@@ -40,7 +40,7 @@ class AvatarPlaceholder extends StatelessWidget {
     return IntrinsicWidth(
       child: IntrinsicHeight(
         child: Container(
-          color: AppColors.background.withOpacity(0.4),
+          color: AppColors.background.withValues(alpha:0.4),
           padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 20),
           margin: const EdgeInsets.only(right: 18),
           child: Column(

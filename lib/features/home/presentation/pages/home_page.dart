@@ -40,7 +40,7 @@ class _HomeContent extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [

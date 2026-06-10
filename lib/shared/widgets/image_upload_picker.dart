@@ -201,7 +201,7 @@ class _ImageUploadPickerState extends State<ImageUploadPicker> {
                             backgroundImage: _currentImageUrl!.startsWith('http')
                                 ? NetworkImage(_currentImageUrl!) as ImageProvider
                                 : FileImage(File(_currentImageUrl!)),
-                            onBackgroundImageError: (_, __) {},
+                            onBackgroundImageError: (_, _) {},
                           )
                         : ClipRRect(
                             borderRadius: BorderRadius.circular(12),

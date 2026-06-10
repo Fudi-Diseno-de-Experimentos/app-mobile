@@ -246,7 +246,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
           children: [
             TabBar(
               labelColor: colorScheme.primary,
-              unselectedLabelColor: colorScheme.onSurface.withOpacity(0.6),
+              unselectedLabelColor: colorScheme.onSurface.withValues(alpha:0.6),
               indicatorColor: colorScheme.primary,
               tabs: const [
                 Tab(text: 'Details'),
@@ -386,7 +386,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             Text(
               _formatRelativeDate(announcement.createdAt),
               style: textTheme.labelSmall?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.5),
+                color: colorScheme.onSurface.withValues(alpha:0.5),
               ),
             ),
             const SizedBox(height: 12),
@@ -403,7 +403,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                   errorBuilder: (context, error, stackTrace) => Container(
                     height: 200,
                     width: double.infinity,
-                    color: colorScheme.secondary.withOpacity(0.1),
+                    color: colorScheme.secondary.withValues(alpha:0.1),
                     child: Icon(
                       Icons.image_not_supported,
                       color: colorScheme.secondary,
@@ -416,12 +416,12 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             Text(
               announcement.description,
               style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.85),
+                color: colorScheme.onSurface.withValues(alpha:0.85),
                 height: 1.6,
               ),
             ),
             const SizedBox(height: 32),
-            Divider(color: colorScheme.secondary.withOpacity(0.3)),
+            Divider(color: colorScheme.secondary.withValues(alpha:0.3)),
             const SizedBox(height: 16),
             Text(
               'Comments',
@@ -454,10 +454,10 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             decoration: InputDecoration(
               hintText: 'Add a comment...',
               hintStyle: TextStyle(
-                color: colorScheme.onSurface.withOpacity(0.4),
+                color: colorScheme.onSurface.withValues(alpha:0.4),
               ),
               filled: true,
-              fillColor: colorScheme.secondary.withOpacity(0.1),
+              fillColor: colorScheme.secondary.withValues(alpha:0.1),
               contentPadding: const EdgeInsets.symmetric(
                 vertical: 14,
                 horizontal: 16,
@@ -522,7 +522,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             child: Text(
               'No comments yet. Be the first to comment.',
               style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.5),
+                color: colorScheme.onSurface.withValues(alpha:0.5),
               ),
             ),
           );
@@ -561,7 +561,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: colorScheme.secondary.withOpacity(0.1),
+        color: colorScheme.secondary.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -569,7 +569,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: colorScheme.secondary.withOpacity(0.3),
+            backgroundColor: colorScheme.secondary.withValues(alpha:0.3),
             backgroundImage: matchedMember.avatarUrl != null && matchedMember.avatarUrl!.isNotEmpty
                 ? NetworkImage(matchedMember.avatarUrl!)
                 : null,
@@ -602,7 +602,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                     Text(
                       _formatRelativeDate(comment.createdAt),
                       style: textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onSurface.withOpacity(0.55),
+                        color: colorScheme.onSurface.withValues(alpha:0.55),
                       ),
                     ),
                   ],
@@ -622,7 +622,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
               icon: Icon(
                 Icons.more_vert,
                 size: 18,
-                color: colorScheme.onSurface.withOpacity(0.5),
+                color: colorScheme.onSurface.withValues(alpha:0.5),
               ),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
@@ -673,7 +673,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       children: [
         CircleAvatar(
           radius: 22,
-          backgroundColor: colorScheme.primary.withOpacity(0.1),
+          backgroundColor: colorScheme.primary.withValues(alpha:0.1),
           backgroundImage: matchedMember.avatarUrl != null && matchedMember.avatarUrl!.isNotEmpty
               ? NetworkImage(matchedMember.avatarUrl!)
               : null,
@@ -693,7 +693,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
           'By ${matchedMember.name} ${matchedMember.lastname}',
           style: textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface.withOpacity(0.9),
+            color: colorScheme.onSurface.withValues(alpha:0.9),
           ),
         ),
       ],
@@ -755,10 +755,10 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: colorScheme.secondary.withOpacity(0.05),
+                      color: colorScheme.secondary.withValues(alpha:0.05),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: colorScheme.outline.withOpacity(0.1),
+                        color: colorScheme.outline.withValues(alpha:0.1),
                       ),
                     ),
                     child: Row(
@@ -771,7 +771,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                             painter: PercentagePainter(
                               percentage: stats.viewPercentage,
                               primaryColor: colorScheme.primary,
-                              backgroundColor: colorScheme.primary.withOpacity(0.15),
+                              backgroundColor: colorScheme.primary.withValues(alpha:0.15),
                             ),
                             child: Center(
                               child: Text(
@@ -800,13 +800,13 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                               Text(
                                 'Viewed: ${viewers.length} / ${stats.totalUsers} users',
                                 style: textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onSurface.withOpacity(0.8),
+                                  color: colorScheme.onSurface.withValues(alpha:0.8),
                                 ),
                               ),
                               Text(
                                 'Pending: $pendingCount users',
                                 style: textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurface.withOpacity(0.55),
+                                  color: colorScheme.onSurface.withValues(alpha:0.55),
                                 ),
                               ),
                             ],
@@ -831,7 +831,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                         child: Text(
                           'No readers logged yet.',
                           style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface.withOpacity(0.5),
+                            color: colorScheme.onSurface.withValues(alpha:0.5),
                           ),
                         ),
                       ),
@@ -858,14 +858,14 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                         margin: const EdgeInsets.only(bottom: 8),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: colorScheme.secondary.withOpacity(0.05),
+                          color: colorScheme.secondary.withValues(alpha:0.05),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
                           children: [
                             CircleAvatar(
                               radius: 20,
-                              backgroundColor: colorScheme.primary.withOpacity(0.1),
+                              backgroundColor: colorScheme.primary.withValues(alpha:0.1),
                               backgroundImage: matchedMember.avatarUrl != null && matchedMember.avatarUrl!.isNotEmpty
                                   ? NetworkImage(matchedMember.avatarUrl!)
                                   : null,
@@ -895,7 +895,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                                   Text(
                                     viewer.userEmail,
                                     style: textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurface.withOpacity(0.6),
+                                      color: colorScheme.onSurface.withValues(alpha:0.6),
                                     ),
                                   ),
                                 ],
@@ -905,7 +905,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                             Text(
                               _formatViewedAt(viewer.viewedAt),
                               style: textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.onSurface.withOpacity(0.4),
+                                  color: colorScheme.onSurface.withValues(alpha:0.4),
                               ),
                             ),
                           ],

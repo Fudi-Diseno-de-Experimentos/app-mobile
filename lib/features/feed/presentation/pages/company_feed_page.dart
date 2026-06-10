@@ -95,7 +95,7 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
                             decoration: BoxDecoration(
                               color: _selectedIndex == 0
                                   ? AppColors.neutral
-                                  : AppColors.secondary.withOpacity(0.3),
+                                  : AppColors.secondary.withValues(alpha:0.3),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             alignment: Alignment.center,
@@ -121,7 +121,7 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
                             decoration: BoxDecoration(
                               color: _selectedIndex == 1
                                   ? AppColors.neutral
-                                  : AppColors.secondary.withOpacity(0.3),
+                                  : AppColors.secondary.withValues(alpha:0.3),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             alignment: Alignment.center,
@@ -163,12 +163,11 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
   Widget? _buildFloatingActionButton() {
     if (_selectedIndex == 0) {
       // Announcements: accessible to all roles
+      final announcementBloc = context.read<AnnouncementBloc>();
       return FloatingActionButton(
         onPressed: () async {
           await context.push('/files/create-announcement');
-          if (context.mounted) {
-            context.read<AnnouncementBloc>().add(FetchAnnouncements());
-          }
+          announcementBloc.add(FetchAnnouncements());
         },
         backgroundColor: AppColors.neutral,
         child: const Icon(Icons.add, color: AppColors.surface),
