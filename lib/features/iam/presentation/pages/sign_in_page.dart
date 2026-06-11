@@ -1,15 +1,15 @@
+import 'package:app_mobile/features/iam/presentation/bloc/iam_bloc.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_event.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_state.dart';
+import 'package:app_mobile/features/iam/presentation/widgets/auth_scaffold.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/shared/widgets/custom_text_field.dart';
+import 'package:app_mobile/shared/widgets/logo_header.dart';
+import 'package:app_mobile/shared/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../widgets/auth_scaffold.dart';
-import '../../../../shared/widgets/custom_text_field.dart';
-import '../../../../shared/widgets/logo_header.dart';
-import '../../../../shared/widgets/primary_button.dart';
-import '../bloc/iam_bloc.dart';
-import '../bloc/iam_event.dart';
-import '../bloc/iam_state.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_event.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -72,17 +72,6 @@ class _SignInPageState extends State<SignInPage> {
               isPassword: true,
               controller: _passwordController,
             ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {},
-                child: const Text(
-                  'Forgot password?',
-                  style: TextStyle(color: Color(0xFF007AFF), fontSize: 12),
-                ),
-              ),
-            ),
             const SizedBox(height: 32),
             BlocBuilder<IamBloc, IamState>(
               builder: (context, state) {
@@ -103,10 +92,10 @@ class _SignInPageState extends State<SignInPage> {
                 ),
                 GestureDetector(
                   onTap: () => context.push('/register'),
-                  child: const Text(
-                    "Sign up now",
+                  child: Text(
+                    'Sign up now',
                     style: TextStyle(
-                      color: Color(0xFF007AFF),
+                      color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),

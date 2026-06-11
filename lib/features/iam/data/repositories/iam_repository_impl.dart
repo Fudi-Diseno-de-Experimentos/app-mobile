@@ -1,25 +1,25 @@
+import 'package:app_mobile/core/auth/token_store.dart';
+import 'package:app_mobile/core/error/exceptions.dart';
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/analytics/domain/repositories/analytics_repository.dart';
+import 'package:app_mobile/features/announcements/domain/repositories/announcement_repository.dart';
+import 'package:app_mobile/features/announcements/domain/repositories/comment_repository.dart';
+import 'package:app_mobile/features/chat/domain/repositories/chat_repository.dart';
+import 'package:app_mobile/features/events/domain/repositories/event_repository.dart';
+import 'package:app_mobile/features/iam/data/datasources/iam_remote_datasource.dart';
+import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
+import 'package:app_mobile/features/iam/domain/repositories/iam_repository.dart';
+import 'package:app_mobile/features/profile/domain/repositories/profile_repository.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:get_it/get_it.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../core/error/exceptions.dart';
-import '../../../../core/error/failures.dart';
-import '../../domain/entities/user_entity.dart';
-import '../../domain/repositories/iam_repository.dart';
-import '../datasources/iam_remote_datasource.dart';
-import '../../../announcements/domain/repositories/announcement_repository.dart';
-import '../../../events/domain/repositories/event_repository.dart';
-import '../../../profile/domain/repositories/profile_repository.dart';
-import '../../../chat/domain/repositories/chat_repository.dart';
-import '../../../analytics/domain/repositories/analytics_repository.dart';
-import '../../../announcements/domain/repositories/comment_repository.dart';
 
 class IamRepositoryImpl implements IamRepository {
   final IamRemoteDataSource remoteDataSource;
-  final SharedPreferences sharedPreferences;
+  final TokenStore tokenStore;
 
   IamRepositoryImpl({
     required this.remoteDataSource,
-    required this.sharedPreferences,
+    required this.tokenStore,
   });
 
   Future<void> _clearAllCaches() async {
@@ -65,7 +65,7 @@ class IamRepositoryImpl implements IamRepository {
     try {
       final userModel = await remoteDataSource.signIn(username, password);
       // Save token locally
-      await sharedPreferences.setString('auth_token', userModel.token);
+      await tokenStore.save(userModel.token);
       
       // Clear all caches on login to avoid user leaks
       await _clearAllCaches();
@@ -108,6 +108,8 @@ class IamRepositoryImpl implements IamRepository {
   Future<Either<Failure, void>> joinCompany(String joinCode) async {
     try {
       await remoteDataSource.joinCompany(joinCode);
+      // Caches built while the user had no company are stale now.
+      await _clearAllCaches();
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
@@ -119,7 +121,7 @@ class IamRepositoryImpl implements IamRepository {
   @override
   Future<Either<Failure, void>> signOut() async {
     try {
-      await sharedPreferences.remove('auth_token');
+      await tokenStore.clear();
       // Clear all caches on logout to avoid user leaks
       await _clearAllCaches();
       return const Right(null);

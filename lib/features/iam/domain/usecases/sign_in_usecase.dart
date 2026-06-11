@@ -1,7 +1,7 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
+import 'package:app_mobile/features/iam/domain/repositories/iam_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/user_entity.dart';
-import '../repositories/iam_repository.dart';
 
 class SignInUseCase {
   final IamRepository repository;
