@@ -1,20 +1,18 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/chat/domain/entities/group_entity.dart';
+import 'package:app_mobile/features/chat/domain/repositories/chat_repository.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_event.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_state.dart';
+import 'package:app_mobile/features/chat/presentation/widgets/chat_item.dart';
+import 'package:app_mobile/features/chat/presentation/widgets/segmented_selector.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
+import 'package:app_mobile/shared/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/widgets/main_app_bar.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_event.dart';
-import '../../../profile/presentation/bloc/profile_state.dart';
-import '../../domain/entities/group_entity.dart';
-import '../../../../app/di.dart';
-import '../../domain/repositories/chat_repository.dart';
-import '../bloc/chat_bloc.dart';
-import '../bloc/chat_event.dart';
-import '../bloc/chat_state.dart';
-import '../widgets/chat_item.dart';
-import '../widgets/segmented_selector.dart';
 
 /// Unified chat feed. One list, four client-side tabs:
 /// All (recent-first) · Direct (2 members) · Groups (>2) · Archives (local).
@@ -83,7 +81,7 @@ class _ChatPageState extends State<ChatPage> {
                 ? Center(
                     child: Text(
                       profileState.message,
-                      style: const TextStyle(color: AppColors.destructive),
+                      style: TextStyle(color: Theme.of(context).colorScheme.error),
                     ),
                   )
                 : const Center(child: CircularProgressIndicator()),
@@ -160,8 +158,8 @@ class _ChatPageState extends State<ChatPage> {
                       return Center(
                         child: Text(
                           state.message,
-                          style: const TextStyle(
-                            color: AppColors.destructive,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
                           ),
                         ),
                       );
@@ -183,8 +181,8 @@ class _ChatPageState extends State<ChatPage> {
                                   alignment: Alignment.center,
                                   child: Text(
                                     'No ${_tabs[_tab].toLowerCase()} chats',
-                                    style: const TextStyle(
-                                      color: AppColors.tertiary,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.tertiary,
                                     ),
                                   ),
                                 ),

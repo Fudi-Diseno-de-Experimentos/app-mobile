@@ -1,17 +1,17 @@
 import 'dart:async';
 
+import 'package:app_mobile/features/chat/domain/entities/message_entity.dart';
+import 'package:app_mobile/features/chat/domain/usecases/delete_message_usecase.dart';
+import 'package:app_mobile/features/chat/domain/usecases/disconnect_chat_usecase.dart';
+import 'package:app_mobile/features/chat/domain/usecases/edit_message_usecase.dart';
+import 'package:app_mobile/features/chat/domain/usecases/get_conversation_messages_usecase.dart';
+import 'package:app_mobile/features/chat/domain/usecases/get_group_messages_usecase.dart';
+import 'package:app_mobile/features/chat/domain/usecases/send_message_usecase.dart';
+import 'package:app_mobile/features/chat/domain/usecases/watch_messages_usecase.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/message_event.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/message_state.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../profile/domain/usecases/get_company_members_usecase.dart';
-import '../../domain/entities/message_entity.dart';
-import '../../domain/usecases/delete_message_usecase.dart';
-import '../../domain/usecases/disconnect_chat_usecase.dart';
-import '../../domain/usecases/edit_message_usecase.dart';
-import '../../domain/usecases/get_conversation_messages_usecase.dart';
-import '../../domain/usecases/get_group_messages_usecase.dart';
-import '../../domain/usecases/send_message_usecase.dart';
-import '../../domain/usecases/watch_messages_usecase.dart';
-import 'message_event.dart';
-import 'message_state.dart';
 
 class MessageBloc extends Bloc<MessageEvent, MessageState> {
   final GetGroupMessagesUseCase getGroupMessagesUseCase;

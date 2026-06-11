@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:app_mobile/core/auth/token_store.dart';
+import 'package:app_mobile/features/chat/data/models/message_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
-
-import '../models/message_model.dart';
 
 /// Live chat transport over the backend STOMP endpoint.
 ///
@@ -24,9 +23,9 @@ abstract class ChatSocketDataSource {
 }
 
 class ChatSocketDataSourceImpl implements ChatSocketDataSource {
-  final SharedPreferences sharedPreferences;
+  final TokenStore tokenStore;
 
-  ChatSocketDataSourceImpl(this.sharedPreferences);
+  ChatSocketDataSourceImpl(this.tokenStore);
 
   StompClient? _client;
   StreamController<MessageModel>? _controller;
@@ -47,7 +46,7 @@ class ChatSocketDataSourceImpl implements ChatSocketDataSource {
     final controller = StreamController<MessageModel>.broadcast();
     _controller = controller;
 
-    final token = sharedPreferences.getString('auth_token');
+    final token = tokenStore.token;
     final authHeaders = <String, String>{
       if (token != null) 'Authorization': 'Bearer $token',
     };

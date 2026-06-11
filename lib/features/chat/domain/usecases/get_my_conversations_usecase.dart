@@ -1,7 +1,7 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/chat/domain/entities/conversation_entity.dart';
+import 'package:app_mobile/features/chat/domain/repositories/chat_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/conversation_entity.dart';
-import '../repositories/chat_repository.dart';
 
 class GetMyConversationsUseCase {
   final ChatRepository repository;

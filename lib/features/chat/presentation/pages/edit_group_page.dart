@@ -1,13 +1,12 @@
+import 'package:app_mobile/core/network/cloudinary_config.dart';
+import 'package:app_mobile/features/chat/domain/entities/group_entity.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_event.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_state.dart';
+import 'package:app_mobile/shared/widgets/image_upload_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../core/network/cloudinary_config.dart';
-import '../../../../shared/widgets/image_upload_picker.dart';
-import '../../domain/entities/group_entity.dart';
-import '../bloc/chat_bloc.dart';
-import '../bloc/chat_event.dart';
-import '../bloc/chat_state.dart';
 
 /// Edit a group's name / description / image (`PUT /api/v1/groups/{id}`,
 /// `UpdateGroupResource`). Visibility and membership use separate endpoints

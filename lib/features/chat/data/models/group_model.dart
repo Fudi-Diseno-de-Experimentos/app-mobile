@@ -1,4 +1,4 @@
-import '../../domain/entities/group_entity.dart';
+import 'package:app_mobile/features/chat/domain/entities/group_entity.dart';
 
 class GroupModel extends GroupEntity {
   const GroupModel({

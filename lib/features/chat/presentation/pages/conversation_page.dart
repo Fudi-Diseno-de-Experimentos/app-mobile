@@ -1,17 +1,15 @@
+import 'package:app_mobile/features/chat/domain/entities/group_entity.dart';
+import 'package:app_mobile/features/chat/domain/entities/message_entity.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/message_bloc.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/message_event.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/message_state.dart';
+import 'package:app_mobile/features/chat/presentation/widgets/message_bubble.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../core/theme/app_colors.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_event.dart';
-import '../../../profile/presentation/bloc/profile_state.dart';
-import '../../domain/entities/group_entity.dart';
-import '../../domain/entities/message_entity.dart';
-import '../bloc/message_bloc.dart';
-import '../bloc/message_event.dart';
-import '../bloc/message_state.dart';
-import '../widgets/message_bubble.dart';
 
 class ConversationPage extends StatefulWidget {
   final GroupEntity group;
@@ -74,7 +72,7 @@ class _ConversationPageState extends State<ConversationPage> {
         globalPos & const Size(40, 40),
         Offset.zero & overlay.size,
       ),
-      items: const [
+      items: [
         PopupMenuItem(
           value: 'edit',
           child: ListTile(
@@ -86,10 +84,10 @@ class _ConversationPageState extends State<ConversationPage> {
         PopupMenuItem(
           value: 'delete',
           child: ListTile(
-            leading: Icon(Icons.delete_outline, color: AppColors.destructive),
+            leading: Icon(Icons.delete_outline, color: Theme.of(context).colorScheme.error),
             title: Text(
               'Delete',
-              style: TextStyle(color: AppColors.destructive),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
             contentPadding: EdgeInsets.zero,
           ),
@@ -231,7 +229,7 @@ class _ConversationPageState extends State<ConversationPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(state.message),
-                          backgroundColor: AppColors.destructive,
+                          backgroundColor: Theme.of(context).colorScheme.error,
                         ),
                       );
                     }
@@ -246,8 +244,8 @@ class _ConversationPageState extends State<ConversationPage> {
                       return Center(
                         child: Text(
                           state.message,
-                          style: const TextStyle(
-                              color: AppColors.destructive),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.error),
                         ),
                       );
                     }
@@ -263,10 +261,10 @@ class _ConversationPageState extends State<ConversationPage> {
                             : const <String, String>{};
                     if (messages != null) {
                       if (messages.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: Text(
                             'No messages yet. Say hi 👋',
-                            style: TextStyle(color: AppColors.tertiary),
+                            style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
                           ),
                         );
                       }
