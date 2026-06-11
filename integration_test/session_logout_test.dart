@@ -1,61 +1,62 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:patrol/patrol.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_mobile/app/app.dart';
 import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/core/auth/token_store.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol/patrol.dart';
+
 import 'helpers/mock_test_helpers.dart';
 
-/// US35 - Mantener la sesión iniciada
-/// Como empleado, quiero mantener la sesión iniciada de forma segura
-/// para no tener que volver a autenticarme con frecuencia.
+/// US35 - Stay signed in
+/// As an employee, I want to stay securely signed in so I don't have
+/// to re-authenticate frequently.
 ///
-/// US36 - Cierre de sesión seguro
-/// Como empleado, quiero cerrar sesión de forma segura para que mi sesión
-/// finalice por completo y no pueda ser reutilizada.
+/// US36 - Secure sign-out
+/// As an employee, I want to sign out securely so my session ends
+/// completely and cannot be reused.
 void main() {
   patrolTest(
-    'US35/US36 - Sesión: debe iniciar sesión, navegar al home, cerrar sesión y redirigir al login',
+    'US35/US36 - Session: should sign in, navigate home, sign out and redirect to login',
     ($) async {
       // Arrange
-      await dotenv.load(fileName: ".env");
+      await dotenv.load(fileName: '.env');
       await initDependencies();
       setupAllMockDependencies();
-      await sl<SharedPreferences>().remove('auth_token');
+      await sl<TokenStore>().clear();
 
       await $.pumpWidgetAndSettle(const MyApp());
 
-      // === US35: Iniciar sesión exitosamente ===
+      // === US35: Sign in successfully ===
 
-      // Act - Iniciar sesión
+      // Act - Sign in
       await $(TextFormField).at(0).enterText('testadmin');
       await $(TextFormField).at(1).enterText('123456');
       await $('Sign in').tap();
       await $.pumpAndSettle();
 
-      // Assert - Verificar que llegamos al home
+      // Assert - Verify we reached home
       expect($('Home'), findsWidgets);
 
-      // === US36: Cerrar sesión y redirigir al login ===
+      // === US36: Sign out and redirect to login ===
 
-      // Act - Navegar a Profile
+      // Act - Navigate to Profile
       await $('Profile').tap();
       await $.pumpAndSettle();
 
-      // Act - Abrir Settings (el ícono es settings_outlined)
+      // Act - Open Settings (the icon is settings_outlined)
       await $(Icons.settings_outlined).tap();
       await $.pumpAndSettle();
 
-      // Assert - Verificar que estamos en Settings
+      // Assert - Verify we are on Settings
       expect($('Settings'), findsOneWidget);
       expect($('Sign Out'), findsOneWidget);
 
-      // Act - Cerrar sesión
+      // Act - Sign out
       await $('Sign Out').tap();
       await $.pumpAndSettle();
 
-      // Assert - Verificar redirección al login
+      // Assert - Verify the redirect to login
       expect($('Sign in'), findsOneWidget);
       expect($('User Name'), findsOneWidget);
     },

@@ -9,12 +9,12 @@ import 'package:patrol/src/platform/contracts/contracts.dart';
 import 'package:test_api/src/backend/invoker.dart';
 
 // START: GENERATED TEST IMPORTS
-import 'anuncio_delete_test.dart' as anuncio_delete_test;
-import 'anuncio_edit_test.dart' as anuncio_edit_test;
-import 'anuncio_test.dart' as anuncio_test;
-import 'evento_delete_test.dart' as evento_delete_test;
-import 'evento_edit_test.dart' as evento_edit_test;
-import 'evento_test.dart' as evento_test;
+import 'announcement_delete_test.dart' as announcement_delete_test;
+import 'announcement_edit_test.dart' as announcement_edit_test;
+import 'announcement_create_test.dart' as announcement_create_test;
+import 'event_delete_test.dart' as event_delete_test;
+import 'event_edit_test.dart' as event_edit_test;
+import 'event_create_test.dart' as event_create_test;
 import 'session_logout_test.dart' as session_logout_test;
 // END: GENERATED TEST IMPORTS
 
@@ -78,12 +78,12 @@ Future<void> main() async {
   });
 
 // START: GENERATED TEST GROUPS
-  group('anuncio_delete_test', anuncio_delete_test.main);
-  group('anuncio_edit_test', anuncio_edit_test.main);
-  group('anuncio_test', anuncio_test.main);
-  group('evento_delete_test', evento_delete_test.main);
-  group('evento_edit_test', evento_edit_test.main);
-  group('evento_test', evento_test.main);
+  group('announcement_delete_test', announcement_delete_test.main);
+  group('announcement_edit_test', announcement_edit_test.main);
+  group('announcement_create_test', announcement_create_test.main);
+  group('event_delete_test', event_delete_test.main);
+  group('event_edit_test', event_edit_test.main);
+  group('event_create_test', event_create_test.main);
   group('session_logout_test', session_logout_test.main);
 // END: GENERATED TEST GROUPS
 

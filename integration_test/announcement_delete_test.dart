@@ -1,24 +1,25 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:patrol/patrol.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_mobile/app/app.dart';
 import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/core/auth/token_store.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol/patrol.dart';
+
 import 'helpers/mock_test_helpers.dart';
 
-/// US13 - Eliminación de anuncios
-/// Como gerente, quiero eliminar anuncios obsoletos para mantener
-/// la información actualizada.
+/// US13 - Announcement deletion
+/// As a manager, I want to delete obsolete announcements to keep
+/// the information up to date.
 void main() {
   patrolTest(
-    'US13 - Eliminación de anuncios: debe eliminar un anuncio y confirmar la acción',
+    'US13 - Announcement deletion: should delete an announcement and confirm the action',
     ($) async {
-      // Arrange - Configuración inicial con mocks
-      await dotenv.load(fileName: ".env");
+      // Arrange - Initial setup with mocks
+      await dotenv.load(fileName: '.env');
       await initDependencies();
       setupAllMockDependencies();
-      await sl<SharedPreferences>().remove('auth_token');
+      await sl<TokenStore>().clear();
 
       await $.pumpWidgetAndSettle(const MyApp());
 
@@ -28,18 +29,18 @@ void main() {
       await $('Sign in').tap();
       await $.pumpAndSettle();
 
-      // Navegar al Feed de anuncios (Announcements ya está seleccionado por defecto)
+      // Navigate to the announcements feed (Announcements is selected by default)
       await $('Files').tap();
       await $.pumpAndSettle();
 
-      // Assert - Verificar que el anuncio existe
-      expect($('Anuncio de Prueba'), findsOneWidget);
+      // Assert - Verify the announcement exists
+      expect($('Sample Announcement'), findsOneWidget);
 
-      // Act - Abrir el detalle del anuncio
-      await $('Anuncio de Prueba').tap();
+      // Act - Open the announcement detail
+      await $('Sample Announcement').tap();
       await $.pumpAndSettle();
 
-      // Abrir menú de opciones
+      // Open the options menu
       await $(Icons.more_vert).tap();
       await $.pumpAndSettle();
 
@@ -47,12 +48,12 @@ void main() {
       await $('Delete').tap();
       await $.pumpAndSettle();
 
-      // Confirmar la eliminación en el AlertDialog
+      // Confirm the deletion in the AlertDialog
       expect($('Delete Announcement'), findsOneWidget);
       await $(AlertDialog).$(TextButton).last.tap();
       await $.pumpAndSettle();
 
-      // Assert - Verificar snackbar de éxito
+      // Assert - Verify the success snackbar
       expect($('Announcement deleted'), findsOneWidget);
     },
   );

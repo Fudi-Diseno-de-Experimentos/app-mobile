@@ -1,26 +1,21 @@
-import 'package:fpdart/fpdart.dart';
+import 'package:app_mobile/app/di.dart';
 import 'package:app_mobile/core/error/failures.dart';
-
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
+import 'package:app_mobile/features/announcements/domain/repositories/announcement_repository.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/create_announcement_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_usecase.dart';
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
+import 'package:app_mobile/features/events/domain/repositories/event_repository.dart';
+import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
 import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
-import 'package:app_mobile/features/iam/domain/usecases/sign_in_usecase.dart';
 import 'package:app_mobile/features/iam/domain/repositories/iam_repository.dart';
-
+import 'package:app_mobile/features/iam/domain/usecases/sign_in_usecase.dart';
 import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
-import 'package:app_mobile/features/profile/domain/usecases/get_profile_usecase.dart';
 import 'package:app_mobile/features/profile/domain/repositories/profile_repository.dart';
 import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
-
-import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/create_announcement_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/repositories/announcement_repository.dart';
-
-import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
-import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
-import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
-import 'package:app_mobile/features/events/domain/repositories/event_repository.dart';
-
-import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_profile_usecase.dart';
+import 'package:fpdart/fpdart.dart';
 
 class FakeSignInUseCase implements SignInUseCase {
   @override
@@ -66,7 +61,7 @@ class FakeGetAnnouncementsUseCase implements GetAnnouncementsUseCase {
   AnnouncementRepository get repository => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, List<AnnouncementEntity>>> call({void params}) async {
+  Future<Either<Failure, List<AnnouncementEntity>>> call({bool forceRefresh = false}) async {
     return const Right([]);
   }
 }
@@ -103,7 +98,7 @@ class FakeGetEventsUseCase implements GetEventsUseCase {
   EventRepository get repository => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, List<EventEntity>>> call({void params}) async {
+  Future<Either<Failure, List<EventEntity>>> call({bool forceRefresh = false}) async {
     return const Right([]);
   }
 }
