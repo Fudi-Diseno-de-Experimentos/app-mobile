@@ -1,12 +1,11 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:app_mobile/core/error/exceptions.dart';
 import 'package:app_mobile/features/company/data/models/company_model.dart';
 import 'package:app_mobile/features/company/data/repositories/company_repository_impl.dart';
 import 'package:app_mobile/features/company/domain/usecases/create_company_usecase.dart';
-import 'package:app_mobile/features/company/domain/usecases/update_company_usecase.dart';
 import 'package:app_mobile/features/company/domain/usecases/get_company_by_user_id_usecase.dart';
+import 'package:app_mobile/features/company/domain/usecases/update_company_usecase.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 
 import '../../mocks/generate_mocks.mocks.dart';
 
@@ -17,7 +16,7 @@ void main() {
   const tCompanyModel = CompanyModel(
     id: 'comp-1',
     ruc: '20123456789',
-    nombre: 'Empresa SAC',
+    name: 'Empresa SAC',
     iconUrl: 'logo.png',
     isActive: true,
     userId: 'user-1',
@@ -29,12 +28,12 @@ void main() {
     repository = CompanyRepositoryImpl(remoteDataSource: mockDataSource);
   });
 
-  group('US41 - Integración: Registro de nueva compañía', () {
-    test('debe crear compañía pasando por todas las capas', () async {
+  group('US41 - Integration: New company registration', () {
+    test('should create a company through all layers', () async {
       // Arrange
       when(mockDataSource.createCompany(
         ruc: anyNamed('ruc'),
-        nombre: anyNamed('nombre'),
+        name: anyNamed('name'),
         iconUrl: anyNamed('iconUrl'),
         isActive: anyNamed('isActive'),
         userId: anyNamed('userId'),
@@ -44,7 +43,7 @@ void main() {
       // Act
       final result = await useCase(
         ruc: '20123456789',
-        nombre: 'Empresa SAC',
+        name: 'Empresa SAC',
         iconUrl: 'logo.png',
         isActive: true,
         userId: 'user-1',
@@ -53,20 +52,20 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (company) {
           expect(company.ruc, '20123456789');
-          expect(company.nombre, 'Empresa SAC');
+          expect(company.name, 'Empresa SAC');
           expect(company.joinCode, 'ABC123');
         },
       );
     });
 
-    test('debe retornar ServerFailure cuando el RUC ya existe', () async {
+    test('should return ServerFailure when the RUC already exists', () async {
       // Arrange
       when(mockDataSource.createCompany(
         ruc: anyNamed('ruc'),
-        nombre: anyNamed('nombre'),
+        name: anyNamed('name'),
         iconUrl: anyNamed('iconUrl'),
         isActive: anyNamed('isActive'),
         userId: anyNamed('userId'),
@@ -76,7 +75,7 @@ void main() {
       // Act
       final result = await useCase(
         ruc: '20123456789',
-        nombre: 'Duplicada',
+        name: 'Duplicada',
         isActive: true,
         userId: 'user-1',
       );
@@ -86,13 +85,13 @@ void main() {
     });
   });
 
-  group('US42 - Integración: Edición de perfil de compañía', () {
-    test('debe actualizar compañía pasando por todas las capas', () async {
+  group('US42 - Integration: Company profile editing', () {
+    test('should update a company through all layers', () async {
       // Arrange
       const updatedModel = CompanyModel(
         id: 'comp-1',
         ruc: '20123456789',
-        nombre: 'Empresa Actualizada',
+        name: 'Empresa Actualizada',
         iconUrl: 'new_logo.png',
         isActive: true,
         userId: 'user-1',
@@ -101,7 +100,7 @@ void main() {
       when(mockDataSource.updateCompany(
         id: anyNamed('id'),
         ruc: anyNamed('ruc'),
-        nombre: anyNamed('nombre'),
+        name: anyNamed('name'),
         iconUrl: anyNamed('iconUrl'),
         isActive: anyNamed('isActive'),
       )).thenAnswer((_) async => updatedModel);
@@ -111,7 +110,7 @@ void main() {
       final result = await useCase(
         id: 'comp-1',
         ruc: '20123456789',
-        nombre: 'Empresa Actualizada',
+        name: 'Empresa Actualizada',
         iconUrl: 'new_logo.png',
         isActive: true,
       );
@@ -119,14 +118,14 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
-        (company) => expect(company.nombre, 'Empresa Actualizada'),
+        (_) => fail('Should be Right'),
+        (company) => expect(company.name, 'Empresa Actualizada'),
       );
     });
   });
 
-  group('US41 - Integración: Obtener compañía del usuario', () {
-    test('debe obtener compañía por userId pasando por todas las capas', () async {
+  group('US41 - Integration: Fetch the user company', () {
+    test('should fetch the company by userId through all layers', () async {
       // Arrange
       when(mockDataSource.getCompanyByUserId('user-1'))
           .thenAnswer((_) async => tCompanyModel);
@@ -138,7 +137,7 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (company) {
           expect(company.id, 'comp-1');
           expect(company.userId, 'user-1');
@@ -146,7 +145,7 @@ void main() {
       );
     });
 
-    test('debe retornar ServerFailure cuando el usuario no tiene compañía', () async {
+    test('should return ServerFailure when the user has no company', () async {
       // Arrange
       when(mockDataSource.getCompanyByUserId('user-no-company'))
           .thenThrow(ServerException(message: 'Not found'));

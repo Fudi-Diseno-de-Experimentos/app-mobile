@@ -1,13 +1,12 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:app_mobile/core/error/exceptions.dart';
 import 'package:app_mobile/features/events/data/models/event_model.dart';
 import 'package:app_mobile/features/events/data/repositories/event_repository_impl.dart';
-import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
-import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 
 import '../../mocks/generate_mocks.mocks.dart';
 
@@ -18,8 +17,8 @@ void main() {
 
   const tModel = EventModel(
     id: 'evt-1',
-    title: 'Reunión General',
-    description: 'Revisión trimestral',
+    title: 'General Meeting',
+    description: 'Quarterly review',
     date: '2024-03-15T10:00:00Z',
     location: 'Auditorio',
     createdBy: 'manager-1',
@@ -40,8 +39,8 @@ void main() {
     );
   });
 
-  group('US18 - Integración: Datasource → Repository → UseCase (Creación de eventos)', () {
-    test('debe obtener eventos desde el datasource a través del repositorio y use case', () async {
+  group('US18 - Integration: Datasource → Repository → UseCase (Event creation)', () {
+    test('should fetch events from the datasource through repository and use case', () async {
       // Arrange
       when(mockDataSource.getEvents())
           .thenAnswer((_) async => [tModel]);
@@ -53,16 +52,16 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (events) {
           expect(events.length, 1);
-          expect(events.first.title, 'Reunión General');
+          expect(events.first.title, 'General Meeting');
           expect(events.first.recipientIds, ['emp-1', 'emp-2']);
         },
       );
     });
 
-    test('debe crear un evento pasando por todas las capas', () async {
+    test('should create an event through all layers', () async {
       // Arrange
       when(mockDataSource.createEvent(
         title: anyNamed('title'),
@@ -76,8 +75,8 @@ void main() {
 
       // Act
       final result = await useCase(
-        title: 'Reunión General',
-        description: 'Revisión trimestral',
+        title: 'General Meeting',
+        description: 'Quarterly review',
         date: '2024-03-15T10:00:00Z',
         location: 'Auditorio',
         createdBy: 'manager-1',
@@ -87,7 +86,7 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (event) {
           expect(event.id, 'evt-1');
           expect(event.location, 'Auditorio');
@@ -95,7 +94,7 @@ void main() {
       );
     });
 
-    test('debe propagar errores del datasource como ServerFailure', () async {
+    test('should propagate datasource errors as ServerFailure', () async {
       // Arrange
       when(mockDataSource.getEvents())
           .thenThrow(ServerException(message: 'Timeout'));
@@ -109,12 +108,12 @@ void main() {
     });
   });
 
-  group('US20 - Integración: Modificación de eventos', () {
-    test('debe actualizar un evento y limpiar la caché', () async {
+  group('US20 - Integration: Event modification', () {
+    test('should update an event and clear the cache', () async {
       // Arrange
       const updatedModel = EventModel(
         id: 'evt-1',
-        title: 'Reunión Pospuesta',
+        title: 'Postponed Meeting',
         description: 'Nueva fecha',
         date: '2024-04-15T10:00:00Z',
         location: 'Sala B',
@@ -136,7 +135,7 @@ void main() {
       // Act
       final result = await useCase(
         id: 'evt-1',
-        title: 'Reunión Pospuesta',
+        title: 'Postponed Meeting',
         description: 'Nueva fecha',
         date: '2024-04-15T10:00:00Z',
         location: 'Sala B',
@@ -146,17 +145,17 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (event) {
-          expect(event.title, 'Reunión Pospuesta');
+          expect(event.title, 'Postponed Meeting');
           expect(event.recipientIds.length, 3);
         },
       );
     });
   });
 
-  group('US19 - Integración: Cancelación de eventos', () {
-    test('debe eliminar un evento y limpiar la caché', () async {
+  group('US19 - Integration: Event cancellation', () {
+    test('should delete an event and clear the cache', () async {
       // Arrange
       when(mockDataSource.deleteEvent('evt-1'))
           .thenAnswer((_) async {});
@@ -171,8 +170,8 @@ void main() {
     });
   });
 
-  group('US18 - Integración: Caché de eventos', () {
-    test('debe usar caché en memoria para la segunda llamada', () async {
+  group('US18 - Integration: Event cache', () {
+    test('should use the in-memory cache for the second call', () async {
       // Arrange
       when(mockDataSource.getEvents())
           .thenAnswer((_) async => [tModel]);
@@ -186,7 +185,7 @@ void main() {
       verify(mockDataSource.getEvents()).called(1);
     });
 
-    test('debe refrescar datos después de crear un evento (invalidación de caché)', () async {
+    test('should refresh data after creating an event (cache invalidation)', () async {
       // Arrange
       when(mockDataSource.getEvents())
           .thenAnswer((_) async => [tModel]);

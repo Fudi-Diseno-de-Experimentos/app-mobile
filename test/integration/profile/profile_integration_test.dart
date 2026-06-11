@@ -1,13 +1,12 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:app_mobile/core/error/exceptions.dart';
 import 'package:app_mobile/features/profile/data/models/profile_model.dart';
 import 'package:app_mobile/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
 import 'package:app_mobile/features/profile/domain/usecases/get_profile_usecase.dart';
 import 'package:app_mobile/features/profile/domain/usecases/update_profile_usecase.dart';
-import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
-import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 
 import '../../mocks/generate_mocks.mocks.dart';
 
@@ -51,8 +50,8 @@ void main() {
     );
   });
 
-  group('US39 - Integración: Carga de perfil con roles', () {
-    test('debe obtener perfil desde el datasource a través del repositorio y use case', () async {
+  group('US39 - Integration: Profile loading with roles', () {
+    test('should fetch the profile from the datasource through repository and use case', () async {
       // Arrange
       when(mockDataSource.getProfile())
           .thenAnswer((_) async => tProfileModel);
@@ -64,7 +63,7 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (profile) {
           expect(profile.username, 'jperez');
           expect(profile.roles, contains('ROLE_MANAGER'));
@@ -73,7 +72,7 @@ void main() {
       );
     });
 
-    test('debe retornar ServerFailure cuando falla la carga del perfil', () async {
+    test('should return ServerFailure when profile loading fails', () async {
       // Arrange
       when(mockDataSource.getProfile())
           .thenThrow(ServerException(message: 'Unauthorized'));
@@ -87,8 +86,8 @@ void main() {
     });
   });
 
-  group('US42 - Integración: Actualización de perfil', () {
-    test('debe actualizar perfil y limpiar caché', () async {
+  group('US42 - Integration: Profile update', () {
+    test('should update the profile and clear the cache', () async {
       // Arrange
       const updatedModel = ProfileModel(
         id: 'profile-1',
@@ -117,14 +116,14 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (profile) => expect(profile.name, 'Juan Carlos'),
       );
     });
   });
 
-  group('US44 - Integración: Miembros de la compañía', () {
-    test('debe obtener miembros de la compañía pasando por todas las capas', () async {
+  group('US44 - Integration: Company members', () {
+    test('should fetch company members through all layers', () async {
       // Arrange
       when(mockDataSource.getCompanyMembers('comp-1'))
           .thenAnswer((_) async => [tProfileModel, tMemberModel]);
@@ -136,7 +135,7 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (members) {
           expect(members.length, 2);
           expect(members.first.name, 'Juan');
@@ -145,7 +144,7 @@ void main() {
       );
     });
 
-    test('debe usar caché de miembros para la segunda llamada', () async {
+    test('should use the members cache for the second call', () async {
       // Arrange
       when(mockDataSource.getCompanyMembers('comp-1'))
           .thenAnswer((_) async => [tProfileModel]);
@@ -160,8 +159,8 @@ void main() {
     });
   });
 
-  group('US39 - Integración: Caché de perfil', () {
-    test('debe usar caché en memoria para la segunda llamada de perfil', () async {
+  group('US39 - Integration: Profile cache', () {
+    test('should use the in-memory cache for the second profile call', () async {
       // Arrange
       when(mockDataSource.getProfile())
           .thenAnswer((_) async => tProfileModel);
@@ -175,7 +174,7 @@ void main() {
       verify(mockDataSource.getProfile()).called(1);
     });
 
-    test('debe refrescar datos después de limpiar caché', () async {
+    test('should refresh data after clearing the cache', () async {
       // Arrange
       when(mockDataSource.getProfile())
           .thenAnswer((_) async => tProfileModel);

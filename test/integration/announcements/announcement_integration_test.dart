@@ -1,13 +1,12 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:app_mobile/core/error/exceptions.dart';
 import 'package:app_mobile/features/announcements/data/models/announcement_model.dart';
 import 'package:app_mobile/features/announcements/data/repositories/announcement_repository_impl.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_usecase.dart';
 import 'package:app_mobile/features/announcements/domain/usecases/create_announcement_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/update_announcement_usecase.dart';
 import 'package:app_mobile/features/announcements/domain/usecases/delete_announcement_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/update_announcement_usecase.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 
 import '../../mocks/generate_mocks.mocks.dart';
 
@@ -18,8 +17,8 @@ void main() {
 
   const tModel = AnnouncementModel(
     id: 'ann-1',
-    title: 'Anuncio Integración',
-    description: 'Test de integración completo',
+    title: 'Integration Announcement',
+    description: 'Full integration test',
     image: 'img.png',
     priority: 'NORMAL',
     createdBy: 'user-1',
@@ -39,8 +38,8 @@ void main() {
     );
   });
 
-  group('US10 - Integración: Datasource → Repository → UseCase (Publicación de anuncios)', () {
-    test('debe obtener anuncios desde el datasource a través del repositorio y use case', () async {
+  group('US10 - Integration: Datasource → Repository → UseCase (Announcement publishing)', () {
+    test('should fetch announcements from the datasource through repository and use case', () async {
       // Arrange
       when(mockDataSource.getAnnouncements())
           .thenAnswer((_) async => [tModel]);
@@ -52,17 +51,17 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (announcements) {
           expect(announcements.length, 1);
           expect(announcements.first.id, 'ann-1');
-          expect(announcements.first.title, 'Anuncio Integración');
+          expect(announcements.first.title, 'Integration Announcement');
         },
       );
       verify(mockDataSource.getAnnouncements()).called(1);
     });
 
-    test('debe crear un anuncio pasando por todas las capas', () async {
+    test('should create an announcement through all layers', () async {
       // Arrange
       when(mockDataSource.createAnnouncement(
         title: anyNamed('title'),
@@ -75,8 +74,8 @@ void main() {
 
       // Act
       final result = await useCase(
-        title: 'Anuncio Integración',
-        description: 'Test de integración completo',
+        title: 'Integration Announcement',
+        description: 'Full integration test',
         image: 'img.png',
         priority: 'NORMAL',
         createdBy: 'user-1',
@@ -85,12 +84,12 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (announcement) => expect(announcement.id, 'ann-1'),
       );
     });
 
-    test('debe propagar errores del datasource como ServerFailure', () async {
+    test('should propagate datasource errors as ServerFailure', () async {
       // Arrange
       when(mockDataSource.getAnnouncements())
           .thenThrow(ServerException(message: 'Error 500'));
@@ -104,13 +103,13 @@ void main() {
     });
   });
 
-  group('US12 - Integración: Edición de anuncios', () {
-    test('debe actualizar un anuncio y limpiar la caché', () async {
+  group('US12 - Integration: Announcement editing', () {
+    test('should update an announcement and clear the cache', () async {
       // Arrange
       const updatedModel = AnnouncementModel(
         id: 'ann-1',
-        title: 'Título Actualizado',
-        description: 'Nueva descripción',
+        title: 'Updated Title',
+        description: 'New description',
         priority: 'HIGH',
         createdBy: 'user-1',
         createdAt: '2024-01-01',
@@ -128,25 +127,25 @@ void main() {
       // Act
       final result = await useCase(
         id: 'ann-1',
-        title: 'Título Actualizado',
-        description: 'Nueva descripción',
+        title: 'Updated Title',
+        description: 'New description',
         priority: 'HIGH',
       );
 
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (announcement) {
-          expect(announcement.title, 'Título Actualizado');
+          expect(announcement.title, 'Updated Title');
           expect(announcement.priority, 'HIGH');
         },
       );
     });
   });
 
-  group('US13 - Integración: Eliminación de anuncios', () {
-    test('debe eliminar un anuncio y limpiar la caché', () async {
+  group('US13 - Integration: Announcement deletion', () {
+    test('should delete an announcement and clear the cache', () async {
       // Arrange
       when(mockDataSource.deleteAnnouncement('ann-1'))
           .thenAnswer((_) async {});
@@ -161,8 +160,8 @@ void main() {
     });
   });
 
-  group('US10 - Integración: Caché de anuncios', () {
-    test('debe usar caché en memoria para la segunda llamada', () async {
+  group('US10 - Integration: Announcement cache', () {
+    test('should use the in-memory cache for the second call', () async {
       // Arrange
       when(mockDataSource.getAnnouncements())
           .thenAnswer((_) async => [tModel]);
@@ -177,7 +176,7 @@ void main() {
       verify(mockDataSource.getAnnouncements()).called(1);
     });
 
-    test('debe refrescar datos después de limpiar caché', () async {
+    test('should refresh data after clearing the cache', () async {
       // Arrange
       when(mockDataSource.getAnnouncements())
           .thenAnswer((_) async => [tModel]);

@@ -12,7 +12,7 @@ class CoreFacade {
 }
 
 void main() {
-  group('Integration Tests - Anuncios y Eventos', () {
+  group('Integration Tests - Announcements and Events', () {
     test('Facade syncs both modules', () async {
       final facade = CoreFacade();
       await facade.syncEventsAndAnnouncements();
