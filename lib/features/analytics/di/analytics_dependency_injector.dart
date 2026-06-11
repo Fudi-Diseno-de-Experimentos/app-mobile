@@ -1,16 +1,16 @@
-import '../../../app/di.dart';
-import '../data/datasources/analytics_remote_datasource.dart';
-import '../data/repositories/analytics_repository_impl.dart';
-import '../domain/repositories/analytics_repository.dart';
-import '../domain/usecases/register_announcement_view_usecase.dart';
-import '../domain/usecases/register_event_view_usecase.dart';
-import '../domain/usecases/get_announcement_stats_usecase.dart';
-import '../domain/usecases/get_event_stats_usecase.dart';
-import '../domain/usecases/get_announcement_viewers_usecase.dart';
-import '../domain/usecases/get_event_viewers_usecase.dart';
-import '../domain/usecases/get_user_announcement_views_usecase.dart';
-import '../domain/usecases/get_user_event_views_usecase.dart';
-import '../presentation/bloc/analytics_bloc.dart';
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/analytics/data/datasources/analytics_remote_datasource.dart';
+import 'package:app_mobile/features/analytics/data/repositories/analytics_repository_impl.dart';
+import 'package:app_mobile/features/analytics/domain/repositories/analytics_repository.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_announcement_stats_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_announcement_viewers_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_event_stats_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_event_viewers_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_user_announcement_views_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_user_event_views_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/register_announcement_view_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/register_event_view_usecase.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_bloc.dart';
 
 void initAnalyticsDependencies() {
   // Datasource

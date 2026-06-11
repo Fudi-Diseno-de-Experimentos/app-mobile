@@ -1,16 +1,16 @@
+import 'package:app_mobile/features/analytics/domain/entities/user_announcement_view_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/user_event_view_entity.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_announcement_stats_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_announcement_viewers_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_event_stats_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_event_viewers_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_user_announcement_views_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_user_event_views_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/register_announcement_view_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/register_event_view_usecase.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_event.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/entities/user_announcement_view_entity.dart';
-import '../../domain/entities/user_event_view_entity.dart';
-import '../../domain/usecases/register_announcement_view_usecase.dart';
-import '../../domain/usecases/register_event_view_usecase.dart';
-import '../../domain/usecases/get_announcement_stats_usecase.dart';
-import '../../domain/usecases/get_event_stats_usecase.dart';
-import '../../domain/usecases/get_announcement_viewers_usecase.dart';
-import '../../domain/usecases/get_event_viewers_usecase.dart';
-import '../../domain/usecases/get_user_announcement_views_usecase.dart';
-import '../../domain/usecases/get_user_event_views_usecase.dart';
-import 'analytics_event.dart';
-import 'analytics_state.dart';
 
 class AnalyticsBloc extends Bloc<AnalyticsEvent, AnalyticsState> {
   final RegisterAnnouncementViewUseCase registerAnnouncementViewUseCase;

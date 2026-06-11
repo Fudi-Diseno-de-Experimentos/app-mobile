@@ -1,4 +1,4 @@
-import '../../domain/entities/view_registration_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/view_registration_entity.dart';
 
 class ViewRegistrationModel extends ViewRegistrationEntity {
   const ViewRegistrationModel({

@@ -1,12 +1,13 @@
+import 'package:app_mobile/core/error/exceptions.dart';
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/analytics/data/datasources/analytics_remote_datasource.dart';
+import 'package:app_mobile/features/analytics/domain/entities/content_stats_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/user_announcement_view_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/user_event_view_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/view_registration_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/viewer_entity.dart';
+import 'package:app_mobile/features/analytics/domain/repositories/analytics_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../../domain/entities/view_registration_entity.dart';
-import '../../domain/entities/content_stats_entity.dart';
-import '../../domain/entities/viewer_entity.dart';
-import '../../domain/entities/user_announcement_view_entity.dart';
-import '../../domain/entities/user_event_view_entity.dart';
-import '../../domain/repositories/analytics_repository.dart';
-import '../datasources/analytics_remote_datasource.dart';
 
 class _CacheEntry<T> {
   final T data;
@@ -40,6 +41,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
       _statsCache.remove(announcementId);
       _viewersCache.remove(announcementId);
       return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -58,6 +61,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
       _statsCache.remove(eventId);
       _viewersCache.remove(eventId);
       return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -75,6 +80,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
       final result = await remoteDataSource.getAnnouncementStats(id);
       _statsCache[id] = _CacheEntry(result);
       return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -92,6 +99,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
       final result = await remoteDataSource.getEventStats(id);
       _statsCache[id] = _CacheEntry(result);
       return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -109,6 +118,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
       final result = await remoteDataSource.getAnnouncementViewers(id);
       _viewersCache[id] = _CacheEntry(result);
       return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -126,6 +137,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
       final result = await remoteDataSource.getEventViewers(id);
       _viewersCache[id] = _CacheEntry(result);
       return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -143,6 +156,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
       final result = await remoteDataSource.getUserAnnouncementViews(userId);
       _userAnnouncementsCache[userId] = _CacheEntry(result);
       return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -160,6 +175,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
       final result = await remoteDataSource.getUserEventViews(userId);
       _userEventsCache[userId] = _CacheEntry(result);
       return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

@@ -1,4 +1,4 @@
-import '../../domain/entities/content_stats_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/content_stats_entity.dart';
 
 class ContentStatsModel extends ContentStatsEntity {
   const ContentStatsModel({

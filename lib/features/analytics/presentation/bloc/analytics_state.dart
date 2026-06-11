@@ -1,8 +1,8 @@
+import 'package:app_mobile/features/analytics/domain/entities/content_stats_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/user_announcement_view_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/user_event_view_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/viewer_entity.dart';
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/content_stats_entity.dart';
-import '../../domain/entities/viewer_entity.dart';
-import '../../domain/entities/user_announcement_view_entity.dart';
-import '../../domain/entities/user_event_view_entity.dart';
 
 abstract class AnalyticsState extends Equatable {
   const AnalyticsState();

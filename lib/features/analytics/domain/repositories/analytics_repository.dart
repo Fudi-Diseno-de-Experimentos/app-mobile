@@ -1,10 +1,10 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/analytics/domain/entities/content_stats_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/user_announcement_view_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/user_event_view_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/view_registration_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/viewer_entity.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/view_registration_entity.dart';
-import '../entities/content_stats_entity.dart';
-import '../entities/viewer_entity.dart';
-import '../entities/user_announcement_view_entity.dart';
-import '../entities/user_event_view_entity.dart';
 
 abstract class AnalyticsRepository {
   Future<Either<Failure, ViewRegistrationEntity>> registerAnnouncementView({
