@@ -1,9 +1,9 @@
+import 'package:app_mobile/core/error/exceptions.dart';
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/company/data/datasources/company_remote_datasource.dart';
+import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
+import 'package:app_mobile/features/company/domain/repositories/company_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/exceptions.dart';
-import '../../../../core/error/failures.dart';
-import '../../domain/entities/company_entity.dart';
-import '../../domain/repositories/company_repository.dart';
-import '../datasources/company_remote_datasource.dart';
 
 class CompanyRepositoryImpl implements CompanyRepository {
   final CompanyRemoteDataSource remoteDataSource;
@@ -13,7 +13,7 @@ class CompanyRepositoryImpl implements CompanyRepository {
   @override
   Future<Either<Failure, CompanyEntity>> createCompany({
     required String ruc,
-    required String nombre,
+    required String name,
     String? iconUrl,
     required bool isActive,
     required String userId,
@@ -21,7 +21,7 @@ class CompanyRepositoryImpl implements CompanyRepository {
     try {
       final model = await remoteDataSource.createCompany(
         ruc: ruc,
-        nombre: nombre,
+        name: name,
         iconUrl: iconUrl,
         isActive: isActive,
         userId: userId,
@@ -38,7 +38,7 @@ class CompanyRepositoryImpl implements CompanyRepository {
   Future<Either<Failure, CompanyEntity>> updateCompany({
     required String id,
     required String ruc,
-    required String nombre,
+    required String name,
     String? iconUrl,
     required bool isActive,
   }) async {
@@ -46,7 +46,7 @@ class CompanyRepositoryImpl implements CompanyRepository {
       final model = await remoteDataSource.updateCompany(
         id: id,
         ruc: ruc,
-        nombre: nombre,
+        name: name,
         iconUrl: iconUrl,
         isActive: isActive,
       );

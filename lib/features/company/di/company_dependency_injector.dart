@@ -1,48 +1,36 @@
-import 'package:get_it/get_it.dart';
-import '../data/datasources/company_remote_datasource.dart';
-import '../data/repositories/company_repository_impl.dart';
-import '../domain/repositories/company_repository.dart';
-import '../domain/usecases/create_company_usecase.dart';
-import '../domain/usecases/update_company_usecase.dart';
-import '../domain/usecases/get_company_by_user_id_usecase.dart';
-import '../domain/usecases/get_company_usecase.dart';
-import '../presentation/bloc/company_bloc.dart';
-
-final sl = GetIt.instance;
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/company/data/datasources/company_remote_datasource.dart';
+import 'package:app_mobile/features/company/data/repositories/company_repository_impl.dart';
+import 'package:app_mobile/features/company/domain/repositories/company_repository.dart';
+import 'package:app_mobile/features/company/domain/usecases/create_company_usecase.dart';
+import 'package:app_mobile/features/company/domain/usecases/get_company_by_user_id_usecase.dart';
+import 'package:app_mobile/features/company/domain/usecases/get_company_usecase.dart';
+import 'package:app_mobile/features/company/domain/usecases/update_company_usecase.dart';
+import 'package:app_mobile/features/company/presentation/bloc/company_bloc.dart';
 
 void initCompanyDependencies() {
-  if (!sl.isRegistered<CompanyRemoteDataSource>()) {
-    sl.registerLazySingleton<CompanyRemoteDataSource>(
-      () => CompanyRemoteDataSourceImpl(apiClient: sl()),
-    );
-  }
+  // Datasources
+  sl.registerLazySingleton<CompanyRemoteDataSource>(
+    () => CompanyRemoteDataSourceImpl(apiClient: sl()),
+  );
 
-  if (!sl.isRegistered<CompanyRepository>()) {
-    sl.registerLazySingleton<CompanyRepository>(
-      () => CompanyRepositoryImpl(remoteDataSource: sl()),
-    );
-  }
+  // Repositories
+  sl.registerLazySingleton<CompanyRepository>(
+    () => CompanyRepositoryImpl(remoteDataSource: sl()),
+  );
 
-  if (!sl.isRegistered<CreateCompanyUseCase>()) {
-    sl.registerLazySingleton(() => CreateCompanyUseCase(sl()));
-  }
-  if (!sl.isRegistered<UpdateCompanyUseCase>()) {
-    sl.registerLazySingleton(() => UpdateCompanyUseCase(sl()));
-  }
-  if (!sl.isRegistered<GetCompanyByUserIdUseCase>()) {
-    sl.registerLazySingleton(() => GetCompanyByUserIdUseCase(sl()));
-  }
-  if (!sl.isRegistered<GetCompanyUseCase>()) {
-    sl.registerLazySingleton(() => GetCompanyUseCase(sl()));
-  }
+  // UseCases
+  sl.registerLazySingleton(() => CreateCompanyUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateCompanyUseCase(sl()));
+  sl.registerLazySingleton(() => GetCompanyByUserIdUseCase(sl()));
+  sl.registerLazySingleton(() => GetCompanyUseCase(sl()));
 
-  if (!sl.isRegistered<CompanyBloc>()) {
-    sl.registerFactory(
-      () => CompanyBloc(
-        createCompanyUseCase: sl(),
-        updateCompanyUseCase: sl(),
-        getCompanyByUserIdUseCase: sl(),
-      ),
-    );
-  }
+  // BLoC
+  sl.registerFactory(
+    () => CompanyBloc(
+      createCompanyUseCase: sl(),
+      updateCompanyUseCase: sl(),
+      getCompanyByUserIdUseCase: sl(),
+    ),
+  );
 }

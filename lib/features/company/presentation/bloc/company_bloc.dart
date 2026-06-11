@@ -1,9 +1,9 @@
+import 'package:app_mobile/features/company/domain/usecases/create_company_usecase.dart';
+import 'package:app_mobile/features/company/domain/usecases/get_company_by_user_id_usecase.dart';
+import 'package:app_mobile/features/company/domain/usecases/update_company_usecase.dart';
+import 'package:app_mobile/features/company/presentation/bloc/company_event.dart';
+import 'package:app_mobile/features/company/presentation/bloc/company_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/create_company_usecase.dart';
-import '../../domain/usecases/update_company_usecase.dart';
-import '../../domain/usecases/get_company_by_user_id_usecase.dart';
-import 'company_event.dart';
-import 'company_state.dart';
 
 class CompanyBloc extends Bloc<CompanyEvent, CompanyState> {
   final CreateCompanyUseCase createCompanyUseCase;
@@ -27,7 +27,7 @@ class CompanyBloc extends Bloc<CompanyEvent, CompanyState> {
     emit(CompanyLoading());
     final result = await createCompanyUseCase(
       ruc: event.ruc,
-      nombre: event.nombre,
+      name: event.name,
       iconUrl: event.iconUrl,
       isActive: event.isActive,
       userId: event.userId,
@@ -46,7 +46,7 @@ class CompanyBloc extends Bloc<CompanyEvent, CompanyState> {
     final result = await updateCompanyUseCase(
       id: event.id,
       ruc: event.ruc,
-      nombre: event.nombre,
+      name: event.name,
       iconUrl: event.iconUrl,
       isActive: event.isActive,
     );

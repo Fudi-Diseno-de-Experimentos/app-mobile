@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 class CompanyEntity extends Equatable {
   final String id;
   final String ruc;
-  final String nombre;
+  final String name;
   final String? iconUrl;
   final bool isActive;
   final String userId;
@@ -12,7 +12,7 @@ class CompanyEntity extends Equatable {
   const CompanyEntity({
     required this.id,
     required this.ruc,
-    required this.nombre,
+    required this.name,
     this.iconUrl,
     required this.isActive,
     required this.userId,
@@ -20,5 +20,5 @@ class CompanyEntity extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, ruc, nombre, iconUrl, isActive, userId, joinCode];
+  List<Object?> get props => [id, ruc, name, iconUrl, isActive, userId, joinCode];
 }

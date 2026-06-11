@@ -1,10 +1,10 @@
-import '../../../../core/network/api_client.dart';
-import '../models/company_model.dart';
+import 'package:app_mobile/core/network/api_client.dart';
+import 'package:app_mobile/features/company/data/models/company_model.dart';
 
 abstract class CompanyRemoteDataSource {
   Future<CompanyModel> createCompany({
     required String ruc,
-    required String nombre,
+    required String name,
     String? iconUrl,
     required bool isActive,
     required String userId,
@@ -13,7 +13,7 @@ abstract class CompanyRemoteDataSource {
   Future<CompanyModel> updateCompany({
     required String id,
     required String ruc,
-    required String nombre,
+    required String name,
     String? iconUrl,
     required bool isActive,
   });
@@ -30,7 +30,7 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
   @override
   Future<CompanyModel> createCompany({
     required String ruc,
-    required String nombre,
+    required String name,
     String? iconUrl,
     required bool isActive,
     required String userId,
@@ -39,7 +39,7 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
       '/companies',
       data: {
         'ruc': ruc,
-        'nombre': nombre,
+        'nombre': name,
         'iconUrl': iconUrl,
         'isActive': isActive,
         'userId': userId,
@@ -52,7 +52,7 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
   Future<CompanyModel> updateCompany({
     required String id,
     required String ruc,
-    required String nombre,
+    required String name,
     String? iconUrl,
     required bool isActive,
   }) async {
@@ -60,7 +60,7 @@ class CompanyRemoteDataSourceImpl implements CompanyRemoteDataSource {
       '/companies/$id',
       data: {
         'ruc': ruc,
-        'nombre': nombre,
+        'nombre': name,
         'iconUrl': iconUrl,
         'isActive': isActive,
       },

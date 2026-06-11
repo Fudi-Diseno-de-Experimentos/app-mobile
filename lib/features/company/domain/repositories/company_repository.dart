@@ -1,11 +1,11 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/company_entity.dart';
 
 abstract class CompanyRepository {
   Future<Either<Failure, CompanyEntity>> createCompany({
     required String ruc,
-    required String nombre,
+    required String name,
     String? iconUrl,
     required bool isActive,
     required String userId,
@@ -14,7 +14,7 @@ abstract class CompanyRepository {
   Future<Either<Failure, CompanyEntity>> updateCompany({
     required String id,
     required String ruc,
-    required String nombre,
+    required String name,
     String? iconUrl,
     required bool isActive,
   });
