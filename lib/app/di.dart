@@ -1,22 +1,17 @@
+import 'package:app_mobile/core/auth/token_store.dart';
+import 'package:app_mobile/core/network/api_client.dart';
+import 'package:app_mobile/core/network/auth_interceptor.dart';
+import 'package:app_mobile/features/analytics/di/analytics_dependency_injector.dart';
+import 'package:app_mobile/features/announcements/di/announcement_dependency_injector.dart';
+import 'package:app_mobile/features/chat/di/chat_dependency_injector.dart';
+import 'package:app_mobile/features/company/di/company_dependency_injector.dart';
+import 'package:app_mobile/features/events/di/event_dependency_injector.dart';
+import 'package:app_mobile/features/iam/di/iam_dependency_injector.dart';
+import 'package:app_mobile/features/profile/di/profile_dependency_injector.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/network/api_client.dart';
-import '../../core/network/auth_interceptor.dart';
-import '../features/iam/data/datasources/iam_remote_datasource.dart';
-import '../features/iam/data/repositories/iam_repository_impl.dart';
-import '../features/iam/domain/repositories/iam_repository.dart';
-import '../features/iam/domain/usecases/join_company_usecase.dart';
-import '../features/iam/domain/usecases/sign_in_usecase.dart';
-import '../features/iam/domain/usecases/sign_out_usecase.dart';
-import '../features/iam/domain/usecases/sign_up_usecase.dart';
-import '../features/iam/presentation/bloc/iam_bloc.dart';
-import '../features/profile/di/profile_dependency_injector.dart';
-import '../features/announcements/di/announcement_dependency_injector.dart';
-import '../features/events/di/event_dependency_injector.dart';
-import '../features/analytics/di/analytics_dependency_injector.dart';
-import '../features/chat/di/chat_dependency_injector.dart';
-import '../features/company/di/company_dependency_injector.dart';
 
 final sl = GetIt.instance;
 
@@ -25,43 +20,21 @@ Future<void> initDependencies() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => Dio());
+  sl.registerLazySingleton(() => const FlutterSecureStorage());
 
   // Core
-  sl.registerLazySingleton(() => AuthInterceptor(sharedPreferences: sl()));
+  final tokenStore = TokenStore(storage: sl());
+  await tokenStore.init();
+  sl.registerLazySingleton(() => tokenStore);
+  sl.registerLazySingleton(() => AuthInterceptor(tokenStore: sl()));
   sl.registerLazySingleton(() {
     final apiClient = ApiClient(dio: sl());
     apiClient.addAuthInterceptor(sl());
     return apiClient;
   });
 
-  // Features - IAM
-  // Datasources
-  sl.registerLazySingleton<IamRemoteDataSource>(
-    () => IamRemoteDataSourceImpl(apiClient: sl()),
-  );
-
-  // Repositories
-  sl.registerLazySingleton<IamRepository>(
-    () => IamRepositoryImpl(remoteDataSource: sl(), sharedPreferences: sl()),
-  );
-
-  // UseCases
-  sl.registerLazySingleton(() => SignInUseCase(sl()));
-  sl.registerLazySingleton(() => SignUpUseCase(sl()));
-  sl.registerLazySingleton(() => JoinCompanyUseCase(sl()));
-  sl.registerLazySingleton(() => SignOutUseCase(sl()));
-
-  // BLoC
-  sl.registerFactory(
-    () => IamBloc(
-      signInUseCase: sl(),
-      signUpUseCase: sl(),
-      joinCompanyUseCase: sl(),
-      signOutUseCase: sl(),
-    ),
-  );
-
-  // Initialize other features
+  // Features
+  initIamDependencies();
   initProfileDependencies();
   initAnnouncementDependencies();
   initEventDependencies();

@@ -1,39 +1,39 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/core/auth/token_store.dart';
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_bloc.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/comment_bloc.dart';
+import 'package:app_mobile/features/announcements/presentation/pages/announcement_page.dart';
+import 'package:app_mobile/features/announcements/presentation/pages/create_announcement_page.dart';
+import 'package:app_mobile/features/chat/domain/entities/group_entity.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/message_bloc.dart';
+import 'package:app_mobile/features/chat/presentation/pages/chat_page.dart';
+import 'package:app_mobile/features/chat/presentation/pages/conversation_page.dart';
+import 'package:app_mobile/features/chat/presentation/pages/create_group_page.dart';
+import 'package:app_mobile/features/chat/presentation/pages/edit_group_page.dart';
+import 'package:app_mobile/features/chat/presentation/pages/new_chat_page.dart';
+import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
+import 'package:app_mobile/features/company/presentation/bloc/company_bloc.dart';
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
+import 'package:app_mobile/features/events/presentation/pages/create_event_page.dart';
+import 'package:app_mobile/features/events/presentation/pages/event_page.dart';
+import 'package:app_mobile/features/feed/presentation/pages/company_feed_page.dart';
+import 'package:app_mobile/features/home/presentation/pages/home_page.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_bloc.dart';
+import 'package:app_mobile/features/iam/presentation/pages/company_setup_page.dart';
+import 'package:app_mobile/features/iam/presentation/pages/sign_in_page.dart';
+import 'package:app_mobile/features/iam/presentation/pages/sign_up_page.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/presentation/pages/company_edit_page.dart';
+import 'package:app_mobile/features/profile/presentation/pages/profile_page.dart';
+import 'package:app_mobile/features/profile/presentation/pages/settings_page.dart';
+import 'package:app_mobile/features/profile/presentation/pages/update_profile_page.dart';
+import 'package:app_mobile/shared/widgets/main_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'di.dart';
-import '../features/iam/presentation/pages/sign_up_page.dart';
-import '../features/iam/presentation/pages/sign_in_page.dart';
-import '../features/iam/presentation/pages/company_setup_page.dart';
-import '../features/company/presentation/bloc/company_bloc.dart';
-import '../features/profile/presentation/pages/profile_page.dart';
-import '../features/profile/presentation/pages/settings_page.dart';
-import '../features/profile/presentation/pages/update_profile_page.dart';
-import '../features/profile/domain/entities/profile_entity.dart';
-import '../shared/widgets/main_layout.dart';
-import '../features/company/domain/entities/company_entity.dart';
-import '../features/profile/presentation/pages/company_edit_page.dart';
-import '../features/chat/presentation/pages/chat_page.dart';
-import '../features/chat/presentation/pages/conversation_page.dart';
-import '../features/chat/presentation/pages/new_chat_page.dart';
-import '../features/chat/presentation/pages/create_group_page.dart';
-import '../features/chat/presentation/pages/edit_group_page.dart';
-import '../features/chat/presentation/bloc/chat_bloc.dart';
-import '../features/chat/presentation/bloc/message_bloc.dart';
-import '../features/chat/domain/entities/group_entity.dart';
-import '../features/feed/presentation/pages/company_feed_page.dart';
-import '../features/announcements/presentation/pages/announcement_page.dart';
-import '../features/announcements/presentation/pages/create_announcement_page.dart';
-import '../features/announcements/presentation/bloc/announcement_bloc.dart';
-import '../features/announcements/presentation/bloc/comment_bloc.dart';
-import '../features/announcements/domain/entities/announcement_entity.dart';
-import '../features/events/domain/entities/event_entity.dart';
-import '../features/events/presentation/pages/create_event_page.dart';
-import '../features/events/presentation/pages/event_page.dart';
-import '../features/events/presentation/bloc/event_bloc.dart';
-import '../features/home/presentation/pages/home_page.dart';
-import '../features/iam/presentation/bloc/iam_bloc.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -81,7 +81,16 @@ Widget _announcementDetail(AnnouncementEntity item) {
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: sl<SharedPreferences>().getString('auth_token') != null ? '/home' : '/sign-in',
+  initialLocation: sl<TokenStore>().isSignedIn ? '/home' : '/sign-in',
+  redirect: (context, state) {
+    final signedIn = sl<TokenStore>().isSignedIn;
+    final onAuthPage = state.matchedLocation == '/sign-in' ||
+        state.matchedLocation == '/register';
+
+    if (!signedIn && !onAuthPage) return '/sign-in';
+    if (signedIn && onAuthPage) return '/home';
+    return null;
+  },
   routes: [
     GoRoute(path: '/sign-in', builder: (context, state) => const SignInPage()),
     GoRoute(path: '/register', builder: (context, state) => const SignUpPage()),
