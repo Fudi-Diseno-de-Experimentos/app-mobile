@@ -16,7 +16,7 @@ class LogoHeader extends StatelessWidget {
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
           clipBehavior: Clip.hardEdge,
           child: SvgPicture.asset(
-            "assets/images/logo-centralis.svg",
+            'assets/images/logo-centralis.svg',
             fit: BoxFit.fill,
             placeholderBuilder: (context) => const Icon(Icons.business, size: 65),
           ),
