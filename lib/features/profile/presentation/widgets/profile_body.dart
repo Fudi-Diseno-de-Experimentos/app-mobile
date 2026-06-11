@@ -1,17 +1,17 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
+import 'package:app_mobile/features/company/domain/usecases/get_company_usecase.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/domain/repositories/profile_repository.dart';
+import 'package:app_mobile/features/profile/domain/usecases/assign_company_to_user_usecase.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_profiles_without_company_usecase.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/features/profile/presentation/widgets/profile_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/di.dart';
-import '../../../company/domain/entities/company_entity.dart';
-import '../../../company/domain/usecases/get_company_usecase.dart';
-import '../../domain/entities/profile_entity.dart';
-import '../../domain/repositories/profile_repository.dart';
-import '../../domain/usecases/assign_company_to_user_usecase.dart';
-import '../../domain/usecases/get_profiles_without_company_usecase.dart';
-import '../bloc/profile_bloc.dart';
-import '../bloc/profile_event.dart';
-import 'profile_action_button.dart';
 
 String _positionLabel(String role) {
   switch (role) {
@@ -20,7 +20,7 @@ String _positionLabel(String role) {
     case 'ROLE_MANAGER':
       return 'Manager';
     case 'ROLE_USER':
-      return 'Miembro';
+      return 'Member';
     default:
       if (role.startsWith('ROLE_')) {
         final raw = role.substring(5).toLowerCase();
@@ -223,7 +223,7 @@ class _ProfileBodyState extends State<ProfileBody> {
               ),
               const SizedBox(height: 16),
               Text(
-                "${widget.profile.name} ${widget.profile.lastname}",
+                '${widget.profile.name} ${widget.profile.lastname}',
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
@@ -297,7 +297,7 @@ class _ProfileBodyState extends State<ProfileBody> {
           border: Border.all(color: colorScheme.error.withValues(alpha: 0.2)),
         ),
         child: Text(
-          "No company assigned.",
+          'No company assigned.',
           style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
           textAlign: TextAlign.center,
         ),
@@ -326,7 +326,7 @@ class _ProfileBodyState extends State<ProfileBody> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "COMPANY DETAILS",
+                'COMPANY DETAILS',
                 style: textTheme.labelSmall?.copyWith(
                   color: colorScheme.onSurface.withValues(alpha: 0.5),
                   fontWeight: FontWeight.bold,
@@ -346,7 +346,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                       Icon(Icons.edit, size: 16, color: colorScheme.primary),
                       const SizedBox(width: 4),
                       Text(
-                        "Edit",
+                        'Edit',
                         style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.primary,
                           fontWeight: FontWeight.bold,
@@ -383,7 +383,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _company!.nombre,
+                      _company!.name,
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: colorScheme.onSurface,
@@ -391,7 +391,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "RUC: ${_company!.ruc}",
+                      'RUC: ${_company!.ruc}',
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
@@ -412,7 +412,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "JOIN CODE",
+                      'JOIN CODE',
                       style: textTheme.labelSmall?.copyWith(
                         color: colorScheme.onSurface.withValues(alpha: 0.4),
                         fontWeight: FontWeight.bold,
@@ -454,7 +454,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "UNASSIGNED EMPLOYEES",
+            'UNASSIGNED EMPLOYEES',
             style: textTheme.labelSmall?.copyWith(
               color: colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.bold,
@@ -476,7 +476,7 @@ class _ProfileBodyState extends State<ProfileBody> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "UNASSIGNED EMPLOYEES",
+          'UNASSIGNED EMPLOYEES',
           style: textTheme.labelSmall?.copyWith(
             color: colorScheme.onSurface.withValues(alpha: 0.5),
             fontWeight: FontWeight.bold,
@@ -513,8 +513,8 @@ class _ProfileBodyState extends State<ProfileBody> {
             ),
             child: Text(
               _noCompanyProfiles.isEmpty
-                  ? "All employees are assigned to a company."
-                  : "No employees match your search.",
+                  ? 'All employees are assigned to a company.'
+                  : 'No employees match your search.',
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface.withValues(alpha: 0.5),
               ),
@@ -528,7 +528,7 @@ class _ProfileBodyState extends State<ProfileBody> {
             itemCount: filtered.length,
             itemBuilder: (context, index) {
               final member = filtered[index];
-              final initials = '${member.name.isNotEmpty ? member.name[0] : ''}${member.lastname.isNotEmpty ? member.lastname[0] : ''}'.toUpperCase();
+              final initials = member.initials;
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),

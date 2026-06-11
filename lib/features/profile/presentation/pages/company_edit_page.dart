@@ -1,14 +1,14 @@
+import 'package:app_mobile/core/network/cloudinary_config.dart';
+import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
+import 'package:app_mobile/features/company/presentation/bloc/company_bloc.dart';
+import 'package:app_mobile/features/company/presentation/bloc/company_event.dart';
+import 'package:app_mobile/features/company/presentation/bloc/company_state.dart';
+import 'package:app_mobile/shared/widgets/custom_text_field.dart';
+import 'package:app_mobile/shared/widgets/image_upload_picker.dart';
+import 'package:app_mobile/shared/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/widgets/custom_text_field.dart';
-import '../../../../shared/widgets/primary_button.dart';
-import '../../../../shared/widgets/image_upload_picker.dart';
-import '../../../../core/network/cloudinary_config.dart';
-import '../../../company/domain/entities/company_entity.dart';
-import '../../../company/presentation/bloc/company_bloc.dart';
-import '../../../company/presentation/bloc/company_event.dart';
-import '../../../company/presentation/bloc/company_state.dart';
 
 class CompanyEditPage extends StatefulWidget {
   final CompanyEntity company;
@@ -20,27 +20,27 @@ class CompanyEditPage extends StatefulWidget {
 }
 
 class _CompanyEditPageState extends State<CompanyEditPage> {
-  final _nombreController = TextEditingController();
+  final _companyNameController = TextEditingController();
   final _rucController = TextEditingController();
   String? _uploadedIconUrl;
 
   @override
   void initState() {
     super.initState();
-    _nombreController.text = widget.company.nombre;
+    _companyNameController.text = widget.company.name;
     _rucController.text = widget.company.ruc;
     _uploadedIconUrl = widget.company.iconUrl;
   }
 
   @override
   void dispose() {
-    _nombreController.dispose();
+    _companyNameController.dispose();
     _rucController.dispose();
     super.dispose();
   }
 
   void _onSave() {
-    if (_nombreController.text.isEmpty || _rucController.text.isEmpty) {
+    if (_companyNameController.text.isEmpty || _rucController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill out all fields')),
       );
@@ -51,7 +51,7 @@ class _CompanyEditPageState extends State<CompanyEditPage> {
           UpdateCompanyRequested(
             id: widget.company.id,
             ruc: _rucController.text,
-            nombre: _nombreController.text,
+            name: _companyNameController.text,
             iconUrl: _uploadedIconUrl,
             isActive: widget.company.isActive,
           ),
@@ -87,7 +87,7 @@ class _CompanyEditPageState extends State<CompanyEditPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Edit Company Details",
+                  'Edit Company Details',
                   style: textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
@@ -95,7 +95,7 @@ class _CompanyEditPageState extends State<CompanyEditPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Modify the name, tax ID (RUC) or change the brand logo.",
+                  'Modify the name, tax ID (RUC) or change the brand logo.',
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurface.withValues(alpha:0.7),
                   ),
@@ -103,7 +103,7 @@ class _CompanyEditPageState extends State<CompanyEditPage> {
                 const SizedBox(height: 32),
                 CustomTextField(
                   hintText: 'Company Name',
-                  controller: _nombreController,
+                  controller: _companyNameController,
                 ),
                 const SizedBox(height: 16),
                 CustomTextField(
@@ -112,7 +112,7 @@ class _CompanyEditPageState extends State<CompanyEditPage> {
                 ),
                 const SizedBox(height: 24),
                 ImageUploadPicker(
-                  imageType: ImageType.announcement,
+                  imageType: ImageType.company,
                   initialImageUrl: _uploadedIconUrl,
                   onImageUploaded: (url) {
                     setState(() {

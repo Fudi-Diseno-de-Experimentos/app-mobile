@@ -1,4 +1,4 @@
-import '../../domain/entities/user_event_view_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/user_event_view_entity.dart';
 
 class UserEventViewModel extends UserEventViewEntity {
   const UserEventViewModel({

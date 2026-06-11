@@ -1,5 +1,5 @@
+import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/user_entity.dart';
 
 abstract class IamState extends Equatable {
   const IamState();

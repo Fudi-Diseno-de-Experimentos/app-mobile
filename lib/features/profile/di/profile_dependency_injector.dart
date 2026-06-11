@@ -1,13 +1,13 @@
+import 'package:app_mobile/features/profile/data/datasources/profile_remote_datasource.dart';
+import 'package:app_mobile/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:app_mobile/features/profile/domain/repositories/profile_repository.dart';
+import 'package:app_mobile/features/profile/domain/usecases/assign_company_to_user_usecase.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_profile_usecase.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_profiles_without_company_usecase.dart';
+import 'package:app_mobile/features/profile/domain/usecases/update_profile_usecase.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:get_it/get_it.dart';
-import '../data/datasources/profile_remote_datasource.dart';
-import '../data/repositories/profile_repository_impl.dart';
-import '../domain/repositories/profile_repository.dart';
-import '../domain/usecases/get_company_members_usecase.dart';
-import '../domain/usecases/get_profile_usecase.dart';
-import '../domain/usecases/update_profile_usecase.dart';
-import '../domain/usecases/get_profiles_without_company_usecase.dart';
-import '../domain/usecases/assign_company_to_user_usecase.dart';
-import '../presentation/bloc/profile_bloc.dart';
 
 final sl = GetIt.instance;
 

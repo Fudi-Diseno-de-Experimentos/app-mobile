@@ -1,6 +1,6 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/profile/domain/repositories/profile_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../repositories/profile_repository.dart';
 
 class AssignCompanyToUserUseCase {
   final ProfileRepository repository;

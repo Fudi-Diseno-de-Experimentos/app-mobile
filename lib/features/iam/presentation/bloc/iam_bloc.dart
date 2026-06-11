@@ -1,10 +1,10 @@
+import 'package:app_mobile/features/iam/domain/usecases/join_company_usecase.dart';
+import 'package:app_mobile/features/iam/domain/usecases/sign_in_usecase.dart';
+import 'package:app_mobile/features/iam/domain/usecases/sign_out_usecase.dart';
+import 'package:app_mobile/features/iam/domain/usecases/sign_up_usecase.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_event.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/join_company_usecase.dart';
-import '../../domain/usecases/sign_in_usecase.dart';
-import '../../domain/usecases/sign_out_usecase.dart';
-import '../../domain/usecases/sign_up_usecase.dart';
-import 'iam_event.dart';
-import 'iam_state.dart';
 
 class IamBloc extends Bloc<IamEvent, IamState> {
   final SignInUseCase signInUseCase;

@@ -1,13 +1,12 @@
-import 'package:fpdart/fpdart.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:app_mobile/core/error/failures.dart';
 import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
 import 'package:app_mobile/features/announcements/domain/entities/comment_entity.dart';
+import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
 import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
 import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
-import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
 import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:mockito/mockito.dart';
 
 void registerFallbackValues() {
   // Either<Failure, T> fallback values for mockito
@@ -59,7 +58,7 @@ void registerFallbackValues() {
     const Right(CompanyEntity(
       id: '',
       ruc: '',
-      nombre: '',
+      name: '',
       isActive: true,
       userId: '',
       joinCode: '',

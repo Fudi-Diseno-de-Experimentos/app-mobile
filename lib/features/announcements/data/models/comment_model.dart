@@ -1,4 +1,4 @@
-import '../../domain/entities/comment_entity.dart';
+import 'package:app_mobile/features/announcements/domain/entities/comment_entity.dart';
 
 class CommentModel extends CommentEntity {
   const CommentModel({

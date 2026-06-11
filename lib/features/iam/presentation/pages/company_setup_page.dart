@@ -1,22 +1,23 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/core/network/cloudinary_config.dart';
+import 'package:app_mobile/features/company/presentation/bloc/company_bloc.dart';
+import 'package:app_mobile/features/company/presentation/bloc/company_event.dart';
+import 'package:app_mobile/features/company/presentation/bloc/company_state.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_bloc.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_event.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_state.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/domain/repositories/profile_repository.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
+import 'package:app_mobile/shared/widgets/custom_text_field.dart';
+import 'package:app_mobile/shared/widgets/image_upload_picker.dart';
+import 'package:app_mobile/shared/widgets/logo_header.dart';
+import 'package:app_mobile/shared/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/di.dart';
-import '../../../profile/domain/repositories/profile_repository.dart';
-import '../../../../shared/widgets/custom_text_field.dart';
-import '../../../../shared/widgets/logo_header.dart';
-import '../../../../shared/widgets/primary_button.dart';
-import '../../../../shared/widgets/image_upload_picker.dart';
-import '../../../../core/network/cloudinary_config.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_state.dart';
-import '../../../profile/presentation/bloc/profile_event.dart';
-import '../../../company/presentation/bloc/company_bloc.dart';
-import '../../../company/presentation/bloc/company_event.dart';
-import '../../../company/presentation/bloc/company_state.dart';
-import '../bloc/iam_bloc.dart';
-import '../bloc/iam_event.dart';
-import '../bloc/iam_state.dart';
 
 class CompanySetupPage extends StatefulWidget {
   const CompanySetupPage({super.key});
@@ -34,17 +35,14 @@ class _CompanySetupPageState extends State<CompanySetupPage> {
 
   // Create form controllers
   final _rucController = TextEditingController();
-  final _nombreController = TextEditingController();
+  final _companyNameController = TextEditingController();
   String? _uploadedIconUrl;
-
-  final String _defaultIconUrl =
-      'https://i.pinimg.com/736x/fb/59/7c/fb597cc50905b6911bf36d3690b9fbc4.jpg';
 
   @override
   void dispose() {
     _codeController.dispose();
     _rucController.dispose();
-    _nombreController.dispose();
+    _companyNameController.dispose();
     super.dispose();
   }
 
@@ -61,7 +59,7 @@ class _CompanySetupPageState extends State<CompanySetupPage> {
   }
 
   void _onCreateCompany(String userId) {
-    if (_rucController.text.isEmpty || _nombreController.text.isEmpty) {
+    if (_rucController.text.isEmpty || _companyNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill out all fields')),
       );
@@ -71,8 +69,9 @@ class _CompanySetupPageState extends State<CompanySetupPage> {
     context.read<CompanyBloc>().add(
           CreateCompanyRequested(
             ruc: _rucController.text,
-            nombre: _nombreController.text,
-            iconUrl: _uploadedIconUrl ?? _defaultIconUrl,
+            name: _companyNameController.text,
+            // Null is fine: every display site falls back to a local icon.
+            iconUrl: _uploadedIconUrl,
             isActive: true,
             userId: userId,
           ),
@@ -153,9 +152,7 @@ class _CompanySetupPageState extends State<CompanySetupPage> {
               }
 
               if (profileState is ProfileLoaded) {
-                final roles = profileState.profile.roles ?? [];
-                final isManager = roles.contains('ROLE_MANAGER') ||
-                    roles.contains('ROLE_ADMIN');
+                final isManager = profileState.profile.isManagerOrAdmin;
 
                 return SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -165,7 +162,7 @@ class _CompanySetupPageState extends State<CompanySetupPage> {
                       const LogoHeader(),
                       const SizedBox(height: 32),
                       Text(
-                        "Setup Company",
+                        'Setup Company',
                         style: textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurface,
@@ -174,8 +171,8 @@ class _CompanySetupPageState extends State<CompanySetupPage> {
                       const SizedBox(height: 8),
                       Text(
                         isManager
-                            ? "You can choose to create a new company or join an existing one."
-                            : "Join an existing company using the code provided by your admin.",
+                            ? 'You can choose to create a new company or join an existing one.'
+                            : 'Join an existing company using the code provided by your admin.',
                         style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
@@ -202,7 +199,7 @@ class _CompanySetupPageState extends State<CompanySetupPage> {
                                     ),
                                   ),
                                   child: Text(
-                                    "Join Company",
+                                    'Join Company',
                                     style: textTheme.titleMedium?.copyWith(
                                       fontWeight: _activeTab == 0
                                           ? FontWeight.bold
@@ -233,7 +230,7 @@ class _CompanySetupPageState extends State<CompanySetupPage> {
                                     ),
                                   ),
                                   child: Text(
-                                    "Create Company",
+                                    'Create Company',
                                     style: textTheme.titleMedium?.copyWith(
                                       fontWeight: _activeTab == 1
                                           ? FontWeight.bold
@@ -260,7 +257,7 @@ class _CompanySetupPageState extends State<CompanySetupPage> {
                 );
               }
 
-              return const Center(child: Text("Unable to load profile data."));
+              return const Center(child: Text('Unable to load profile data.'));
             },
           ),
         ),
@@ -296,7 +293,7 @@ class _CompanySetupPageState extends State<CompanySetupPage> {
       children: [
         CustomTextField(
           hintText: 'Company Name',
-          controller: _nombreController,
+          controller: _companyNameController,
         ),
         const SizedBox(height: 16),
         CustomTextField(
@@ -305,7 +302,7 @@ class _CompanySetupPageState extends State<CompanySetupPage> {
         ),
         const SizedBox(height: 20),
         ImageUploadPicker(
-          imageType: ImageType.announcement,
+          imageType: ImageType.company,
           onImageUploaded: (url) {
             setState(() {
               _uploadedIconUrl = url;

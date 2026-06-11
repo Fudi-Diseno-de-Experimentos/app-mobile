@@ -1,9 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:app_mobile/features/iam/data/models/user_model.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('UserModel - US38: Autenticación segura con JWT', () {
-    test('fromJson debe crear un modelo válido con todos los campos', () {
+  group('UserModel - US38: Secure JWT authentication', () {
+    test('fromJson should build a valid model with all fields', () {
       // Arrange
       final json = {
         'id': 'user-1',
@@ -22,7 +22,7 @@ void main() {
       expect(model.companyId, 'company-1');
     });
 
-    test('fromJson debe manejar companyId nulo para usuarios sin compañía', () {
+    test('fromJson should handle a null companyId for users without a company', () {
       // Arrange
       final json = {
         'id': 'user-2',
@@ -38,7 +38,7 @@ void main() {
       expect(model.companyId, isNull);
     });
 
-    test('fromJson debe convertir IDs numéricos a String', () {
+    test('fromJson should convert numeric IDs to String', () {
       // Arrange
       final json = {
         'id': 42,
@@ -55,7 +55,7 @@ void main() {
       expect(model.companyId, '99');
     });
 
-    test('fromJson debe manejar campos faltantes con valores por defecto', () {
+    test('fromJson should handle missing fields with defaults', () {
       // Arrange
       final json = <String, dynamic>{};
 

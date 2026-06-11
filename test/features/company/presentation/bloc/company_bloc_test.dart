@@ -1,13 +1,12 @@
-import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:fpdart/fpdart.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:app_mobile/core/error/failures.dart';
 import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
 import 'package:app_mobile/features/company/presentation/bloc/company_bloc.dart';
 import 'package:app_mobile/features/company/presentation/bloc/company_event.dart';
 import 'package:app_mobile/features/company/presentation/bloc/company_state.dart';
+import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:mockito/mockito.dart';
 
 import '../../../../mocks/generate_mocks.mocks.dart';
 import '../../../../mocks/mock_helpers.dart';
@@ -21,7 +20,7 @@ void main() {
   const tCompany = CompanyEntity(
     id: 'comp-1',
     ruc: '20123456789',
-    nombre: 'Empresa Test SAC',
+    name: 'Empresa Test SAC',
     iconUrl: 'logo.png',
     isActive: true,
     userId: 'user-1',
@@ -43,13 +42,13 @@ void main() {
 
   tearDown(() => bloc.close());
 
-  group('US41 - Registro de nueva compañía', () {
+  group('US41 - New company registration', () {
     blocTest<CompanyBloc, CompanyState>(
-      'debe emitir [Loading, CreateSuccess] al registrar compañía exitosamente',
+      'should emit [Loading, CreateSuccess] when a company is registered successfully',
       build: () {
         when(mockCreate(
           ruc: anyNamed('ruc'),
-          nombre: anyNamed('nombre'),
+          name: anyNamed('name'),
           iconUrl: anyNamed('iconUrl'),
           isActive: anyNamed('isActive'),
           userId: anyNamed('userId'),
@@ -58,7 +57,7 @@ void main() {
       },
       act: (bloc) => bloc.add(const CreateCompanyRequested(
         ruc: '20123456789',
-        nombre: 'Empresa Test SAC',
+        name: 'Empresa Test SAC',
         iconUrl: 'logo.png',
         isActive: true,
         userId: 'user-1',
@@ -70,38 +69,38 @@ void main() {
     );
 
     blocTest<CompanyBloc, CompanyState>(
-      'debe emitir [Loading, Failure] cuando el RUC ya está registrado',
+      'should emit [Loading, Failure] when the RUC is already registered',
       build: () {
         when(mockCreate(
           ruc: anyNamed('ruc'),
-          nombre: anyNamed('nombre'),
+          name: anyNamed('name'),
           iconUrl: anyNamed('iconUrl'),
           isActive: anyNamed('isActive'),
           userId: anyNamed('userId'),
-        )).thenAnswer((_) async => const Left(ServerFailure('La organización ya existe')));
+        )).thenAnswer((_) async => const Left(ServerFailure('The organization already exists')));
         return bloc;
       },
       act: (bloc) => bloc.add(const CreateCompanyRequested(
         ruc: '20123456789',
-        nombre: 'Duplicada',
+        name: 'Duplicada',
         isActive: true,
         userId: 'user-1',
       )),
       expect: () => [
         CompanyLoading(),
-        const CompanyFailure('La organización ya existe'),
+        const CompanyFailure('The organization already exists'),
       ],
     );
   });
 
-  group('US42 - Edición de perfil de compañía', () {
+  group('US42 - Company profile editing', () {
     blocTest<CompanyBloc, CompanyState>(
-      'debe emitir [Loading, UpdateSuccess] al actualizar compañía exitosamente',
+      'should emit [Loading, UpdateSuccess] when the company updates successfully',
       build: () {
         const updated = CompanyEntity(
           id: 'comp-1',
           ruc: '20123456789',
-          nombre: 'Empresa Actualizada SAC',
+          name: 'Empresa Actualizada SAC',
           iconUrl: 'new_logo.png',
           isActive: true,
           userId: 'user-1',
@@ -110,7 +109,7 @@ void main() {
         when(mockUpdate(
           id: anyNamed('id'),
           ruc: anyNamed('ruc'),
-          nombre: anyNamed('nombre'),
+          name: anyNamed('name'),
           iconUrl: anyNamed('iconUrl'),
           isActive: anyNamed('isActive'),
         )).thenAnswer((_) async => const Right(updated));
@@ -119,7 +118,7 @@ void main() {
       act: (bloc) => bloc.add(const UpdateCompanyRequested(
         id: 'comp-1',
         ruc: '20123456789',
-        nombre: 'Empresa Actualizada SAC',
+        name: 'Empresa Actualizada SAC',
         iconUrl: 'new_logo.png',
         isActive: true,
       )),
@@ -130,12 +129,12 @@ void main() {
     );
 
     blocTest<CompanyBloc, CompanyState>(
-      'debe emitir [Loading, Failure] cuando falla la actualización',
+      'should emit [Loading, Failure] when the update fails',
       build: () {
         when(mockUpdate(
           id: anyNamed('id'),
           ruc: anyNamed('ruc'),
-          nombre: anyNamed('nombre'),
+          name: anyNamed('name'),
           iconUrl: anyNamed('iconUrl'),
           isActive: anyNamed('isActive'),
         )).thenAnswer((_) async => const Left(ServerFailure('Error de servidor')));
@@ -144,7 +143,7 @@ void main() {
       act: (bloc) => bloc.add(const UpdateCompanyRequested(
         id: 'comp-1',
         ruc: '20123456789',
-        nombre: 'Test',
+        name: 'Test',
         isActive: true,
       )),
       expect: () => [
@@ -154,9 +153,9 @@ void main() {
     );
   });
 
-  group('US41 - Obtener compañía del usuario', () {
+  group('US41 - Fetch the user company', () {
     blocTest<CompanyBloc, CompanyState>(
-      'debe emitir [Loading, LoadSuccess] al obtener compañía por userId',
+      'should emit [Loading, LoadSuccess] when fetching the company by userId',
       build: () {
         when(mockGetByUserId('user-1'))
             .thenAnswer((_) async => const Right(tCompany));
@@ -170,16 +169,16 @@ void main() {
     );
 
     blocTest<CompanyBloc, CompanyState>(
-      'debe emitir [Loading, Failure] cuando el usuario no tiene compañía',
+      'should emit [Loading, Failure] when the user has no company',
       build: () {
         when(mockGetByUserId('user-sin-company'))
-            .thenAnswer((_) async => const Left(ServerFailure('Compañía no encontrada')));
+            .thenAnswer((_) async => const Left(ServerFailure('Company not found')));
         return bloc;
       },
       act: (bloc) => bloc.add(const GetCompanyRequested('user-sin-company')),
       expect: () => [
         CompanyLoading(),
-        const CompanyFailure('Compañía no encontrada'),
+        const CompanyFailure('Company not found'),
       ],
     );
   });

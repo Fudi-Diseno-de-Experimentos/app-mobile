@@ -1,9 +1,10 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/announcement_entity.dart';
 
 abstract class AnnouncementRepository {
-  Future<Either<Failure, List<AnnouncementEntity>>> getAnnouncements();
+  Future<Either<Failure, List<AnnouncementEntity>>> getAnnouncements(
+      {bool forceRefresh = false});
   Future<Either<Failure, AnnouncementEntity>> getAnnouncementById(String id);
   Future<Either<Failure, List<AnnouncementEntity>>> getAnnouncementsByPriority(
     String priority,
@@ -25,6 +26,6 @@ abstract class AnnouncementRepository {
     String? image,
     required String priority,
   });
-  Future<Either<Failure, void>> deleteAnnouncement(String id);
+  Future<Either<Failure, Unit>> deleteAnnouncement(String id);
   Future<void> clearCache();
 }

@@ -1,5 +1,5 @@
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/profile_entity.dart';
 
 abstract class ProfileEvent extends Equatable {
   const ProfileEvent();

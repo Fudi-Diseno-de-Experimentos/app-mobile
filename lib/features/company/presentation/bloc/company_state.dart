@@ -1,5 +1,5 @@
+import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/company_entity.dart';
 
 abstract class CompanyState extends Equatable {
   const CompanyState();

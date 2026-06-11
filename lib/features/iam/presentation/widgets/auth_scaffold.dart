@@ -13,7 +13,7 @@ class AuthScaffold extends StatelessWidget {
         child: Container(
           color: Theme.of(
             context,
-          ).colorScheme.surface, // This maps to our AppColors.surface
+          ).colorScheme.surface, // This maps to our Theme.of(context).colorScheme.surface
           width: double.infinity,
           height: double.infinity,
           child: SingleChildScrollView(

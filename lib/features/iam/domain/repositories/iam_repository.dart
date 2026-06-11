@@ -1,6 +1,6 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/user_entity.dart';
 
 abstract class IamRepository {
   Future<Either<Failure, UserEntity>> signIn(String username, String password);

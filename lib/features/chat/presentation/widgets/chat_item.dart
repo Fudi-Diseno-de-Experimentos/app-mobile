@@ -1,5 +1,5 @@
+import 'package:app_mobile/features/chat/domain/entities/group_entity.dart';
 import 'package:flutter/material.dart';
-import '../../domain/entities/group_entity.dart';
 
 /// A single chat preview row. Flat (no card/border) so the list reads as one
 /// seamless surface separated only by hairline dividers — WhatsApp style.

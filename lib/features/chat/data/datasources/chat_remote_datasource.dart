@@ -1,7 +1,7 @@
-import '../../../../core/network/api_client.dart';
-import '../models/conversation_model.dart';
-import '../models/group_model.dart';
-import '../models/message_model.dart';
+import 'package:app_mobile/core/network/api_client.dart';
+import 'package:app_mobile/features/chat/data/models/conversation_model.dart';
+import 'package:app_mobile/features/chat/data/models/group_model.dart';
+import 'package:app_mobile/features/chat/data/models/message_model.dart';
 
 abstract class ChatRemoteDataSource {
   Future<List<GroupModel>> getMyGroups(String userId);

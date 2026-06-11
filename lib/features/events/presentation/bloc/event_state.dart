@@ -1,6 +1,6 @@
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/event_entity.dart';
-import '../../../profile/domain/entities/profile_entity.dart';
 
 abstract class EventState extends Equatable {
   const EventState();

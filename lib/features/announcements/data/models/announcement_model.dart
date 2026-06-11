@@ -1,4 +1,4 @@
-import '../../domain/entities/announcement_entity.dart';
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
 
 class AnnouncementModel extends AnnouncementEntity {
   const AnnouncementModel({

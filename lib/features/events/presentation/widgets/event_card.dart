@@ -1,7 +1,7 @@
+import 'package:app_mobile/core/utils/date_format.dart';
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
+import 'package:app_mobile/features/events/presentation/widgets/avatar_group.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../domain/entities/event_entity.dart';
-import 'avatar_group.dart';
 
 class EventCard extends StatelessWidget {
   final EventEntity item;
@@ -13,7 +13,7 @@ class EventCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: AppColors.primary,
+          color: Theme.of(context).colorScheme.primary,
           width: 1,
         ),
         borderRadius: BorderRadius.circular(4),
@@ -34,8 +34,8 @@ class EventCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     item.title,
-                    style: const TextStyle(
-                      color: AppColors.neutral,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                     ),
                   ),
@@ -53,10 +53,10 @@ class EventCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Button",
+                Text(
+                  'Button',
                   style: TextStyle(
-                    color: AppColors.tertiary,
+                    color: Theme.of(context).colorScheme.tertiary,
                     fontSize: 10,
                   ),
                 ),
@@ -65,8 +65,8 @@ class EventCard extends StatelessWidget {
                   width: double.infinity,
                   child: Text(
                     item.description,
-                    style: const TextStyle(
-                      color: AppColors.primary,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
                       fontSize: 14,
                     ),
                   ),
@@ -81,24 +81,24 @@ class EventCard extends StatelessWidget {
             width: double.infinity,
             child: Row(
               children: [
-                const Icon(Icons.access_time, size: 20, color: AppColors.tertiary),
+                Icon(Icons.access_time, size: 20, color: Theme.of(context).colorScheme.tertiary),
                 const SizedBox(width: 8),
                 Text(
-                  _formatDate(item.date),
-                  style: const TextStyle(
-                    color: AppColors.tertiary,
+                  AppDateFormat.relativeDateTime(item.date),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.tertiary,
                     fontSize: 10,
                   ),
                 ),
                 const Spacer(),
-                const Icon(Icons.location_on_outlined, size: 20, color: AppColors.tertiary),
+                Icon(Icons.location_on_outlined, size: 20, color: Theme.of(context).colorScheme.tertiary),
                 const SizedBox(width: 8),
                 SizedBox(
                   width: 80,
                   child: Text(
                     item.location,
-                    style: const TextStyle(
-                      color: AppColors.primary,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
                       fontSize: 10,
                     ),
                     maxLines: 1,
@@ -111,22 +111,5 @@ class EventCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatDate(String isoDate) {
-    try {
-      final date = DateTime.parse(isoDate);
-      final hour = date.hour > 12 ? date.hour - 12 : (date.hour == 0 ? 12 : date.hour);
-      final period = date.hour >= 12 ? 'PM' : 'AM';
-      final minute = date.minute.toString().padLeft(2, '0');
-      
-      final now = DateTime.now();
-      if (date.year == now.year && date.month == now.month && date.day == now.day) {
-        return "Today, $hour:$minute $period";
-      }
-      return "${date.month}/${date.day}/${date.year}, $hour:$minute $period";
-    } catch (e) {
-      return isoDate;
-    }
   }
 }

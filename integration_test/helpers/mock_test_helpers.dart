@@ -1,75 +1,67 @@
-import 'package:fpdart/fpdart.dart';
+import 'package:app_mobile/app/di.dart';
 import 'package:app_mobile/core/error/failures.dart';
-
-import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
-import 'package:app_mobile/features/iam/domain/usecases/sign_in_usecase.dart';
-import 'package:app_mobile/features/iam/domain/usecases/sign_up_usecase.dart';
-import 'package:app_mobile/features/iam/domain/usecases/sign_out_usecase.dart';
-import 'package:app_mobile/features/iam/domain/usecases/join_company_usecase.dart';
-import 'package:app_mobile/features/iam/domain/repositories/iam_repository.dart';
-
-import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
-import 'package:app_mobile/features/profile/domain/usecases/get_profile_usecase.dart';
-import 'package:app_mobile/features/profile/domain/usecases/update_profile_usecase.dart';
-import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
-import 'package:app_mobile/features/profile/domain/usecases/get_profiles_without_company_usecase.dart';
-import 'package:app_mobile/features/profile/domain/usecases/assign_company_to_user_usecase.dart';
-import 'package:app_mobile/features/profile/domain/repositories/profile_repository.dart';
-
-import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
-import 'package:app_mobile/features/announcements/domain/entities/comment_entity.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/get_announcement_by_id_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_by_priority_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_by_creator_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/create_announcement_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/update_announcement_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/delete_announcement_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/get_comments_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/create_comment_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/usecases/delete_comment_usecase.dart';
-import 'package:app_mobile/features/announcements/domain/repositories/announcement_repository.dart';
-import 'package:app_mobile/features/announcements/domain/repositories/comment_repository.dart';
-
-import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
-import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
-import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
-import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart';
-import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart';
-import 'package:app_mobile/features/events/domain/repositories/event_repository.dart';
-
-import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
-import 'package:app_mobile/features/company/domain/usecases/create_company_usecase.dart';
-import 'package:app_mobile/features/company/domain/usecases/update_company_usecase.dart';
-import 'package:app_mobile/features/company/domain/usecases/get_company_by_user_id_usecase.dart';
-import 'package:app_mobile/features/company/domain/repositories/company_repository.dart';
-
-import 'package:app_mobile/features/analytics/domain/entities/view_registration_entity.dart';
 import 'package:app_mobile/features/analytics/domain/entities/content_stats_entity.dart';
-import 'package:app_mobile/features/analytics/domain/entities/viewer_entity.dart';
 import 'package:app_mobile/features/analytics/domain/entities/user_announcement_view_entity.dart';
 import 'package:app_mobile/features/analytics/domain/entities/user_event_view_entity.dart';
-import 'package:app_mobile/features/analytics/domain/usecases/register_announcement_view_usecase.dart';
-import 'package:app_mobile/features/analytics/domain/usecases/register_event_view_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/entities/view_registration_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/viewer_entity.dart';
+import 'package:app_mobile/features/analytics/domain/repositories/analytics_repository.dart';
 import 'package:app_mobile/features/analytics/domain/usecases/get_announcement_stats_usecase.dart';
-import 'package:app_mobile/features/analytics/domain/usecases/get_event_stats_usecase.dart';
 import 'package:app_mobile/features/analytics/domain/usecases/get_announcement_viewers_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/get_event_stats_usecase.dart';
 import 'package:app_mobile/features/analytics/domain/usecases/get_event_viewers_usecase.dart';
 import 'package:app_mobile/features/analytics/domain/usecases/get_user_announcement_views_usecase.dart';
 import 'package:app_mobile/features/analytics/domain/usecases/get_user_event_views_usecase.dart';
-import 'package:app_mobile/features/analytics/domain/repositories/analytics_repository.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/register_announcement_view_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/register_event_view_usecase.dart';
 import 'package:app_mobile/features/analytics/presentation/bloc/analytics_bloc.dart';
-
-import 'package:app_mobile/features/chat/domain/usecases/get_my_groups_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
+import 'package:app_mobile/features/announcements/domain/entities/comment_entity.dart';
+import 'package:app_mobile/features/announcements/domain/repositories/announcement_repository.dart';
+import 'package:app_mobile/features/announcements/domain/repositories/comment_repository.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/create_announcement_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/create_comment_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/delete_announcement_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/delete_comment_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcement_by_id_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_by_creator_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_by_priority_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_comments_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/update_announcement_usecase.dart';
 import 'package:app_mobile/features/chat/domain/entities/group_entity.dart';
 import 'package:app_mobile/features/chat/domain/repositories/chat_repository.dart';
-
-import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/chat/domain/usecases/get_my_groups_usecase.dart';
+import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
+import 'package:app_mobile/features/company/domain/repositories/company_repository.dart';
+import 'package:app_mobile/features/company/domain/usecases/create_company_usecase.dart';
+import 'package:app_mobile/features/company/domain/usecases/get_company_by_user_id_usecase.dart';
+import 'package:app_mobile/features/company/domain/usecases/update_company_usecase.dart';
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
+import 'package:app_mobile/features/events/domain/repositories/event_repository.dart';
+import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart';
+import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
+import 'package:app_mobile/features/iam/domain/repositories/iam_repository.dart';
+import 'package:app_mobile/features/iam/domain/usecases/join_company_usecase.dart';
+import 'package:app_mobile/features/iam/domain/usecases/sign_in_usecase.dart';
+import 'package:app_mobile/features/iam/domain/usecases/sign_out_usecase.dart';
+import 'package:app_mobile/features/iam/domain/usecases/sign_up_usecase.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/domain/repositories/profile_repository.dart';
+import 'package:app_mobile/features/profile/domain/usecases/assign_company_to_user_usecase.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_profile_usecase.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_profiles_without_company_usecase.dart';
+import 'package:app_mobile/features/profile/domain/usecases/update_profile_usecase.dart';
+import 'package:fpdart/fpdart.dart';
 
 const _tAnnouncement = AnnouncementEntity(
   id: 'ann-1',
-  title: 'Anuncio de Prueba',
-  description: 'Descripción del anuncio para pruebas patrol',
+  title: 'Sample Announcement',
+  description: 'Announcement description for patrol tests',
   image: null,
   priority: 'NORMAL',
   createdBy: 'user-1',
@@ -79,8 +71,8 @@ const _tAnnouncement = AnnouncementEntity(
 
 const _tAnnouncementHigh = AnnouncementEntity(
   id: 'ann-2',
-  title: 'Anuncio Urgente',
-  description: 'Este anuncio es prioritario',
+  title: 'Urgent Announcement',
+  description: 'This announcement is high priority',
   image: null,
   priority: 'HIGH',
   createdBy: 'user-1',
@@ -90,8 +82,8 @@ const _tAnnouncementHigh = AnnouncementEntity(
 
 const _tEvent = EventEntity(
   id: 'evt-1',
-  title: 'Evento de Prueba',
-  description: 'Descripción del evento para pruebas patrol',
+  title: 'Sample Event',
+  description: 'Event description for patrol tests',
   date: '2024-06-15T10:00:00Z',
   location: 'Sala de Conferencias A',
   createdBy: 'user-1',
@@ -188,7 +180,7 @@ class FakeGetAnnouncementsUseCase implements GetAnnouncementsUseCase {
   AnnouncementRepository get repository => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, List<AnnouncementEntity>>> call({void params}) async {
+  Future<Either<Failure, List<AnnouncementEntity>>> call({bool forceRefresh = false}) async {
     return const Right([_tAnnouncement, _tAnnouncementHigh]);
   }
 }
@@ -280,8 +272,8 @@ class FakeDeleteAnnouncementUseCase implements DeleteAnnouncementUseCase {
   AnnouncementRepository get repository => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, void>> call(String id) async {
-    return const Right(null);
+  Future<Either<Failure, Unit>> call(String id) async {
+    return const Right(unit);
   }
 }
 
@@ -290,7 +282,8 @@ class FakeGetCommentsUseCase implements GetCommentsUseCase {
   CommentRepository get repository => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, List<CommentEntity>>> call(String announcementId) async {
+  Future<Either<Failure, List<CommentEntity>>> call(String announcementId,
+      {bool forceRefresh = false}) async {
     return const Right([]);
   }
 }
@@ -321,8 +314,8 @@ class FakeDeleteCommentUseCase implements DeleteCommentUseCase {
   CommentRepository get repository => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, void>> call(String commentId) async {
-    return const Right(null);
+  Future<Either<Failure, Unit>> call(String commentId) async {
+    return const Right(unit);
   }
 }
 
@@ -331,7 +324,7 @@ class FakeGetEventsUseCase implements GetEventsUseCase {
   EventRepository get repository => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, List<EventEntity>>> call({void params}) async {
+  Future<Either<Failure, List<EventEntity>>> call({bool forceRefresh = false}) async {
     return const Right([_tEvent]);
   }
 }
@@ -437,7 +430,7 @@ class FakeCreateCompanyUseCase implements CreateCompanyUseCase {
   @override
   Future<Either<Failure, CompanyEntity>> call({
     required String ruc,
-    required String nombre,
+    required String name,
     String? iconUrl,
     required bool isActive,
     required String userId,
@@ -445,7 +438,7 @@ class FakeCreateCompanyUseCase implements CreateCompanyUseCase {
     return Right(CompanyEntity(
       id: 'comp-new',
       ruc: ruc,
-      nombre: nombre,
+      name: name,
       iconUrl: iconUrl,
       isActive: isActive,
       userId: userId,
@@ -462,14 +455,14 @@ class FakeUpdateCompanyUseCase implements UpdateCompanyUseCase {
   Future<Either<Failure, CompanyEntity>> call({
     required String id,
     required String ruc,
-    required String nombre,
+    required String name,
     String? iconUrl,
     required bool isActive,
   }) async {
     return Right(CompanyEntity(
       id: id,
       ruc: ruc,
-      nombre: nombre,
+      name: name,
       iconUrl: iconUrl,
       isActive: isActive,
       userId: 'user-1',
@@ -487,7 +480,7 @@ class FakeGetCompanyByUserIdUseCase implements GetCompanyByUserIdUseCase {
     return const Right(CompanyEntity(
       id: 'company-1',
       ruc: '20123456789',
-      nombre: 'Test Company',
+      name: 'Test Company',
       isActive: true,
       userId: 'user-1',
       joinCode: 'TEST123',
@@ -539,7 +532,7 @@ class FakeGetAnnouncementStatsUseCase implements GetAnnouncementStatsUseCase {
   Future<Either<Failure, ContentStatsEntity>> call(String id, {bool forceRefresh = false}) async {
     return Right(ContentStatsEntity(
       contentId: id,
-      contentTitle: 'Anuncio',
+      contentTitle: 'Announcement',
       totalUsers: 10,
       totalViews: 5,
       viewPercentage: 50.0,
@@ -556,7 +549,7 @@ class FakeGetEventStatsUseCase implements GetEventStatsUseCase {
   Future<Either<Failure, ContentStatsEntity>> call(String id, {bool forceRefresh = false}) async {
     return Right(ContentStatsEntity(
       contentId: id,
-      contentTitle: 'Evento',
+      contentTitle: 'Event',
       totalUsers: 10,
       totalViews: 3,
       viewPercentage: 30.0,

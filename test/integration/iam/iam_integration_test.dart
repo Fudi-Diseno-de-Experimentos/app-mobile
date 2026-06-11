@@ -1,18 +1,17 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:app_mobile/core/error/exceptions.dart';
 import 'package:app_mobile/features/iam/data/models/user_model.dart';
 import 'package:app_mobile/features/iam/data/repositories/iam_repository_impl.dart';
 import 'package:app_mobile/features/iam/domain/usecases/sign_in_usecase.dart';
-import 'package:app_mobile/features/iam/domain/usecases/sign_up_usecase.dart';
 import 'package:app_mobile/features/iam/domain/usecases/sign_out_usecase.dart';
+import 'package:app_mobile/features/iam/domain/usecases/sign_up_usecase.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 
 import '../../mocks/generate_mocks.mocks.dart';
 
 void main() {
   late MockIamRemoteDataSource mockDataSource;
-  late MockSharedPreferences mockPrefs;
+  late MockTokenStore mockTokenStore;
   late IamRepositoryImpl repository;
 
   const tUserModel = UserModel(
@@ -24,17 +23,17 @@ void main() {
 
   setUp(() {
     mockDataSource = MockIamRemoteDataSource();
-    mockPrefs = MockSharedPreferences();
-    when(mockPrefs.setString(any, any)).thenAnswer((_) async => true);
-    when(mockPrefs.remove(any)).thenAnswer((_) async => true);
+    mockTokenStore = MockTokenStore();
+    when(mockTokenStore.save(any)).thenAnswer((_) async {});
+    when(mockTokenStore.clear()).thenAnswer((_) async {});
     repository = IamRepositoryImpl(
       remoteDataSource: mockDataSource,
-      sharedPreferences: mockPrefs,
+      tokenStore: mockTokenStore,
     );
   });
 
-  group('US38 - Integración: Autenticación segura con JWT', () {
-    test('debe autenticar usuario y guardar token en SharedPreferences', () async {
+  group('US38 - Integration: Secure JWT authentication', () {
+    test('should authenticate the user and store the token', () async {
       // Arrange
       when(mockDataSource.signIn('admin', '123456'))
           .thenAnswer((_) async => tUserModel);
@@ -46,17 +45,17 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       result.fold(
-        (_) => fail('Debería ser Right'),
+        (_) => fail('Should be Right'),
         (user) {
           expect(user.token, 'jwt-token-valid');
           expect(user.username, 'admin');
           expect(user.companyId, 'comp-1');
         },
       );
-      verify(mockPrefs.setString('auth_token', 'jwt-token-valid')).called(1);
+      verify(mockTokenStore.save('jwt-token-valid')).called(1);
     });
 
-    test('debe retornar ServerFailure con credenciales inválidas', () async {
+    test('should return ServerFailure with invalid credentials', () async {
       // Arrange
       when(mockDataSource.signIn('admin', 'wrong'))
           .thenThrow(ServerException(message: 'Bad credentials'));
@@ -69,13 +68,13 @@ void main() {
       expect(result.isLeft(), true);
       result.fold(
         (failure) => expect(failure.message, 'Bad credentials'),
-        (_) => fail('Debería ser Left'),
+        (_) => fail('Should be Left'),
       );
     });
   });
 
-  group('US33 - Integración: Registro de usuario', () {
-    test('debe registrar usuario pasando por todas las capas', () async {
+  group('US33 - Integration: User registration', () {
+    test('should register a user through all layers', () async {
       // Arrange
       when(mockDataSource.signUp(
         username: anyNamed('username'),
@@ -108,7 +107,7 @@ void main() {
       )).called(1);
     });
 
-    test('debe retornar ServerFailure cuando el email ya existe', () async {
+    test('should return ServerFailure when the email already exists', () async {
       // Arrange
       when(mockDataSource.signUp(
         username: anyNamed('username'),
@@ -134,8 +133,8 @@ void main() {
     });
   });
 
-  group('US36 - Integración: Cierre de sesión seguro', () {
-    test('debe eliminar token de SharedPreferences al cerrar sesión', () async {
+  group('US36 - Integration: Secure sign-out', () {
+    test('should remove the token on sign-out', () async {
       // Arrange
       final useCase = SignOutUseCase(repository);
 
@@ -144,7 +143,7 @@ void main() {
 
       // Assert
       expect(result.isRight(), true);
-      verify(mockPrefs.remove('auth_token')).called(1);
+      verify(mockTokenStore.clear()).called(1);
     });
   });
 }

@@ -1,14 +1,13 @@
-import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:fpdart/fpdart.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:app_mobile/core/error/failures.dart';
 import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
 import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
 import 'package:app_mobile/features/events/presentation/bloc/event_event.dart';
 import 'package:app_mobile/features/events/presentation/bloc/event_state.dart';
 import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:mockito/mockito.dart';
 
 import '../../../../mocks/generate_mocks.mocks.dart';
 import '../../../../mocks/mock_helpers.dart';
@@ -23,8 +22,8 @@ void main() {
 
   const tEvent = EventEntity(
     id: 'evt-1',
-    title: 'Reunión Trimestral',
-    description: 'Revisión de objetivos',
+    title: 'Quarterly Meeting',
+    description: 'Goals review',
     date: '2024-03-15T10:00:00Z',
     location: 'Sala Principal',
     createdBy: 'manager-1',
@@ -62,9 +61,9 @@ void main() {
 
   tearDown(() => bloc.close());
 
-  group('US18 - Creación básica de eventos', () {
+  group('US18 - Basic event creation', () {
     blocTest<EventBloc, EventState>(
-      'debe emitir [Loading, Loaded] al obtener eventos exitosamente',
+      'should emit [Loading, Loaded] when events are fetched successfully',
       build: () {
         when(mockGetEvents())
             .thenAnswer((_) async => const Right([tEvent]));
@@ -78,21 +77,21 @@ void main() {
     );
 
     blocTest<EventBloc, EventState>(
-      'debe emitir [Loading, Error] cuando falla la obtención de eventos',
+      'should emit [Loading, Error] when fetching events fails',
       build: () {
         when(mockGetEvents())
-            .thenAnswer((_) async => const Left(ServerFailure('Sin conexión')));
+            .thenAnswer((_) async => const Left(ServerFailure('No connection')));
         return bloc;
       },
       act: (bloc) => bloc.add(FetchEvents()),
       expect: () => [
         EventLoading(),
-        const EventError('Sin conexión'),
+        const EventError('No connection'),
       ],
     );
 
     blocTest<EventBloc, EventState>(
-      'debe emitir [Loading, CreateSuccess, Loading, Loaded] al crear un evento exitosamente',
+      'should emit [Loading, CreateSuccess, Loading, Loaded] when an event is created successfully',
       build: () {
         when(mockCreateEvent(
           title: anyNamed('title'),
@@ -107,8 +106,8 @@ void main() {
         return bloc;
       },
       act: (bloc) => bloc.add(const CreateEventRequested(
-        title: 'Reunión Trimestral',
-        description: 'Revisión de objetivos',
+        title: 'Quarterly Meeting',
+        description: 'Goals review',
         date: '2024-03-15T10:00:00Z',
         location: 'Sala Principal',
         createdBy: 'manager-1',
@@ -123,7 +122,7 @@ void main() {
     );
 
     blocTest<EventBloc, EventState>(
-      'debe emitir [Loading, Error] cuando falla la creación de evento',
+      'should emit [Loading, Error] when event creation fails',
       build: () {
         when(mockCreateEvent(
           title: anyNamed('title'),
@@ -132,7 +131,7 @@ void main() {
           location: anyNamed('location'),
           createdBy: anyNamed('createdBy'),
           recipientIds: anyNamed('recipientIds'),
-        )).thenAnswer((_) async => const Left(ServerFailure('Campos inválidos')));
+        )).thenAnswer((_) async => const Left(ServerFailure('Invalid fields')));
         return bloc;
       },
       act: (bloc) => bloc.add(const CreateEventRequested(
@@ -145,14 +144,14 @@ void main() {
       )),
       expect: () => [
         EventLoading(),
-        const EventError('Campos inválidos'),
+        const EventError('Invalid fields'),
       ],
     );
   });
 
-  group('US18 - Cargar miembros de la compañía para selección de invitados', () {
+  group('US18 - Load company members for invitee selection', () {
     blocTest<EventBloc, EventState>(
-      'debe emitir [Loading, MembersLoaded] al obtener miembros exitosamente',
+      'should emit [Loading, MembersLoaded] when members are fetched successfully',
       build: () {
         when(mockGetCompanyMembers('comp-1'))
             .thenAnswer((_) async => const Right([tMember]));
@@ -166,13 +165,13 @@ void main() {
     );
   });
 
-  group('US20 - Modificación de eventos', () {
+  group('US20 - Event modification', () {
     blocTest<EventBloc, EventState>(
-      'debe emitir [Loading, UpdateSuccess] al actualizar un evento exitosamente',
+      'should emit [Loading, UpdateSuccess] when an event updates successfully',
       build: () {
         const updatedEvent = EventEntity(
           id: 'evt-1',
-          title: 'Reunión Pospuesta',
+          title: 'Postponed Meeting',
           description: 'Nueva fecha',
           date: '2024-04-15T10:00:00Z',
           location: 'Sala B',
@@ -193,7 +192,7 @@ void main() {
       },
       act: (bloc) => bloc.add(const UpdateEventRequested(
         id: 'evt-1',
-        title: 'Reunión Pospuesta',
+        title: 'Postponed Meeting',
         description: 'Nueva fecha',
         date: '2024-04-15T10:00:00Z',
         location: 'Sala B',
@@ -206,7 +205,7 @@ void main() {
     );
 
     blocTest<EventBloc, EventState>(
-      'debe emitir [Loading, Error] cuando falla la actualización del evento',
+      'should emit [Loading, Error] when the event update fails',
       build: () {
         when(mockUpdateEvent(
           id: anyNamed('id'),
@@ -215,12 +214,12 @@ void main() {
           date: anyNamed('date'),
           location: anyNamed('location'),
           recipientIds: anyNamed('recipientIds'),
-        )).thenAnswer((_) async => const Left(ServerFailure('Evento no encontrado')));
+        )).thenAnswer((_) async => const Left(ServerFailure('Event not found')));
         return bloc;
       },
       act: (bloc) => bloc.add(const UpdateEventRequested(
         id: 'evt-999',
-        title: 'No existe',
+        title: 'Does not exist',
         description: 'Desc',
         date: '2024-01-01',
         location: 'Sala',
@@ -228,14 +227,14 @@ void main() {
       )),
       expect: () => [
         EventLoading(),
-        const EventError('Evento no encontrado'),
+        const EventError('Event not found'),
       ],
     );
   });
 
-  group('US19 - Cancelación de eventos', () {
+  group('US19 - Event cancellation', () {
     blocTest<EventBloc, EventState>(
-      'debe emitir [Loading, DeleteSuccess] al eliminar un evento exitosamente',
+      'should emit [Loading, DeleteSuccess] when an event is deleted successfully',
       build: () {
         when(mockDeleteEvent('evt-1'))
             .thenAnswer((_) async => const Right(unit));
@@ -249,7 +248,7 @@ void main() {
     );
 
     blocTest<EventBloc, EventState>(
-      'debe emitir [Loading, Error] cuando falla la eliminación del evento',
+      'should emit [Loading, Error] when the event deletion fails',
       build: () {
         when(mockDeleteEvent('evt-1'))
             .thenAnswer((_) async => const Left(ServerFailure('Permiso denegado')));

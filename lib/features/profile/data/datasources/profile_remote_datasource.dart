@@ -1,5 +1,5 @@
-import '../../../../core/network/api_client.dart';
-import '../models/profile_model.dart';
+import 'package:app_mobile/core/network/api_client.dart';
+import 'package:app_mobile/features/profile/data/models/profile_model.dart';
 
 abstract class ProfileRemoteDataSource {
   Future<ProfileModel> getProfile();

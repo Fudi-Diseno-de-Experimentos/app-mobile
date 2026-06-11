@@ -1,14 +1,13 @@
+import 'package:app_mobile/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_event.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_state.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../profile/domain/entities/profile_entity.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_event.dart';
-import '../../../profile/presentation/bloc/profile_state.dart';
-import '../bloc/chat_bloc.dart';
-import '../bloc/chat_event.dart';
-import '../bloc/chat_state.dart';
 
 /// People finder: search company employees, tap one to start a 1:1 chat.
 /// A 1:1 is a backend `DIRECT` conversation created/fetched (idempotent) via
@@ -64,12 +63,7 @@ class _NewChatPageState extends State<NewChatPage> {
           context.read<ProfileBloc>().add(ProfileLoadRequested());
         }
 
-        ProfileEntity? me;
-        if (profileState is ProfileLoaded) {
-          me = profileState.profile;
-        } else if (profileState is ProfileUpdateSuccess) {
-          me = profileState.profile;
-        }
+        final me = profileState.profileOrNull;
 
         if (me == null) {
           return Scaffold(

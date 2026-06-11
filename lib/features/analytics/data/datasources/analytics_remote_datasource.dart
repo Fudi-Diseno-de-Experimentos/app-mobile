@@ -1,9 +1,9 @@
-import '../../../../core/network/api_client.dart';
-import '../models/view_registration_model.dart';
-import '../models/content_stats_model.dart';
-import '../models/viewer_model.dart';
-import '../models/user_announcement_view_model.dart';
-import '../models/user_event_view_model.dart';
+import 'package:app_mobile/core/network/api_client.dart';
+import 'package:app_mobile/features/analytics/data/models/content_stats_model.dart';
+import 'package:app_mobile/features/analytics/data/models/user_announcement_view_model.dart';
+import 'package:app_mobile/features/analytics/data/models/user_event_view_model.dart';
+import 'package:app_mobile/features/analytics/data/models/view_registration_model.dart';
+import 'package:app_mobile/features/analytics/data/models/viewer_model.dart';
 
 abstract class AnalyticsRemoteDataSource {
   Future<ViewRegistrationModel> registerAnnouncementView({

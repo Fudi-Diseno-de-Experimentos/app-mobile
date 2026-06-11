@@ -5,6 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i15;
 
+import 'package:app_mobile/core/auth/token_store.dart' as _i55;
 import 'package:app_mobile/core/error/failures.dart' as _i17;
 import 'package:app_mobile/features/announcements/data/datasources/announcement_remote_datasource.dart'
     as _i48;
@@ -208,17 +209,21 @@ class MockGetAnnouncementsUseCase extends _i1.Mock
           as _i2.AnnouncementRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>>
-  call() =>
+  _i15.Future<_i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>> call({
+    bool? forceRefresh = false,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#call, []),
+            Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
             returnValue:
                 _i15.Future<
                   _i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>
                 >.value(
                   _i19.dummyValue<
                     _i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>
-                  >(this, Invocation.method(#call, [])),
+                  >(
+                    this,
+                    Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+                  ),
                 ),
           )
           as _i15.Future<
@@ -479,17 +484,18 @@ class MockDeleteAnnouncementUseCase extends _i1.Mock
           as _i2.AnnouncementRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, void>> call(String? id) =>
+  _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>> call(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#call, [id]),
-            returnValue: _i15.Future<_i16.Either<_i17.Failure, void>>.value(
-              _i19.dummyValue<_i16.Either<_i17.Failure, void>>(
-                this,
-                Invocation.method(#call, [id]),
-              ),
-            ),
+            returnValue:
+                _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>>.value(
+                  _i19.dummyValue<_i16.Either<_i17.Failure, _i16.Unit>>(
+                    this,
+                    Invocation.method(#call, [id]),
+                  ),
+                ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, void>>);
+          as _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>>);
 }
 
 /// A class which mocks [GetCommentsUseCase].
@@ -514,17 +520,29 @@ class MockGetCommentsUseCase extends _i1.Mock
 
   @override
   _i15.Future<_i16.Either<_i17.Failure, List<_i27.CommentEntity>>> call(
-    String? announcementId,
-  ) =>
+    String? announcementId, {
+    bool? forceRefresh = false,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#call, [announcementId]),
+            Invocation.method(
+              #call,
+              [announcementId],
+              {#forceRefresh: forceRefresh},
+            ),
             returnValue:
                 _i15.Future<
                   _i16.Either<_i17.Failure, List<_i27.CommentEntity>>
                 >.value(
                   _i19.dummyValue<
                     _i16.Either<_i17.Failure, List<_i27.CommentEntity>>
-                  >(this, Invocation.method(#call, [announcementId])),
+                  >(
+                    this,
+                    Invocation.method(
+                      #call,
+                      [announcementId],
+                      {#forceRefresh: forceRefresh},
+                    ),
+                  ),
                 ),
           )
           as _i15.Future<_i16.Either<_i17.Failure, List<_i27.CommentEntity>>>);
@@ -602,17 +620,18 @@ class MockDeleteCommentUseCase extends _i1.Mock
           as _i3.CommentRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, void>> call(String? commentId) =>
+  _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>> call(String? commentId) =>
       (super.noSuchMethod(
             Invocation.method(#call, [commentId]),
-            returnValue: _i15.Future<_i16.Either<_i17.Failure, void>>.value(
-              _i19.dummyValue<_i16.Either<_i17.Failure, void>>(
-                this,
-                Invocation.method(#call, [commentId]),
-              ),
-            ),
+            returnValue:
+                _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>>.value(
+                  _i19.dummyValue<_i16.Either<_i17.Failure, _i16.Unit>>(
+                    this,
+                    Invocation.method(#call, [commentId]),
+                  ),
+                ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, void>>);
+          as _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>>);
 }
 
 /// A class which mocks [GetEventsUseCase].
@@ -635,16 +654,21 @@ class MockGetEventsUseCase extends _i1.Mock implements _i30.GetEventsUseCase {
           as _i4.EventRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, List<_i31.EventEntity>>> call() =>
+  _i15.Future<_i16.Either<_i17.Failure, List<_i31.EventEntity>>> call({
+    bool? forceRefresh = false,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#call, []),
+            Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
             returnValue:
                 _i15.Future<
                   _i16.Either<_i17.Failure, List<_i31.EventEntity>>
                 >.value(
                   _i19.dummyValue<
                     _i16.Either<_i17.Failure, List<_i31.EventEntity>>
-                  >(this, Invocation.method(#call, [])),
+                  >(
+                    this,
+                    Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+                  ),
                 ),
           )
           as _i15.Future<_i16.Either<_i17.Failure, List<_i31.EventEntity>>>);
@@ -978,7 +1002,7 @@ class MockCreateCompanyUseCase extends _i1.Mock
   @override
   _i15.Future<_i16.Either<_i17.Failure, _i41.CompanyEntity>> call({
     required String? ruc,
-    required String? nombre,
+    required String? name,
     String? iconUrl,
     required bool? isActive,
     required String? userId,
@@ -986,7 +1010,7 @@ class MockCreateCompanyUseCase extends _i1.Mock
       (super.noSuchMethod(
             Invocation.method(#call, [], {
               #ruc: ruc,
-              #nombre: nombre,
+              #name: name,
               #iconUrl: iconUrl,
               #isActive: isActive,
               #userId: userId,
@@ -1001,7 +1025,7 @@ class MockCreateCompanyUseCase extends _i1.Mock
                     this,
                     Invocation.method(#call, [], {
                       #ruc: ruc,
-                      #nombre: nombre,
+                      #name: name,
                       #iconUrl: iconUrl,
                       #isActive: isActive,
                       #userId: userId,
@@ -1036,7 +1060,7 @@ class MockUpdateCompanyUseCase extends _i1.Mock
   _i15.Future<_i16.Either<_i17.Failure, _i41.CompanyEntity>> call({
     required String? id,
     required String? ruc,
-    required String? nombre,
+    required String? name,
     String? iconUrl,
     required bool? isActive,
   }) =>
@@ -1044,7 +1068,7 @@ class MockUpdateCompanyUseCase extends _i1.Mock
             Invocation.method(#call, [], {
               #id: id,
               #ruc: ruc,
-              #nombre: nombre,
+              #name: name,
               #iconUrl: iconUrl,
               #isActive: isActive,
             }),
@@ -1059,7 +1083,7 @@ class MockUpdateCompanyUseCase extends _i1.Mock
                     Invocation.method(#call, [], {
                       #id: id,
                       #ruc: ruc,
-                      #nombre: nombre,
+                      #name: name,
                       #iconUrl: iconUrl,
                       #isActive: isActive,
                     }),
@@ -1564,7 +1588,7 @@ class MockCompanyRemoteDataSource extends _i1.Mock
   @override
   _i15.Future<_i12.CompanyModel> createCompany({
     required String? ruc,
-    required String? nombre,
+    required String? name,
     String? iconUrl,
     required bool? isActive,
     required String? userId,
@@ -1572,7 +1596,7 @@ class MockCompanyRemoteDataSource extends _i1.Mock
       (super.noSuchMethod(
             Invocation.method(#createCompany, [], {
               #ruc: ruc,
-              #nombre: nombre,
+              #name: name,
               #iconUrl: iconUrl,
               #isActive: isActive,
               #userId: userId,
@@ -1582,7 +1606,7 @@ class MockCompanyRemoteDataSource extends _i1.Mock
                 this,
                 Invocation.method(#createCompany, [], {
                   #ruc: ruc,
-                  #nombre: nombre,
+                  #name: name,
                   #iconUrl: iconUrl,
                   #isActive: isActive,
                   #userId: userId,
@@ -1596,7 +1620,7 @@ class MockCompanyRemoteDataSource extends _i1.Mock
   _i15.Future<_i12.CompanyModel> updateCompany({
     required String? id,
     required String? ruc,
-    required String? nombre,
+    required String? name,
     String? iconUrl,
     required bool? isActive,
   }) =>
@@ -1604,7 +1628,7 @@ class MockCompanyRemoteDataSource extends _i1.Mock
             Invocation.method(#updateCompany, [], {
               #id: id,
               #ruc: ruc,
-              #nombre: nombre,
+              #name: name,
               #iconUrl: iconUrl,
               #isActive: isActive,
             }),
@@ -1614,7 +1638,7 @@ class MockCompanyRemoteDataSource extends _i1.Mock
                 Invocation.method(#updateCompany, [], {
                   #id: id,
                   #ruc: ruc,
-                  #nombre: nombre,
+                  #name: name,
                   #iconUrl: iconUrl,
                   #isActive: isActive,
                 }),
@@ -1829,6 +1853,47 @@ class MockSharedPreferences extends _i1.Mock implements _i54.SharedPreferences {
   _i15.Future<void> reload() =>
       (super.noSuchMethod(
             Invocation.method(#reload, []),
+            returnValue: _i15.Future<void>.value(),
+            returnValueForMissingStub: _i15.Future<void>.value(),
+          )
+          as _i15.Future<void>);
+}
+
+/// A class which mocks [TokenStore].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockTokenStore extends _i1.Mock implements _i55.TokenStore {
+  MockTokenStore() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  bool get isSignedIn =>
+      (super.noSuchMethod(Invocation.getter(#isSignedIn), returnValue: false)
+          as bool);
+
+  @override
+  _i15.Future<void> init() =>
+      (super.noSuchMethod(
+            Invocation.method(#init, []),
+            returnValue: _i15.Future<void>.value(),
+            returnValueForMissingStub: _i15.Future<void>.value(),
+          )
+          as _i15.Future<void>);
+
+  @override
+  _i15.Future<void> save(String? token) =>
+      (super.noSuchMethod(
+            Invocation.method(#save, [token]),
+            returnValue: _i15.Future<void>.value(),
+            returnValueForMissingStub: _i15.Future<void>.value(),
+          )
+          as _i15.Future<void>);
+
+  @override
+  _i15.Future<void> clear() =>
+      (super.noSuchMethod(
+            Invocation.method(#clear, []),
             returnValue: _i15.Future<void>.value(),
             returnValueForMissingStub: _i15.Future<void>.value(),
           )

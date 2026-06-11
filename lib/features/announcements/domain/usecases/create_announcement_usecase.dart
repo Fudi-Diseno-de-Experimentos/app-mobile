@@ -1,7 +1,7 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
+import 'package:app_mobile/features/announcements/domain/repositories/announcement_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/announcement_entity.dart';
-import '../repositories/announcement_repository.dart';
 
 class CreateAnnouncementUseCase {
   final AnnouncementRepository repository;

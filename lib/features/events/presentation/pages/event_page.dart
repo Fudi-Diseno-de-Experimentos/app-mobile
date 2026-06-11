@@ -1,20 +1,20 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/core/utils/date_format.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_bloc.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_event.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_state.dart';
+import 'package:app_mobile/features/announcements/presentation/pages/announcement_page.dart'; // To reuse PercentagePainter
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_event.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_state.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/di.dart';
-import '../../../analytics/presentation/bloc/analytics_bloc.dart';
-import '../../../analytics/presentation/bloc/analytics_event.dart';
-import '../../../analytics/presentation/bloc/analytics_state.dart';
-import '../../domain/entities/event_entity.dart';
-import '../../domain/repositories/event_repository.dart';
-import '../../../profile/domain/entities/profile_entity.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_state.dart';
-import '../../../profile/domain/usecases/get_company_members_usecase.dart';
-import '../bloc/event_bloc.dart';
-import '../bloc/event_event.dart';
-import '../bloc/event_state.dart';
-import '../../../announcements/presentation/pages/announcement_page.dart'; // To reuse PercentagePainter
 
 class EventPage extends StatefulWidget {
   final EventEntity event;
@@ -31,24 +31,32 @@ class _EventPageState extends State<EventPage> {
   late AnalyticsBloc _analyticsBloc;
   List<ProfileEntity> _companyMembers = [];
 
+  // Updated copy received after an edit; falls back to route-passed data.
+  EventEntity? _updated;
+  EventEntity get _current => _updated ?? widget.event;
+
   @override
   void initState() {
     super.initState();
     _analyticsBloc = sl<AnalyticsBloc>();
 
-    if (widget.event.recipientIds.isNotEmpty) {
+    if (_current.recipientIds.isNotEmpty) {
       _fetchRecipients();
     } else {
       _recipientsLoaded = true;
     }
     _registerView();
 
-    final roles = _currentUserRoles();
-    final isManagerOrAdmin = roles.contains('ROLE_ADMIN') || roles.contains('ROLE_MANAGER');
+    final isManagerOrAdmin = context
+            .read<ProfileBloc>()
+            .state
+            .profileOrNull
+            ?.isManagerOrAdmin ??
+        false;
     if (isManagerOrAdmin) {
       _fetchCompanyMembers();
       _analyticsBloc.add(FetchStatsAndViewersRequested(
-        contentId: widget.event.id,
+        contentId: _current.id,
         isEvent: true,
       ));
     }
@@ -60,27 +68,12 @@ class _EventPageState extends State<EventPage> {
     super.dispose();
   }
 
-  List<String> _currentUserRoles() {
-    final profileState = context.read<ProfileBloc>().state;
-    if (profileState is ProfileLoaded) {
-      return profileState.profile.roles ?? const [];
-    } else if (profileState is ProfileUpdateSuccess) {
-      return profileState.profile.roles ?? const [];
-    }
-    return const [];
-  }
-
   void _registerView() {
     final profileState = context.read<ProfileBloc>().state;
-    String? actualUserId;
-    if (profileState is ProfileLoaded) {
-      actualUserId = profileState.profile.userId;
-    } else if (profileState is ProfileUpdateSuccess) {
-      actualUserId = profileState.profile.userId;
-    }
+    final actualUserId = profileState.profileOrNull?.userId;
     if (actualUserId != null && actualUserId.isNotEmpty) {
       _analyticsBloc.add(RegisterEventView(
-        eventId: widget.event.id,
+        eventId: _current.id,
         userId: actualUserId,
       ));
     }
@@ -88,12 +81,7 @@ class _EventPageState extends State<EventPage> {
 
   void _fetchRecipients() {
     final profileState = context.read<ProfileBloc>().state;
-    String? companyId;
-    if (profileState is ProfileLoaded) {
-      companyId = profileState.profile.companyId;
-    } else if (profileState is ProfileUpdateSuccess) {
-      companyId = profileState.profile.companyId;
-    }
+    final companyId = profileState.profileOrNull?.companyId;
     if (companyId != null) {
       context.read<EventBloc>().add(FetchCompanyMembers(companyId));
     } else {
@@ -103,12 +91,7 @@ class _EventPageState extends State<EventPage> {
 
   void _fetchCompanyMembers() async {
     final profileState = context.read<ProfileBloc>().state;
-    String? companyId;
-    if (profileState is ProfileLoaded) {
-      companyId = profileState.profile.companyId;
-    } else if (profileState is ProfileUpdateSuccess) {
-      companyId = profileState.profile.companyId;
-    }
+    final companyId = profileState.profileOrNull?.companyId;
     if (companyId != null) {
       final usecase = sl<GetCompanyMembersUseCase>();
       final result = await usecase(companyId);
@@ -126,18 +109,10 @@ class _EventPageState extends State<EventPage> {
   }
 
   bool _canManage(BuildContext context) {
-    final profileState = context.read<ProfileBloc>().state;
-    String? userId;
-    List<String> roles = const [];
-    if (profileState is ProfileLoaded) {
-      userId = profileState.profile.id;
-      roles = profileState.profile.roles ?? const [];
-    } else if (profileState is ProfileUpdateSuccess) {
-      userId = profileState.profile.id;
-      roles = profileState.profile.roles ?? const [];
-    }
-    final isOwner = userId != null && userId == widget.event.createdBy;
-    final isAdmin = roles.contains('ROLE_ADMIN');
+    final profile = context.read<ProfileBloc>().state.profileOrNull;
+    // Events store profile.id in createdBy (see ProfileEntity docs).
+    final isOwner = profile != null && profile.id == _current.createdBy;
+    final isAdmin = (profile?.roles ?? const []).contains('ROLE_ADMIN');
     return isOwner || isAdmin;
   }
 
@@ -147,8 +122,12 @@ class _EventPageState extends State<EventPage> {
     final textTheme = Theme.of(context).textTheme;
     final canManage = _canManage(context);
 
-    final roles = _currentUserRoles();
-    final isManagerOrAdmin = roles.contains('ROLE_ADMIN') || roles.contains('ROLE_MANAGER');
+    final isManagerOrAdmin = context
+            .read<ProfileBloc>()
+            .state
+            .profileOrNull
+            ?.isManagerOrAdmin ??
+        false;
 
     Widget pageBody;
     if (isManagerOrAdmin) {
@@ -185,10 +164,13 @@ class _EventPageState extends State<EventPage> {
         if (state is EventMembersLoaded) {
           setState(() {
             _recipients = state.members
-                .where((m) => widget.event.recipientIds.contains(m.id))
+                .where((m) => _current.recipientIds.contains(m.id))
                 .toList();
             _recipientsLoaded = true;
           });
+        } else if (state is EventUpdateSuccess &&
+            state.event.id == _current.id) {
+          setState(() => _updated = state.event);
         } else if (state is EventDeleteSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Event deleted')),
@@ -268,21 +250,25 @@ class _EventPageState extends State<EventPage> {
           children: [
             RefreshIndicator(
               onRefresh: () async {
-                await sl<EventRepository>().clearCache();
-                if (mounted) {
-                  if (widget.event.recipientIds.isNotEmpty) {
-                    _fetchRecipients();
-                  }
-                  final roles = _currentUserRoles();
-                  final isManagerOrAdmin = roles.contains('ROLE_ADMIN') || roles.contains('ROLE_MANAGER');
-                  if (isManagerOrAdmin) {
-                    _fetchCompanyMembers();
-                    _analyticsBloc.add(FetchStatsAndViewersRequested(
-                      contentId: widget.event.id,
-                      isEvent: true,
-                      forceRefresh: true,
-                    ));
-                  }
+                context
+                    .read<EventBloc>()
+                    .add(const FetchEvents(forceRefresh: true));
+                if (_current.recipientIds.isNotEmpty) {
+                  _fetchRecipients();
+                }
+                final isManagerOrAdmin = context
+                        .read<ProfileBloc>()
+                        .state
+                        .profileOrNull
+                        ?.isManagerOrAdmin ??
+                    false;
+                if (isManagerOrAdmin) {
+                  _fetchCompanyMembers();
+                  _analyticsBloc.add(FetchStatsAndViewersRequested(
+                    contentId: _current.id,
+                    isEvent: true,
+                    forceRefresh: true,
+                  ));
                 }
               },
               child: SingleChildScrollView(
@@ -292,7 +278,7 @@ class _EventPageState extends State<EventPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.event.title,
+                      _current.title,
                       style: textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: colorScheme.onSurface,
@@ -301,14 +287,14 @@ class _EventPageState extends State<EventPage> {
                     const SizedBox(height: 12),
                     _InfoRow(
                       icon: Icons.access_time,
-                      label: _formatDate(widget.event.date),
+                      label: AppDateFormat.dateTime(_current.date),
                     ),
                     const SizedBox(height: 8),
                     _InfoRow(
                       icon: Icons.location_on_outlined,
-                      label: widget.event.location.isEmpty
+                      label: _current.location.isEmpty
                           ? 'No location'
-                          : widget.event.location,
+                          : _current.location,
                     ),
                     const SizedBox(height: 24),
                     Text(
@@ -320,9 +306,9 @@ class _EventPageState extends State<EventPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      widget.event.description.isEmpty
+                      _current.description.isEmpty
                           ? 'No description'
-                          : widget.event.description,
+                          : _current.description,
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurface.withValues(alpha:0.8),
                       ),
@@ -362,7 +348,7 @@ class _EventPageState extends State<EventPage> {
           return RefreshIndicator(
             onRefresh: () async {
               _analyticsBloc.add(FetchStatsAndViewersRequested(
-                contentId: widget.event.id,
+                contentId: _current.id,
                 isEvent: true,
                 forceRefresh: true,
               ));
@@ -391,7 +377,7 @@ class _EventPageState extends State<EventPage> {
           return RefreshIndicator(
             onRefresh: () async {
               _analyticsBloc.add(FetchStatsAndViewersRequested(
-                contentId: widget.event.id,
+                contentId: _current.id,
                 isEvent: true,
                 forceRefresh: true,
               ));
@@ -491,7 +477,9 @@ class _EventPageState extends State<EventPage> {
                   else
                     ...viewers.map((viewer) {
                       final matchedMember = _companyMembers.cast<ProfileEntity>().firstWhere(
-                        (m) => m.id == viewer.userId,
+                        // viewer.userId is a *user* id, so match on userId,
+                        // not the profile id (see ProfileEntity docs).
+                        (m) => m.userId == viewer.userId,
                         orElse: () => ProfileEntity(
                           id: viewer.userId,
                           userId: viewer.userId,
@@ -503,8 +491,7 @@ class _EventPageState extends State<EventPage> {
                         ),
                       );
 
-                      final initials = '${matchedMember.name.isNotEmpty ? matchedMember.name[0] : ''}${matchedMember.lastname.isNotEmpty ? matchedMember.lastname[0] : ''}'
-                          .toUpperCase();
+                      final initials = matchedMember.initials;
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
@@ -593,7 +580,7 @@ class _EventPageState extends State<EventPage> {
   }
 
   Widget _buildInvitedSection(ColorScheme colorScheme, TextTheme textTheme) {
-    if (widget.event.recipientIds.isEmpty) {
+    if (_current.recipientIds.isEmpty) {
       return Text(
         'No invited people',
         style: textTheme.bodyMedium?.copyWith(
@@ -613,7 +600,7 @@ class _EventPageState extends State<EventPage> {
 
     if (_recipients.isEmpty) {
       return Text(
-        '${widget.event.recipientIds.length} invited',
+        '${_current.recipientIds.length} invited',
         style: textTheme.bodyMedium?.copyWith(
           color: colorScheme.onSurface.withValues(alpha:0.7),
         ),
@@ -622,9 +609,7 @@ class _EventPageState extends State<EventPage> {
 
     return Column(
       children: _recipients.map((member) {
-        final initials =
-            '${member.name.isNotEmpty ? member.name[0] : ''}${member.lastname.isNotEmpty ? member.lastname[0] : ''}'
-                .toUpperCase();
+        final initials = member.initials;
         return Container(
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -683,7 +668,7 @@ class _EventPageState extends State<EventPage> {
   void _onMenuSelected(BuildContext context, String value) {
     switch (value) {
       case 'edit':
-        context.push('/files/create-event', extra: widget.event);
+        context.push('/files/create-event', extra: _current);
         break;
       case 'delete':
         _confirmDelete(context);
@@ -715,23 +700,7 @@ class _EventPageState extends State<EventPage> {
       ),
     );
     if (confirmed == true) {
-      bloc.add(DeleteEventRequested(widget.event.id));
-    }
-  }
-
-  String _formatDate(String isoDate) {
-    try {
-      final date = DateTime.parse(isoDate);
-      final hour = date.hour > 12
-          ? date.hour - 12
-          : (date.hour == 0 ? 12 : date.hour);
-      final period = date.hour >= 12 ? 'PM' : 'AM';
-      final minute = date.minute.toString().padLeft(2, '0');
-      final day = date.day.toString().padLeft(2, '0');
-      final month = date.month.toString().padLeft(2, '0');
-      return '$day/$month/${date.year}, $hour:$minute $period';
-    } catch (_) {
-      return isoDate;
+      bloc.add(DeleteEventRequested(_current.id));
     }
   }
 }

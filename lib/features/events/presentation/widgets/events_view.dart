@@ -1,13 +1,10 @@
+import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_event.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_state.dart';
+import 'package:app_mobile/features/events/presentation/widgets/event_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../app/di.dart';
-import '../../domain/repositories/event_repository.dart';
-import '../bloc/event_bloc.dart';
-import '../bloc/event_event.dart';
-import '../bloc/event_state.dart';
-import 'event_card.dart';
 
 class EventsView extends StatelessWidget {
   const EventsView({super.key});
@@ -22,7 +19,7 @@ class EventsView extends StatelessWidget {
           return Center(
             child: Text(
               state.message,
-              style: const TextStyle(color: AppColors.destructive),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           );
         } else if (state is EventLoaded) {
@@ -34,10 +31,10 @@ class EventsView extends StatelessWidget {
               // Upcoming Events Header
               Container(
                 margin: const EdgeInsets.only(left: 24, bottom: 12),
-                child: const Text(
-                  "Upcoming Events",
+                child: Text(
+                  'Upcoming Events',
                   style: TextStyle(
-                    color: AppColors.neutral,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                   ),
                 ),
@@ -46,10 +43,9 @@ class EventsView extends StatelessWidget {
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
-                    await sl<EventRepository>().clearCache();
-                    if (context.mounted) {
-                      context.read<EventBloc>().add(FetchEvents());
-                    }
+                    context
+                        .read<EventBloc>()
+                        .add(const FetchEvents(forceRefresh: true));
                   },
                   child: events.isEmpty
                       ? SingleChildScrollView(
@@ -57,9 +53,9 @@ class EventsView extends StatelessWidget {
                           child: Container(
                             height: MediaQuery.of(context).size.height * 0.6,
                             alignment: Alignment.center,
-                            child: const Text(
-                              "No upcoming events",
-                              style: TextStyle(color: AppColors.tertiary),
+                            child: Text(
+                              'No upcoming events',
+                              style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
                             ),
                           ),
                         )
@@ -86,7 +82,7 @@ class EventsView extends StatelessWidget {
           );
         }
 
-        return const Center(child: Text("Loading events..."));
+        return const Center(child: Text('Loading events...'));
       },
     );
   }

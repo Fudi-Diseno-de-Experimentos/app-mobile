@@ -1,10 +1,10 @@
-import '../../domain/entities/company_entity.dart';
+import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
 
 class CompanyModel extends CompanyEntity {
   const CompanyModel({
     required super.id,
     required super.ruc,
-    required super.nombre,
+    required super.name,
     super.iconUrl,
     required super.isActive,
     required super.userId,
@@ -15,7 +15,7 @@ class CompanyModel extends CompanyEntity {
     return CompanyModel(
       id: json['id'] as String,
       ruc: json['ruc'] as String,
-      nombre: json['nombre'] as String,
+      name: json['nombre'] as String,
       iconUrl: json['iconUrl'] as String?,
       isActive: json['isActive'] as bool,
       userId: json['userId'] as String,
@@ -27,7 +27,7 @@ class CompanyModel extends CompanyEntity {
     return {
       'id': id,
       'ruc': ruc,
-      'nombre': nombre,
+      'nombre': name,
       'iconUrl': iconUrl,
       'isActive': isActive,
       'userId': userId,

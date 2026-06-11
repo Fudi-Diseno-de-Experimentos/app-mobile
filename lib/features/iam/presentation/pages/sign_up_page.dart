@@ -1,15 +1,15 @@
+import 'package:app_mobile/features/iam/presentation/bloc/iam_bloc.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_event.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_state.dart';
+import 'package:app_mobile/features/iam/presentation/widgets/auth_scaffold.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/shared/widgets/custom_text_field.dart';
+import 'package:app_mobile/shared/widgets/logo_header.dart';
+import 'package:app_mobile/shared/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../widgets/auth_scaffold.dart';
-import '../../../../shared/widgets/custom_text_field.dart';
-import '../../../../shared/widgets/logo_header.dart';
-import '../../../../shared/widgets/primary_button.dart';
-import '../bloc/iam_bloc.dart';
-import '../bloc/iam_event.dart';
-import '../bloc/iam_state.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_event.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -136,7 +136,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   Switch(
                     value: _isManager,
-                    activeTrackColor: const Color(0xFF007AFF),
+                    activeTrackColor: Theme.of(context).colorScheme.primary,
                     onChanged: (value) {
                       setState(() {
                         _isManager = value;
@@ -160,15 +160,15 @@ class _SignUpPageState extends State<SignUpPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Already have an account? ",
+                    'Already have an account? ',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   GestureDetector(
                     onTap: () => context.pop(),
-                    child: const Text(
-                      "Sign in",
+                    child: Text(
+                      'Sign in',
                       style: TextStyle(
-                        color: Color(0xFF007AFF),
+                        color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),

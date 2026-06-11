@@ -1,9 +1,9 @@
+import 'package:app_mobile/features/announcements/domain/usecases/create_comment_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/delete_comment_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_comments_usecase.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/comment_event.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/comment_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/get_comments_usecase.dart';
-import '../../domain/usecases/create_comment_usecase.dart';
-import '../../domain/usecases/delete_comment_usecase.dart';
-import 'comment_event.dart';
-import 'comment_state.dart';
 
 class CommentBloc extends Bloc<CommentEvent, CommentState> {
   final GetCommentsUseCase getCommentsUseCase;
@@ -25,7 +25,8 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     Emitter<CommentState> emit,
   ) async {
     emit(CommentLoading());
-    final result = await getCommentsUseCase(event.announcementId);
+    final result = await getCommentsUseCase(event.announcementId,
+        forceRefresh: event.forceRefresh);
     result.fold(
       (failure) => emit(CommentError(failure.message)),
       (comments) => emit(CommentLoaded(comments)),

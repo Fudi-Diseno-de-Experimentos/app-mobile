@@ -1,9 +1,10 @@
 import 'dart:io';
+
+import 'package:app_mobile/core/network/cloudinary_config.dart';
+import 'package:app_mobile/core/network/cloudinary_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../core/network/cloudinary_config.dart';
-import '../../core/network/cloudinary_service.dart';
 
 class ImageUploadPicker extends StatefulWidget {
   final Function(String) onImageUploaded;

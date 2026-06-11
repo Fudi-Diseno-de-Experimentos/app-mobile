@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 
 /// Equal-width segmented tab bar, visually identical to the Company Feed
 /// selector (`company_feed_page.dart`): neutral selected fill, secondary
@@ -30,15 +29,15 @@ class SegmentedSelector extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: selected
-                      ? AppColors.neutral
-                      : AppColors.secondary.withValues(alpha: 0.3),
+                      ? Theme.of(context).colorScheme.onSurface
+                      : Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   labels[i],
                   style: TextStyle(
-                    color: selected ? AppColors.surface : AppColors.tertiary,
+                    color: selected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.tertiary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),

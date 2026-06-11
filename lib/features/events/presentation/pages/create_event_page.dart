@@ -1,13 +1,13 @@
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_event.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_state.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../profile/domain/entities/profile_entity.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_state.dart';
-import '../../domain/entities/event_entity.dart';
-import '../bloc/event_bloc.dart';
-import '../bloc/event_event.dart';
-import '../bloc/event_state.dart';
 
 class CreateEventPage extends StatefulWidget {
   final EventEntity? event;
@@ -48,12 +48,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
       } catch (_) {}
     }
     final profileState = context.read<ProfileBloc>().state;
-    String? companyId;
-    if (profileState is ProfileLoaded) {
-      companyId = profileState.profile.companyId;
-    } else if (profileState is ProfileUpdateSuccess) {
-      companyId = profileState.profile.companyId;
-    }
+    final companyId = profileState.profileOrNull?.companyId;
     if (companyId != null) {
       context.read<EventBloc>().add(FetchCompanyMembers(companyId));
     }
@@ -165,12 +160,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
     }
 
     final profileState = context.read<ProfileBloc>().state;
-    String userId = '00000000-0000-0000-0000-000000000000';
-    if (profileState is ProfileLoaded) {
-      userId = profileState.profile.id;
-    } else if (profileState is ProfileUpdateSuccess) {
-      userId = profileState.profile.id;
-    }
+    final userId =
+        profileState.profileOrNull?.id ?? '00000000-0000-0000-0000-000000000000';
 
     context.read<EventBloc>().add(
           CreateEventRequested(

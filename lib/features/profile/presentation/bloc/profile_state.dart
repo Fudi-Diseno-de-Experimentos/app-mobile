@@ -1,5 +1,5 @@
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/profile_entity.dart';
 
 abstract class ProfileState extends Equatable {
   const ProfileState();
@@ -39,4 +39,14 @@ class ProfileError extends ProfileState {
 
   @override
   List<Object?> get props => [message];
+}
+
+extension ProfileStateX on ProfileState {
+  /// The loaded profile, regardless of which "has a profile" state we are in.
+  ProfileEntity? get profileOrNull {
+    final state = this;
+    if (state is ProfileLoaded) return state.profile;
+    if (state is ProfileUpdateSuccess) return state.profile;
+    return null;
+  }
 }

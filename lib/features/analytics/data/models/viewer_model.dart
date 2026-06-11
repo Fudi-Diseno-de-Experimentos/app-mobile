@@ -1,4 +1,4 @@
-import '../../domain/entities/viewer_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/viewer_entity.dart';
 
 class ViewerModel extends ViewerEntity {
   const ViewerModel({

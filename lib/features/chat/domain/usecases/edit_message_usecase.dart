@@ -1,7 +1,7 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/chat/domain/entities/message_entity.dart';
+import 'package:app_mobile/features/chat/domain/repositories/chat_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/message_entity.dart';
-import '../repositories/chat_repository.dart';
 
 /// Edits a message body. Only the author may edit (enforced server-side).
 class EditMessageUseCase {

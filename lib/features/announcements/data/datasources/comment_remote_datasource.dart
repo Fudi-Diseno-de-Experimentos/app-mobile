@@ -1,5 +1,5 @@
-import '../../../../core/network/api_client.dart';
-import '../models/comment_model.dart';
+import 'package:app_mobile/core/network/api_client.dart';
+import 'package:app_mobile/features/announcements/data/models/comment_model.dart';
 
 abstract class CommentRemoteDataSource {
   Future<List<CommentModel>> getComments(String announcementId);

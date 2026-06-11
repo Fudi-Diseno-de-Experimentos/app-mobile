@@ -7,7 +7,15 @@ abstract class AnnouncementEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchAnnouncements extends AnnouncementEvent {}
+class FetchAnnouncements extends AnnouncementEvent {
+  /// Skip caches and hit the API (pull-to-refresh).
+  final bool forceRefresh;
+
+  const FetchAnnouncements({this.forceRefresh = false});
+
+  @override
+  List<Object> get props => [forceRefresh];
+}
 
 /// Fetch announcements filtered by priority. A null/empty [priority] loads all
 /// (`GET /announcements`); a value loads `GET /announcements/priority/{priority}`.

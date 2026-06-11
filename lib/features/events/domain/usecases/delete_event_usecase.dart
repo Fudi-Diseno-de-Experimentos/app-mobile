@@ -1,6 +1,6 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/events/domain/repositories/event_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../repositories/event_repository.dart';
 
 class DeleteEventUseCase {
   final EventRepository repository;

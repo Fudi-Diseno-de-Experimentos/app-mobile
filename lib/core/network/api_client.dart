@@ -1,7 +1,7 @@
+import 'package:app_mobile/core/error/exceptions.dart';
+import 'package:app_mobile/core/network/api_constants.dart';
+import 'package:app_mobile/core/network/auth_interceptor.dart';
 import 'package:dio/dio.dart';
-import 'api_constants.dart';
-import 'auth_interceptor.dart';
-import '../error/exceptions.dart';
 
 class ApiClient {
   final Dio _dio;
@@ -22,7 +22,10 @@ class ApiClient {
   }
 
   void addAuthInterceptor(AuthInterceptor interceptor) {
-    _dio.interceptors.add(interceptor);
+    // Insert before the LogInterceptor (added in the constructor) so the auth
+    // header is attached *before* the request is logged — otherwise the log
+    // shows an empty `headers:` block and hides whether a token was sent.
+    _dio.interceptors.insert(0, interceptor);
   }
 
   Future<Response> get(
@@ -124,7 +127,9 @@ class ApiClient {
         message = 'Connection timeout';
         break;
       case DioExceptionType.badResponse:
-        message = error.response?.data?['message'] ?? 'Server error';
+        final data = error.response?.data;
+        message = (data is Map ? data['message']?.toString() : null) ??
+            'Server error${statusCode != null ? ' ($statusCode)' : ''}';
         break;
       case DioExceptionType.connectionError:
         message = 'No Internet connection';

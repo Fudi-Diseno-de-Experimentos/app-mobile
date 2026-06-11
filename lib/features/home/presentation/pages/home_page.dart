@@ -1,16 +1,22 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_bloc.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_event.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_state.dart';
+import 'package:app_mobile/features/announcements/presentation/widgets/priority_dot.dart';
+import 'package:app_mobile/features/chat/domain/entities/group_entity.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_event.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_state.dart';
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_event.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_state.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/di.dart';
-import '../../../announcements/presentation/bloc/announcement_bloc.dart';
-import '../../../announcements/presentation/bloc/announcement_event.dart';
-import '../../../announcements/presentation/bloc/announcement_state.dart';
-import '../../../announcements/domain/entities/announcement_entity.dart';
-import '../../../events/presentation/bloc/event_bloc.dart';
-import '../../../events/presentation/bloc/event_event.dart';
-import '../../../events/presentation/bloc/event_state.dart';
-import '../../../events/domain/entities/event_entity.dart';
-import '../../../announcements/presentation/widgets/priority_dot.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -109,39 +115,137 @@ class _SectionHeader extends StatelessWidget {
 
 // ─── Latest Chats ─────────────────────────────────────────────────────────────
 
-class _LatestChatsSection extends StatelessWidget {
+class _LatestChatsSection extends StatefulWidget {
   const _LatestChatsSection();
+
+  @override
+  State<_LatestChatsSection> createState() => _LatestChatsSectionState();
+}
+
+class _LatestChatsSectionState extends State<_LatestChatsSection> {
+  late final ChatBloc _chatBloc;
+  bool _requested = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _chatBloc = sl<ChatBloc>();
+    _loadChats(context.read<ProfileBloc>().state);
+  }
+
+  @override
+  void dispose() {
+    _chatBloc.close();
+    super.dispose();
+  }
+
+  void _loadChats(ProfileState profileState) {
+    if (_requested) return;
+    final profile = profileState.profileOrNull;
+    if (profile == null) return;
+    _requested = true;
+    _chatBloc.add(LoadGroups(profile.id, profile.companyId ?? ''));
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return SizedBox(
-      height: 88,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        children: [
-          Center(
-            child: Row(
-              children: [
-                Icon(
-                  Icons.chat_bubble_outline,
-                  size: 18,
-                  color: colorScheme.onSurface.withValues(alpha: 0.35),
+    // The profile may still be loading when home first builds; request the
+    // chat feed as soon as it arrives.
+    return BlocListener<ProfileBloc, ProfileState>(
+      listener: (context, state) => _loadChats(state),
+      child: BlocBuilder<ChatBloc, ChatState>(
+        bloc: _chatBloc,
+        builder: (context, state) {
+          final chats = state is GroupsLoaded
+              ? (state.groups
+                    .where((g) => !state.archivedIds.contains(g.id))
+                    .toList()
+                ..sort((a, b) => (DateTime.tryParse(b.updatedAt) ??
+                        DateTime.fromMillisecondsSinceEpoch(0))
+                    .compareTo(DateTime.tryParse(a.updatedAt) ??
+                        DateTime.fromMillisecondsSinceEpoch(0))))
+              : const <GroupEntity>[];
+
+          if (chats.isEmpty) {
+            return SizedBox(
+              height: 88,
+              child: Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.chat_bubble_outline,
+                      size: 18,
+                      color: colorScheme.onSurface.withValues(alpha: 0.35),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'No recent chats',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurface.withValues(alpha: 0.45),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  'No recent chats',
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha: 0.45),
+              ),
+            );
+          }
+
+          return SizedBox(
+            height: 88,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              itemCount: chats.length.clamp(0, 6),
+              separatorBuilder: (_, _) => const SizedBox(width: 20),
+              itemBuilder: (context, index) {
+                final chat = chats[index];
+                final hasImage =
+                    chat.imageUrl != null && chat.imageUrl!.isNotEmpty;
+                return GestureDetector(
+                  onTap: () => context.go('/messages'),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor:
+                            colorScheme.primary.withValues(alpha: 0.1),
+                        backgroundImage:
+                            hasImage ? NetworkImage(chat.imageUrl!) : null,
+                        child: hasImage
+                            ? null
+                            : Text(
+                                chat.name.isNotEmpty
+                                    ? chat.name[0].toUpperCase()
+                                    : '?',
+                                style: TextStyle(color: colorScheme.primary),
+                              ),
+                      ),
+                      const SizedBox(height: 6),
+                      SizedBox(
+                        width: 64,
+                        child: Text(
+                          chat.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: textTheme.bodySmall?.copyWith(
+                            color:
+                                colorScheme.onSurface.withValues(alpha: 0.7),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                );
+              },
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -435,8 +539,8 @@ class _EventMiniCard extends StatelessWidget {
 
   String _monthOf(String isoDate) {
     const months = [
-      '', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN',
-      'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC',
+      '', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+      'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
     ];
     try {
       final m = DateTime.parse(isoDate).month;

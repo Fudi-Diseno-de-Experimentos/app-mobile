@@ -1,11 +1,11 @@
+import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_event.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_state.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/get_events_usecase.dart';
-import '../../domain/usecases/create_event_usecase.dart';
-import '../../domain/usecases/delete_event_usecase.dart';
-import '../../domain/usecases/update_event_usecase.dart';
-import '../../../profile/domain/usecases/get_company_members_usecase.dart';
-import 'event_event.dart';
-import 'event_state.dart';
 
 class EventBloc extends Bloc<EventEvent, EventState> {
   final GetEventsUseCase getEventsUseCase;
@@ -33,7 +33,8 @@ class EventBloc extends Bloc<EventEvent, EventState> {
     Emitter<EventState> emit,
   ) async {
     emit(EventLoading());
-    final failureOrEvents = await getEventsUseCase();
+    final failureOrEvents =
+        await getEventsUseCase(forceRefresh: event.forceRefresh);
     failureOrEvents.fold(
       (failure) => emit(EventError(failure.message)),
       (events) => emit(EventLoaded(events)),

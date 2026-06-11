@@ -1,19 +1,17 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_bloc.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_event.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_state.dart';
+import 'package:app_mobile/features/announcements/presentation/widgets/announcement_card.dart';
+import 'package:app_mobile/features/announcements/presentation/widgets/priority_dot.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/di.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../profile/domain/entities/profile_entity.dart';
-import '../../../profile/domain/usecases/get_company_members_usecase.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_state.dart';
-import '../../domain/entities/announcement_entity.dart';
-import '../../domain/repositories/announcement_repository.dart';
-import '../bloc/announcement_bloc.dart';
-import '../bloc/announcement_event.dart';
-import '../bloc/announcement_state.dart';
-import 'announcement_card.dart';
-import 'priority_dot.dart';
 
 /// Single unified feed: announcements page with priority filter chips.
 /// Sorted by urgency (URGENT → HIGH → NORMAL), then most-recent-first.
@@ -36,12 +34,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
 
   void _fetchCompanyMembers() async {
     final profileState = context.read<ProfileBloc>().state;
-    String? companyId;
-    if (profileState is ProfileLoaded) {
-      companyId = profileState.profile.companyId;
-    } else if (profileState is ProfileUpdateSuccess) {
-      companyId = profileState.profile.companyId;
-    }
+    final companyId = profileState.profileOrNull?.companyId;
     if (companyId != null) {
       final usecase = sl<GetCompanyMembersUseCase>();
       final result = await usecase(companyId);
@@ -89,7 +82,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
           return Center(
             child: Text(
               state.message,
-              style: const TextStyle(color: AppColors.destructive),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           );
         } else if (state is AnnouncementLoaded) {
@@ -111,10 +104,9 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   children: ['ALL', 'NORMAL', 'HIGH', 'URGENT'].map((priority) {
                     final isSelected = _selectedPriority == priority;
-                    Color activeColor = colorScheme.primary;
-                    if (priority == 'HIGH') activeColor = Colors.orange;
-                    if (priority == 'URGENT') activeColor = colorScheme.error;
-                    if (priority == 'NORMAL') activeColor = const Color(0xFF2E7D32);
+                    final activeColor = priority == 'ALL'
+                        ? colorScheme.primary
+                        : PriorityStyle.color(context, priority);
 
                     return GestureDetector(
                       onTap: () => setState(() => _selectedPriority = priority),
@@ -150,11 +142,10 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
-                    await sl<AnnouncementRepository>().clearCache();
-                    if (context.mounted) {
-                      context.read<AnnouncementBloc>().add(FetchAnnouncements());
-                      _fetchCompanyMembers();
-                    }
+                    context
+                        .read<AnnouncementBloc>()
+                        .add(const FetchAnnouncements(forceRefresh: true));
+                    _fetchCompanyMembers();
                   },
                   child: announcements.isEmpty
                       ? SingleChildScrollView(
@@ -164,7 +155,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                             alignment: Alignment.center,
                             child: Text(
                               "No ${_selectedPriority == 'ALL' ? '' : '${_selectedPriority.toLowerCase()} '}announcements available",
-                              style: const TextStyle(color: AppColors.tertiary),
+                              style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
                             ),
                           ),
                         )
@@ -196,7 +187,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
           );
         }
 
-        return const Center(child: Text("Initializing..."));
+        return const Center(child: Text('Initializing...'));
       },
     );
   }

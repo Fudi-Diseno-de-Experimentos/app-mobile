@@ -1,4 +1,4 @@
-import '../../domain/entities/user_announcement_view_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/user_announcement_view_entity.dart';
 
 class UserAnnouncementViewModel extends UserAnnouncementViewEntity {
   const UserAnnouncementViewModel({

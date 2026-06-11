@@ -7,7 +7,15 @@ abstract class EventEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchEvents extends EventEvent {}
+class FetchEvents extends EventEvent {
+  /// Skip caches and hit the API (pull-to-refresh).
+  final bool forceRefresh;
+
+  const FetchEvents({this.forceRefresh = false});
+
+  @override
+  List<Object> get props => [forceRefresh];
+}
 
 class FetchCompanyMembers extends EventEvent {
   final String companyId;

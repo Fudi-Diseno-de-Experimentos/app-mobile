@@ -1,4 +1,4 @@
-import '../../domain/entities/conversation_entity.dart';
+import 'package:app_mobile/features/chat/domain/entities/conversation_entity.dart';
 
 class ConversationModel extends ConversationEntity {
   const ConversationModel({

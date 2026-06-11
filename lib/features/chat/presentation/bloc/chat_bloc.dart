@@ -1,16 +1,16 @@
+import 'package:app_mobile/features/chat/data/datasources/chat_archive_store.dart';
+import 'package:app_mobile/features/chat/domain/entities/conversation_entity.dart';
+import 'package:app_mobile/features/chat/domain/entities/group_entity.dart';
+import 'package:app_mobile/features/chat/domain/usecases/create_group_usecase.dart';
+import 'package:app_mobile/features/chat/domain/usecases/get_my_conversations_usecase.dart';
+import 'package:app_mobile/features/chat/domain/usecases/get_my_groups_usecase.dart';
+import 'package:app_mobile/features/chat/domain/usecases/start_conversation_usecase.dart';
+import 'package:app_mobile/features/chat/domain/usecases/update_group_usecase.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_event.dart';
+import 'package:app_mobile/features/chat/presentation/bloc/chat_state.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../profile/domain/entities/profile_entity.dart';
-import '../../../profile/domain/usecases/get_company_members_usecase.dart';
-import '../../data/datasources/chat_archive_store.dart';
-import '../../domain/entities/conversation_entity.dart';
-import '../../domain/entities/group_entity.dart';
-import '../../domain/usecases/create_group_usecase.dart';
-import '../../domain/usecases/get_my_conversations_usecase.dart';
-import '../../domain/usecases/get_my_groups_usecase.dart';
-import '../../domain/usecases/start_conversation_usecase.dart';
-import '../../domain/usecases/update_group_usecase.dart';
-import 'chat_event.dart';
-import 'chat_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final GetMyGroupsUseCase getMyGroupsUseCase;

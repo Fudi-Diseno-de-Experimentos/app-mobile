@@ -1,6 +1,6 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/chat/domain/repositories/chat_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../repositories/chat_repository.dart';
 
 /// Soft-deletes a message (status -> DELETED, hidden from the thread).
 class DeleteMessageUseCase {

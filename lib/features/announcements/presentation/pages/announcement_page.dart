@@ -1,25 +1,26 @@
+import 'dart:math' as math;
+
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/core/utils/date_format.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_bloc.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_event.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_state.dart';
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
+import 'package:app_mobile/features/announcements/domain/entities/comment_entity.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_bloc.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_event.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_state.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/comment_bloc.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/comment_event.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/comment_state.dart';
+import 'package:app_mobile/features/announcements/presentation/widgets/priority_dot.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/di.dart';
-import '../../../analytics/presentation/bloc/analytics_bloc.dart';
-import '../../../analytics/presentation/bloc/analytics_event.dart';
-import '../../../analytics/presentation/bloc/analytics_state.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_state.dart';
-import '../../../profile/domain/entities/profile_entity.dart';
-import '../../../profile/domain/usecases/get_company_members_usecase.dart';
-import '../../domain/entities/announcement_entity.dart';
-import '../../domain/entities/comment_entity.dart';
-import '../bloc/announcement_bloc.dart';
-import '../bloc/announcement_event.dart';
-import '../bloc/announcement_state.dart';
-import '../bloc/comment_bloc.dart';
-import '../bloc/comment_event.dart';
-import '../bloc/comment_state.dart';
-import '../widgets/priority_dot.dart';
-import '../../domain/repositories/announcement_repository.dart';
-import '../../domain/repositories/comment_repository.dart';
 
 class AnnouncementPage extends StatefulWidget {
   final AnnouncementEntity announcement;
@@ -50,12 +51,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
         .add(FetchAnnouncementById(widget.announcement.id));
 
     final profileState = context.read<ProfileBloc>().state;
-    String? actualUserId;
-    if (profileState is ProfileLoaded) {
-      actualUserId = profileState.profile.userId;
-    } else if (profileState is ProfileUpdateSuccess) {
-      actualUserId = profileState.profile.userId;
-    }
+    final actualUserId = profileState.profileOrNull?.userId;
 
     if (actualUserId != null && actualUserId.isNotEmpty) {
       _analyticsBloc.add(RegisterAnnouncementView(
@@ -64,9 +60,12 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       ));
     }
 
-    final roles = _currentUser(context).roles;
-    final isManagerOrAdmin =
-        roles.contains('ROLE_ADMIN') || roles.contains('ROLE_MANAGER');
+    final isManagerOrAdmin = context
+            .read<ProfileBloc>()
+            .state
+            .profileOrNull
+            ?.isManagerOrAdmin ??
+        false;
     if (isManagerOrAdmin) {
       _fetchMembers();
       _analyticsBloc.add(FetchStatsAndViewersRequested(
@@ -85,12 +84,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
 
   void _fetchMembers() async {
     final profileState = context.read<ProfileBloc>().state;
-    String? companyId;
-    if (profileState is ProfileLoaded) {
-      companyId = profileState.profile.companyId;
-    } else if (profileState is ProfileUpdateSuccess) {
-      companyId = profileState.profile.companyId;
-    }
+    final companyId = profileState.profileOrNull?.companyId;
     if (companyId != null) {
       final usecase = sl<GetCompanyMembersUseCase>();
       final result = await usecase(companyId);
@@ -108,19 +102,10 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   }
 
   ({String? userId, List<String> roles}) _currentUser(BuildContext context) {
-    final profileState = context.read<ProfileBloc>().state;
-    if (profileState is ProfileLoaded) {
-      return (
-        userId: profileState.profile.id,
-        roles: profileState.profile.roles ?? const [],
-      );
-    } else if (profileState is ProfileUpdateSuccess) {
-      return (
-        userId: profileState.profile.id,
-        roles: profileState.profile.roles ?? const [],
-      );
-    }
-    return (userId: null, roles: const <String>[]);
+    // NOTE: announcements/comments store profile.id under "author"/"createdBy"
+    // fields, so this deliberately exposes profile.id as userId.
+    final profile = context.read<ProfileBloc>().state.profileOrNull;
+    return (userId: profile?.id, roles: profile?.roles ?? const <String>[]);
   }
 
   bool _canManage(BuildContext context) {
@@ -141,7 +126,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   void _onMenuSelected(BuildContext context, String value) {
     switch (value) {
       case 'edit':
-        context.push('/files/create-announcement', extra: widget.announcement);
+        context.push('/files/create-announcement', extra: _current);
         break;
       case 'delete':
         _confirmDelete(context);
@@ -181,7 +166,10 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
     final text = _commentController.text.trim();
     if (text.isEmpty) return;
     final user = _currentUser(context);
-    final authorId = user.userId ?? '00000000-0000-0000-0000-000000000000';
+    final authorId = user.userId;
+    // The send button is disabled until the profile loads, but guard anyway
+    // so a comment is never attributed to a phantom author.
+    if (authorId == null) return;
     context.read<CommentBloc>().add(
           CreateCommentRequested(
             announcementId: widget.announcement.id,
@@ -234,9 +222,12 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
     final announcement = _current;
     final canManage = _canManage(context);
 
-    final user = _currentUser(context);
-    final isManagerOrAdmin =
-        user.roles.contains('ROLE_ADMIN') || user.roles.contains('ROLE_MANAGER');
+    final isManagerOrAdmin = context
+            .read<ProfileBloc>()
+            .state
+            .profileOrNull
+            ?.isManagerOrAdmin ??
+        false;
 
     Widget pageBody;
     if (isManagerOrAdmin) {
@@ -346,14 +337,11 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   ) {
     return RefreshIndicator(
       onRefresh: () async {
-        await sl<CommentRepository>().clearCache();
-        await sl<AnnouncementRepository>().clearCache();
-        if (mounted) {
-          context.read<CommentBloc>().add(FetchComments(widget.announcement.id));
-          context
-              .read<AnnouncementBloc>()
-              .add(FetchAnnouncementById(widget.announcement.id));
-        }
+        context.read<CommentBloc>().add(
+            FetchComments(widget.announcement.id, forceRefresh: true));
+        context
+            .read<AnnouncementBloc>()
+            .add(FetchAnnouncementById(widget.announcement.id));
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -384,7 +372,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              _formatRelativeDate(announcement.createdAt),
+              AppDateFormat.relativeDate(announcement.createdAt),
               style: textTheme.labelSmall?.copyWith(
                 color: colorScheme.onSurface.withValues(alpha:0.5),
               ),
@@ -481,8 +469,12 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
         BlocBuilder<CommentBloc, CommentState>(
           builder: (context, state) {
             final isBusy = state is CommentActionInProgress;
+            // Disabled until the profile loads so comments always carry a
+            // real author id (watch: re-enables as soon as it arrives).
+            final hasAuthor =
+                context.watch<ProfileBloc>().state.profileOrNull != null;
             return IconButton(
-              onPressed: isBusy ? null : _submitComment,
+              onPressed: isBusy || !hasAuthor ? null : _submitComment,
               icon: Icon(Icons.send, color: colorScheme.primary),
             );
           },
@@ -542,20 +534,8 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
-    final matchedMember = _companyMembers.cast<ProfileEntity>().firstWhere(
-      (m) => m.id == comment.authorId,
-      orElse: () => ProfileEntity(
-        id: comment.authorId,
-        userId: comment.authorId,
-        username: '',
-        name: 'Unknown',
-        lastname: 'User',
-        email: '',
-      ),
-    );
-
-    final initials = '${matchedMember.name.isNotEmpty ? matchedMember.name[0] : ''}${matchedMember.lastname.isNotEmpty ? matchedMember.lastname[0] : ''}'
-        .toUpperCase();
+    final matchedMember = _companyMembers.byProfileId(comment.authorId);
+    final initials = matchedMember.initials;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -600,7 +580,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                       ),
                     ),
                     Text(
-                      _formatRelativeDate(comment.createdAt),
+                      AppDateFormat.relativeDate(comment.createdAt),
                       style: textTheme.labelSmall?.copyWith(
                         color: colorScheme.onSurface.withValues(alpha:0.55),
                       ),
@@ -654,20 +634,8 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   }
 
   Widget _buildAuthorRow(String authorId, ColorScheme colorScheme, TextTheme textTheme) {
-    final matchedMember = _companyMembers.cast<ProfileEntity>().firstWhere(
-      (m) => m.id == authorId,
-      orElse: () => ProfileEntity(
-        id: authorId,
-        userId: authorId,
-        username: '',
-        name: 'Unknown',
-        lastname: 'User',
-        email: '',
-      ),
-    );
-
-    final initials = '${matchedMember.name.isNotEmpty ? matchedMember.name[0] : ''}${matchedMember.lastname.isNotEmpty ? matchedMember.lastname[0] : ''}'
-        .toUpperCase();
+    final matchedMember = _companyMembers.byProfileId(authorId);
+    final initials = matchedMember.initials;
 
     return Row(
       children: [
@@ -839,7 +807,9 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                   else
                     ...viewers.map((viewer) {
                       final matchedMember = _companyMembers.cast<ProfileEntity>().firstWhere(
-                        (m) => m.id == viewer.userId,
+                        // viewer.userId is a *user* id, so match on userId,
+                        // not the profile id (see ProfileEntity docs).
+                        (m) => m.userId == viewer.userId,
                         orElse: () => ProfileEntity(
                           id: viewer.userId,
                           userId: viewer.userId,
@@ -851,8 +821,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                         ),
                       );
 
-                      final initials = '${matchedMember.name.isNotEmpty ? matchedMember.name[0] : ''}${matchedMember.lastname.isNotEmpty ? matchedMember.lastname[0] : ''}'
-                          .toUpperCase();
+                      final initials = matchedMember.initials;
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
@@ -940,18 +909,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
     }
   }
 
-  String _formatRelativeDate(String isoDate) {
-    try {
-      final date = DateTime.parse(isoDate);
-      final now = DateTime.now();
-      final diff = now.difference(date);
-      if (diff.inDays == 0 && now.day == date.day) return 'Today';
-      if (diff.inDays <= 1) return 'Yesterday';
-      return '${date.day}/${date.month}/${date.year}';
-    } catch (_) {
-      return isoDate;
-    }
-  }
 }
 
 class PercentagePainter extends CustomPainter {
@@ -984,10 +941,10 @@ class PercentagePainter extends CustomPainter {
 
     canvas.drawCircle(center, radius - strokeWidth / 2, bgPaint);
 
-    final sweepAngle = 2 * 3.1415926535 * (percentage / 100);
+    final sweepAngle = 2 * math.pi * (percentage / 100);
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
-      -3.1415926535 / 2,
+      -math.pi / 2,
       sweepAngle,
       false,
       activePaint,
@@ -995,5 +952,8 @@ class PercentagePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant PercentagePainter oldDelegate) =>
+      oldDelegate.percentage != percentage ||
+      oldDelegate.primaryColor != primaryColor ||
+      oldDelegate.backgroundColor != backgroundColor;
 }

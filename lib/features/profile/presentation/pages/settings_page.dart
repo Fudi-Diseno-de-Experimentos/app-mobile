@@ -1,13 +1,13 @@
+import 'package:app_mobile/features/iam/presentation/bloc/iam_bloc.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_event.dart';
+import 'package:app_mobile/features/iam/presentation/bloc/iam_state.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/features/profile/presentation/widgets/settings_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../features/iam/presentation/bloc/iam_bloc.dart';
-import '../../../../features/iam/presentation/bloc/iam_event.dart';
-import '../../../../features/iam/presentation/bloc/iam_state.dart';
-import '../../domain/entities/profile_entity.dart';
-import '../widgets/settings_tile.dart';
-import '../bloc/profile_bloc.dart';
-import '../bloc/profile_event.dart';
 
 class SettingsPage extends StatelessWidget {
   final ProfileEntity profile;

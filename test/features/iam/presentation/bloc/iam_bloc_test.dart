@@ -1,13 +1,12 @@
-import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:fpdart/fpdart.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:app_mobile/core/error/failures.dart';
 import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
 import 'package:app_mobile/features/iam/presentation/bloc/iam_bloc.dart';
 import 'package:app_mobile/features/iam/presentation/bloc/iam_event.dart';
 import 'package:app_mobile/features/iam/presentation/bloc/iam_state.dart';
+import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:mockito/mockito.dart';
 
 import '../../../../mocks/generate_mocks.mocks.dart';
 import '../../../../mocks/mock_helpers.dart';
@@ -43,9 +42,9 @@ void main() {
 
   tearDown(() => bloc.close());
 
-  group('US38 - Autenticación segura con JWT', () {
+  group('US38 - Secure JWT authentication', () {
     blocTest<IamBloc, IamState>(
-      'debe emitir [Loading, SignInSuccess] al iniciar sesión exitosamente',
+      'should emit [Loading, SignInSuccess] when signing in successfully',
       build: () {
         when(mockSignIn('admin', '123456'))
             .thenAnswer((_) async => const Right(tUser));
@@ -62,10 +61,10 @@ void main() {
     );
 
     blocTest<IamBloc, IamState>(
-      'debe emitir [Loading, Error] con credenciales inválidas',
+      'should emit [Loading, Error] with invalid credentials',
       build: () {
         when(mockSignIn('admin', 'wrong'))
-            .thenAnswer((_) async => const Left(ServerFailure('Credenciales inválidas')));
+            .thenAnswer((_) async => const Left(ServerFailure('Invalid credentials')));
         return bloc;
       },
       act: (bloc) => bloc.add(const SignInSubmitted(
@@ -74,14 +73,14 @@ void main() {
       )),
       expect: () => [
         IamLoading(),
-        const IamError('Credenciales inválidas'),
+        const IamError('Invalid credentials'),
       ],
     );
   });
 
-  group('US33 - Validar y almacenar datos de usuario al registrarse', () {
+  group('US33 - Validate and store user data on registration', () {
     blocTest<IamBloc, IamState>(
-      'debe emitir [Loading, SignUpSuccess] al registrarse exitosamente',
+      'should emit [Loading, SignUpSuccess] when registering successfully',
       build: () {
         when(mockSignUp(
           username: anyNamed('username'),
@@ -107,7 +106,7 @@ void main() {
     );
 
     blocTest<IamBloc, IamState>(
-      'debe emitir [Loading, Error] cuando el correo ya está registrado',
+      'should emit [Loading, Error] when the email is already registered',
       build: () {
         when(mockSignUp(
           username: anyNamed('username'),
@@ -116,7 +115,7 @@ void main() {
           lastname: anyNamed('lastname'),
           email: anyNamed('email'),
           roles: anyNamed('roles'),
-        )).thenAnswer((_) async => const Left(ServerFailure('El correo ya está en uso')));
+        )).thenAnswer((_) async => const Left(ServerFailure('The email is already in use')));
         return bloc;
       },
       act: (bloc) => bloc.add(const SignUpSubmitted(
@@ -128,14 +127,14 @@ void main() {
       )),
       expect: () => [
         IamLoading(),
-        const IamError('El correo ya está en uso'),
+        const IamError('The email is already in use'),
       ],
     );
   });
 
-  group('US36 - Cierre de sesión seguro', () {
+  group('US36 - Secure sign-out', () {
     blocTest<IamBloc, IamState>(
-      'debe emitir [Loading, SignOutSuccess] al cerrar sesión exitosamente',
+      'should emit [Loading, SignOutSuccess] when signing out successfully',
       build: () {
         when(mockSignOut())
             .thenAnswer((_) async => const Right(null));
@@ -149,23 +148,23 @@ void main() {
     );
 
     blocTest<IamBloc, IamState>(
-      'debe emitir [Loading, Error] cuando falla el cierre de sesión',
+      'should emit [Loading, Error] when sign-out fails',
       build: () {
         when(mockSignOut())
-            .thenAnswer((_) async => const Left(ServerFailure('Error al cerrar sesión')));
+            .thenAnswer((_) async => const Left(ServerFailure('Sign-out failed')));
         return bloc;
       },
       act: (bloc) => bloc.add(const SignOutSubmitted()),
       expect: () => [
         IamLoading(),
-        const IamError('Error al cerrar sesión'),
+        const IamError('Sign-out failed'),
       ],
     );
   });
 
-  group('US44 - Unirse a una compañía', () {
+  group('US44 - Join a company', () {
     blocTest<IamBloc, IamState>(
-      'debe emitir [Loading, JoinCompanySuccess] al unirse exitosamente',
+      'should emit [Loading, JoinCompanySuccess] when joining successfully',
       build: () {
         when(mockJoinCompany('ABC123'))
             .thenAnswer((_) async => const Right(null));
@@ -179,16 +178,16 @@ void main() {
     );
 
     blocTest<IamBloc, IamState>(
-      'debe emitir [Loading, Error] con código inválido',
+      'should emit [Loading, Error] with an invalid code',
       build: () {
         when(mockJoinCompany('INVALID'))
-            .thenAnswer((_) async => const Left(ServerFailure('Código inválido')));
+            .thenAnswer((_) async => const Left(ServerFailure('Invalid code')));
         return bloc;
       },
       act: (bloc) => bloc.add(const JoinCompanySubmitted(joinCode: 'INVALID')),
       expect: () => [
         IamLoading(),
-        const IamError('Código inválido'),
+        const IamError('Invalid code'),
       ],
     );
   });

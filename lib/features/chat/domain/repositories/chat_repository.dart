@@ -1,8 +1,8 @@
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/chat/domain/entities/conversation_entity.dart';
+import 'package:app_mobile/features/chat/domain/entities/group_entity.dart';
+import 'package:app_mobile/features/chat/domain/entities/message_entity.dart';
 import 'package:fpdart/fpdart.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/conversation_entity.dart';
-import '../entities/group_entity.dart';
-import '../entities/message_entity.dart';
 
 abstract class ChatRepository {
   Future<Either<Failure, List<GroupEntity>>> getMyGroups(String userId);
