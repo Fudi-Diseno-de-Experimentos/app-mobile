@@ -1,17 +1,17 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_bloc.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_event.dart';
+import 'package:app_mobile/features/announcements/presentation/widgets/announcements_view.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_event.dart';
+import 'package:app_mobile/features/events/presentation/widgets/events_view.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/di.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../features/announcements/presentation/bloc/announcement_bloc.dart';
-import '../../../../features/announcements/presentation/bloc/announcement_event.dart';
-import '../../../../features/announcements/presentation/widgets/announcements_view.dart';
-import '../../../../features/events/presentation/bloc/event_bloc.dart';
-import '../../../../features/events/presentation/bloc/event_event.dart';
-import '../../../../features/events/presentation/widgets/events_view.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_event.dart';
-import '../../../profile/presentation/bloc/profile_state.dart';
 
 class CompanyFeedPage extends StatelessWidget {
   const CompanyFeedPage({super.key});
@@ -54,7 +54,7 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButton: _buildFloatingActionButton(),
       body: SafeArea(
         child: Column(
@@ -66,19 +66,19 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Company Feed",
+                  Text(
+                    'Company Feed',
                     style: TextStyle(
-                      color: AppColors.neutral,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    "Official updates and news from across the organization",
+                  Text(
+                    'Official updates and news from across the organization',
                     style: TextStyle(
-                      color: AppColors.tertiary,
+                      color: Theme.of(context).colorScheme.tertiary,
                       fontSize: 14,
                     ),
                   ),
@@ -94,17 +94,17 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
                               color: _selectedIndex == 0
-                                  ? AppColors.neutral
-                                  : AppColors.secondary.withValues(alpha:0.3),
+                                  ? Theme.of(context).colorScheme.onSurface
+                                  : Theme.of(context).colorScheme.secondary.withValues(alpha:0.3),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             alignment: Alignment.center,
                             child: Text(
-                              "Announcements",
+                              'Announcements',
                               style: TextStyle(
                                 color: _selectedIndex == 0
-                                    ? AppColors.surface
-                                    : AppColors.tertiary,
+                                    ? Theme.of(context).colorScheme.surface
+                                    : Theme.of(context).colorScheme.tertiary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -120,17 +120,17 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
                               color: _selectedIndex == 1
-                                  ? AppColors.neutral
-                                  : AppColors.secondary.withValues(alpha:0.3),
+                                  ? Theme.of(context).colorScheme.onSurface
+                                  : Theme.of(context).colorScheme.secondary.withValues(alpha:0.3),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             alignment: Alignment.center,
                             child: Text(
-                              "Events",
+                              'Events',
                               style: TextStyle(
                                 color: _selectedIndex == 1
-                                    ? AppColors.surface
-                                    : AppColors.tertiary,
+                                    ? Theme.of(context).colorScheme.surface
+                                    : Theme.of(context).colorScheme.tertiary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -169,21 +169,15 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
           await context.push('/files/create-announcement');
           announcementBloc.add(FetchAnnouncements());
         },
-        backgroundColor: AppColors.neutral,
-        child: const Icon(Icons.add, color: AppColors.surface),
+        backgroundColor: Theme.of(context).colorScheme.onSurface,
+        child: Icon(Icons.add, color: Theme.of(context).colorScheme.surface),
       );
     } else {
       // Events: accessible only to ROLE_ADMIN or ROLE_MANAGER
       return BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
-          bool canCreateEvent = false;
-          if (state is ProfileLoaded) {
-            final roles = state.profile.roles ?? [];
-            canCreateEvent = roles.contains('ROLE_ADMIN') || roles.contains('ROLE_MANAGER');
-          } else if (state is ProfileUpdateSuccess) {
-            final roles = state.profile.roles ?? [];
-            canCreateEvent = roles.contains('ROLE_ADMIN') || roles.contains('ROLE_MANAGER');
-          }
+          final canCreateEvent =
+              state.profileOrNull?.isManagerOrAdmin ?? false;
 
           if (canCreateEvent) {
             return FloatingActionButton(
@@ -193,8 +187,8 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
                   context.read<EventBloc>().add(FetchEvents());
                 }
               },
-              backgroundColor: AppColors.neutral,
-              child: const Icon(Icons.event, color: AppColors.surface),
+              backgroundColor: Theme.of(context).colorScheme.onSurface,
+              child: Icon(Icons.event, color: Theme.of(context).colorScheme.surface),
             );
           }
           return const SizedBox.shrink();
