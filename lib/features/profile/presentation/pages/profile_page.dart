@@ -1,11 +1,12 @@
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
+import 'package:app_mobile/features/profile/presentation/widgets/members_tab_content.dart';
+import 'package:app_mobile/features/profile/presentation/widgets/profile_body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../bloc/profile_bloc.dart';
-import '../bloc/profile_event.dart';
-import '../bloc/profile_state.dart';
-import '../widgets/members_tab_content.dart';
-import '../widgets/profile_body.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -28,15 +29,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
-        final profile = state is ProfileLoaded
-            ? state.profile
-            : state is ProfileUpdateSuccess
-                ? state.profile
-                : null;
-
-        final roles = profile?.roles ?? [];
-        final isManagerOrAdmin =
-            roles.contains('ROLE_ADMIN') || roles.contains('ROLE_MANAGER');
+        final profile = state.profileOrNull;
+        final isManagerOrAdmin = profile?.isManagerOrAdmin ?? false;
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,

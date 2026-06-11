@@ -41,3 +41,33 @@ class ProfileEntity extends Equatable {
     avatarUrl,
   ];
 }
+
+extension ProfileRolesX on ProfileEntity {
+  /// Centralized permission rule for content management (create/edit/delete
+  /// announcements and events, see analytics).
+  bool get isManagerOrAdmin {
+    final r = roles ?? const [];
+    return r.contains('ROLE_ADMIN') || r.contains('ROLE_MANAGER');
+  }
+
+  /// Uppercase first letters of name + lastname for avatar placeholders.
+  String get initials =>
+      '${name.isNotEmpty ? name[0] : ''}${lastname.isNotEmpty ? lastname[0] : ''}'
+          .toUpperCase();
+}
+
+extension MemberLookupX on List<ProfileEntity> {
+  /// Member whose *profile id* is [id] (announcement/comment authors store
+  /// profile ids), or an "Unknown User" placeholder.
+  ProfileEntity byProfileId(String id) => firstWhere(
+        (m) => m.id == id,
+        orElse: () => ProfileEntity(
+          id: id,
+          userId: id,
+          username: '',
+          name: 'Unknown',
+          lastname: 'User',
+          email: '',
+        ),
+      );
+}

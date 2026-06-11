@@ -1,12 +1,13 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/core/utils/date_format.dart';
+import 'package:app_mobile/features/analytics/domain/entities/user_announcement_view_entity.dart';
+import 'package:app_mobile/features/analytics/domain/entities/user_event_view_entity.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_bloc.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_event.dart';
+import 'package:app_mobile/features/analytics/presentation/bloc/analytics_state.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../app/di.dart';
-import '../../../analytics/domain/entities/user_announcement_view_entity.dart';
-import '../../../analytics/domain/entities/user_event_view_entity.dart';
-import '../../../analytics/presentation/bloc/analytics_bloc.dart';
-import '../../../analytics/presentation/bloc/analytics_event.dart';
-import '../../../analytics/presentation/bloc/analytics_state.dart';
-import '../../domain/entities/profile_entity.dart';
 
 class MemberDetailSheet extends StatefulWidget {
   final ProfileEntity member;
@@ -233,7 +234,7 @@ class _MemberDetailSheetState extends State<MemberDetailSheet> {
                           ],
                         ),
                         Text(
-                          _formatDateTime(view.viewedAt),
+                          AppDateFormat.monthDayTime(view.viewedAt),
                           style: textTheme.labelSmall?.copyWith(
                             color: colorScheme.onSurface.withValues(alpha: 0.55),
                             fontWeight: FontWeight.w500,
@@ -325,7 +326,7 @@ class _MemberDetailSheetState extends State<MemberDetailSheet> {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            'Scheduled: ${_formatEventDate(view.eventDate)}',
+                            'Scheduled: ${AppDateFormat.date(view.eventDate)}',
                             style: textTheme.labelSmall?.copyWith(
                               color: colorScheme.onSurface.withValues(alpha: 0.55),
                             ),
@@ -377,7 +378,7 @@ class _MemberDetailSheetState extends State<MemberDetailSheet> {
                           ],
                         ),
                         Text(
-                          _formatDateTime(view.viewedAt),
+                          AppDateFormat.monthDayTime(view.viewedAt),
                           style: textTheme.labelSmall?.copyWith(
                             color: colorScheme.onSurface.withValues(alpha: 0.55),
                             fontWeight: FontWeight.w500,
@@ -403,33 +404,5 @@ class _MemberDetailSheetState extends State<MemberDetailSheet> {
       },
       child: child,
     );
-  }
-
-  String _formatDateTime(String isoDate) {
-    try {
-      final date = DateTime.parse(isoDate).toLocal();
-      final hour = date.hour > 12 ? date.hour - 12 : (date.hour == 0 ? 12 : date.hour);
-      final period = date.hour >= 12 ? 'PM' : 'AM';
-      final minute = date.minute.toString().padLeft(2, '0');
-      final day = date.day.toString().padLeft(2, '0');
-      
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      final monthStr = months[date.month - 1];
-
-      return '$monthStr $day, $hour:$minute $period';
-    } catch (_) {
-      return isoDate;
-    }
-  }
-
-  String _formatEventDate(String isoDate) {
-    try {
-      final date = DateTime.parse(isoDate).toLocal();
-      final day = date.day.toString().padLeft(2, '0');
-      final month = date.month.toString().padLeft(2, '0');
-      return '$day/$month/${date.year}';
-    } catch (_) {
-      return isoDate;
-    }
   }
 }

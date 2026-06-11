@@ -1,8 +1,8 @@
+import 'package:app_mobile/features/profile/domain/usecases/get_profile_usecase.dart';
+import 'package:app_mobile/features/profile/domain/usecases/update_profile_usecase.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/get_profile_usecase.dart';
-import '../../domain/usecases/update_profile_usecase.dart';
-import 'profile_event.dart';
-import 'profile_state.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final GetProfileUseCase getProfileUseCase;
@@ -44,7 +44,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     final result = await updateProfileUseCase(event.profile);
     result.fold(
       (failure) => emit(ProfileError(failure.message)),
-      (profile) => emit(ProfileUpdateSuccess(profile)),
+      (profile) {
+        // Momentary state for success listeners (snackbars), then settle on
+        // ProfileLoaded so consumers only ever branch on one loaded state.
+        emit(ProfileUpdateSuccess(profile));
+        emit(ProfileLoaded(profile));
+      },
     );
   }
 }

@@ -1,9 +1,9 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/domain/repositories/profile_repository.dart';
+import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
+import 'package:app_mobile/features/profile/presentation/widgets/member_detail_sheet.dart';
 import 'package:flutter/material.dart';
-import '../../../../app/di.dart';
-import '../../domain/entities/profile_entity.dart';
-import '../../domain/repositories/profile_repository.dart';
-import '../../domain/usecases/get_company_members_usecase.dart';
-import 'member_detail_sheet.dart';
 
 class MembersTabContent extends StatefulWidget {
   final String companyId;

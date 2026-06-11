@@ -1,14 +1,14 @@
+import 'package:app_mobile/core/network/cloudinary_config.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
+import 'package:app_mobile/shared/widgets/custom_text_field.dart';
+import 'package:app_mobile/shared/widgets/image_upload_picker.dart';
+import 'package:app_mobile/shared/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/widgets/custom_text_field.dart';
-import '../../../../shared/widgets/primary_button.dart';
-import '../../../../shared/widgets/image_upload_picker.dart';
-import '../../../../core/network/cloudinary_config.dart';
-import '../../domain/entities/profile_entity.dart';
-import '../bloc/profile_bloc.dart';
-import '../bloc/profile_event.dart';
-import '../bloc/profile_state.dart';
 
 class UpdateProfilePage extends StatefulWidget {
   final ProfileEntity profile;
