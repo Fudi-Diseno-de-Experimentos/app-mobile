@@ -50,7 +50,7 @@ dependencies:
   image: ^4.3.0
   path_provider: ^2.1.5
   stomp_dart_client: ^2.1.0
-  patrol: ^4.5.0
+  flutter_secure_storage: ^9.2.2
 
 patrol:
   test_directory: integration_test
@@ -68,6 +68,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  patrol: ^4.5.0
   mockito: ^5.4.6
   build_runner: ^2.4.15
   bloc_test: ^10.0.0
@@ -76,6 +77,7 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+  test_api: any
 flutter:
 
   # The following line ensures that the Material Icons font is
