@@ -1,9 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:app_mobile/features/company/data/models/company_model.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('CompanyModel - US41: Registro de nueva compañía', () {
-    test('fromJson debe crear un modelo válido con todos los campos', () {
+  group('CompanyModel - US41: New company registration', () {
+    test('fromJson should build a valid model with all fields', () {
       // Arrange
       final json = {
         'id': 'comp-1',
@@ -21,14 +21,14 @@ void main() {
       // Assert
       expect(model.id, 'comp-1');
       expect(model.ruc, '20123456789');
-      expect(model.nombre, 'Empresa Test SAC');
+      expect(model.name, 'Empresa Test SAC');
       expect(model.iconUrl, 'https://example.com/logo.png');
       expect(model.isActive, true);
       expect(model.userId, 'user-1');
       expect(model.joinCode, 'ABC123');
     });
 
-    test('fromJson debe manejar iconUrl nulo', () {
+    test('fromJson should handle a null iconUrl', () {
       // Arrange
       final json = {
         'id': 'comp-2',
@@ -47,7 +47,7 @@ void main() {
       expect(model.iconUrl, isNull);
     });
 
-    test('fromJson debe asignar joinCode vacío cuando falta en el JSON', () {
+    test('fromJson should default joinCode to empty when missing from the JSON', () {
       // Arrange
       final json = {
         'id': 'comp-3',
@@ -65,12 +65,12 @@ void main() {
       expect(model.joinCode, '');
     });
 
-    test('toJson debe generar un mapa válido para el API', () {
+    test('toJson should produce a valid map for the API', () {
       // Arrange
       const model = CompanyModel(
         id: 'comp-1',
         ruc: '20123456789',
-        nombre: 'Empresa Test',
+        name: 'Empresa Test',
         iconUrl: 'logo.png',
         isActive: true,
         userId: 'user-1',
@@ -88,12 +88,12 @@ void main() {
       expect(json['userId'], 'user-1');
     });
 
-    test('toJson/fromJson debe ser simétrico (roundtrip)', () {
+    test('toJson/fromJson should be symmetric (roundtrip)', () {
       // Arrange
       const original = CompanyModel(
         id: 'comp-1',
         ruc: '20123456789',
-        nombre: 'Roundtrip SAC',
+        name: 'Roundtrip SAC',
         iconUrl: 'logo.png',
         isActive: true,
         userId: 'user-1',
@@ -109,8 +109,8 @@ void main() {
     });
   });
 
-  group('CompanyModel - US43: Baja del servicio de compañía', () {
-    test('fromJson debe parsear isActive false para compañía dada de baja', () {
+  group('CompanyModel - US43: Company service deactivation', () {
+    test('fromJson should parse isActive false for a deactivated company', () {
       // Arrange
       final json = {
         'id': 'comp-inactive',

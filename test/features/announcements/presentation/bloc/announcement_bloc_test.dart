@@ -1,13 +1,12 @@
-import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:fpdart/fpdart.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:app_mobile/core/error/failures.dart';
 import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
 import 'package:app_mobile/features/announcements/presentation/bloc/announcement_bloc.dart';
 import 'package:app_mobile/features/announcements/presentation/bloc/announcement_event.dart';
 import 'package:app_mobile/features/announcements/presentation/bloc/announcement_state.dart';
+import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:mockito/mockito.dart';
 
 import '../../../../mocks/generate_mocks.mocks.dart';
 import '../../../../mocks/mock_helpers.dart';
@@ -24,7 +23,7 @@ void main() {
 
   const tAnnouncement = AnnouncementEntity(
     id: 'ann-1',
-    title: 'Anuncio Test',
+    title: 'Test Announcement',
     description: 'Contenido',
     priority: 'NORMAL',
     createdBy: 'user-1',
@@ -65,9 +64,9 @@ void main() {
 
   tearDown(() => bloc.close());
 
-  group('US10 - Publicación básica de anuncios', () {
+  group('US10 - Basic announcement publishing', () {
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe emitir [Loading, Loaded] cuando se obtienen anuncios exitosamente',
+      'should emit [Loading, Loaded] when announcements are fetched successfully',
       build: () {
         when(mockGetAnnouncements())
             .thenAnswer((_) async => const Right([tAnnouncement]));
@@ -81,7 +80,7 @@ void main() {
     );
 
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe emitir [Loading, Error] cuando falla la obtención de anuncios',
+      'should emit [Loading, Error] when fetching announcements fails',
       build: () {
         when(mockGetAnnouncements())
             .thenAnswer((_) async => const Left(ServerFailure('Error del servidor')));
@@ -95,7 +94,7 @@ void main() {
     );
 
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe emitir [Loading, CreateSuccess, Loading, Loaded] al crear un anuncio exitosamente',
+      'should emit [Loading, CreateSuccess, Loading, Loaded] when an announcement is created successfully',
       build: () {
         when(mockCreate(
           title: anyNamed('title'),
@@ -109,7 +108,7 @@ void main() {
         return bloc;
       },
       act: (bloc) => bloc.add(const CreateAnnouncementRequested(
-        title: 'Anuncio Test',
+        title: 'Test Announcement',
         description: 'Contenido',
         priority: 'NORMAL',
         createdBy: 'user-1',
@@ -123,7 +122,7 @@ void main() {
     );
 
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe emitir [Loading, Error] cuando falla la creación de un anuncio',
+      'should emit [Loading, Error] when announcement creation fails',
       build: () {
         when(mockCreate(
           title: anyNamed('title'),
@@ -147,9 +146,9 @@ void main() {
     );
   });
 
-  group('US11 - Priorización de anuncios', () {
+  group('US11 - Announcement prioritization', () {
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe filtrar anuncios por prioridad HIGH',
+      'should filter announcements by HIGH priority',
       build: () {
         when(mockGetByPriority('HIGH'))
             .thenAnswer((_) async => const Right([tAnnouncementHigh]));
@@ -163,7 +162,7 @@ void main() {
     );
 
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe cargar todos los anuncios cuando la prioridad es nula',
+      'should load all announcements when the priority is null',
       build: () {
         when(mockGetAnnouncements())
             .thenAnswer((_) async => const Right([tAnnouncement, tAnnouncementHigh]));
@@ -180,7 +179,7 @@ void main() {
     );
 
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe cargar todos los anuncios cuando la prioridad es cadena vacía',
+      'should load all announcements when the priority is an empty string',
       build: () {
         when(mockGetAnnouncements())
             .thenAnswer((_) async => const Right([tAnnouncement]));
@@ -194,14 +193,14 @@ void main() {
     );
   });
 
-  group('US12 - Edición de anuncios', () {
+  group('US12 - Announcement editing', () {
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe emitir [Loading, UpdateSuccess] al actualizar un anuncio exitosamente',
+      'should emit [Loading, UpdateSuccess] when an announcement updates successfully',
       build: () {
         const updated = AnnouncementEntity(
           id: 'ann-1',
-          title: 'Título Actualizado',
-          description: 'Nueva descripción',
+          title: 'Updated Title',
+          description: 'New description',
           priority: 'HIGH',
           createdBy: 'user-1',
           createdAt: '2024-01-01',
@@ -218,8 +217,8 @@ void main() {
       },
       act: (bloc) => bloc.add(const UpdateAnnouncementRequested(
         id: 'ann-1',
-        title: 'Título Actualizado',
-        description: 'Nueva descripción',
+        title: 'Updated Title',
+        description: 'New description',
         priority: 'HIGH',
       )),
       expect: () => [
@@ -229,12 +228,12 @@ void main() {
     );
   });
 
-  group('US13 - Eliminación de anuncios', () {
+  group('US13 - Announcement deletion', () {
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe emitir [Loading, DeleteSuccess] al eliminar un anuncio exitosamente',
+      'should emit [Loading, DeleteSuccess] when an announcement is deleted successfully',
       build: () {
         when(mockDelete('ann-1'))
-            .thenAnswer((_) async => const Right(null));
+            .thenAnswer((_) async => const Right(unit));
         return bloc;
       },
       act: (bloc) => bloc.add(const DeleteAnnouncementRequested('ann-1')),
@@ -245,7 +244,7 @@ void main() {
     );
 
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe emitir [Loading, Error] cuando falla la eliminación',
+      'should emit [Loading, Error] when the deletion fails',
       build: () {
         when(mockDelete('ann-1'))
             .thenAnswer((_) async => const Left(ServerFailure('No se puede eliminar')));
@@ -259,9 +258,9 @@ void main() {
     );
   });
 
-  group('US14 - Detalle de anuncio', () {
+  group('US14 - Announcement detail', () {
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe emitir [DetailLoaded] al obtener un anuncio por ID',
+      'should emit [DetailLoaded] when fetching an announcement by ID',
       build: () {
         when(mockGetAnnouncementById('ann-1'))
             .thenAnswer((_) async => const Right(tAnnouncement));
@@ -274,7 +273,7 @@ void main() {
     );
 
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'no debe emitir error cuando falla la obtención por ID (mantiene datos de ruta)',
+      'should not emit an error when fetching by ID fails (keeps route data)',
       build: () {
         when(mockGetAnnouncementById('ann-1'))
             .thenAnswer((_) async => const Left(ServerFailure('No encontrado')));
@@ -285,9 +284,9 @@ void main() {
     );
   });
 
-  group('US10 - Filtrar anuncios por creador', () {
+  group('US10 - Filter announcements by creator', () {
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe filtrar anuncios por creador',
+      'should filter announcements by creator',
       build: () {
         when(mockGetByCreator('user-1'))
             .thenAnswer((_) async => const Right([tAnnouncement]));
@@ -301,7 +300,7 @@ void main() {
     );
 
     blocTest<AnnouncementBloc, AnnouncementState>(
-      'debe cargar todos cuando el creador es nulo',
+      'should load all when the creator is null',
       build: () {
         when(mockGetAnnouncements())
             .thenAnswer((_) async => const Right([tAnnouncement]));

@@ -1,13 +1,12 @@
-import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:fpdart/fpdart.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:app_mobile/core/error/failures.dart';
 import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
 import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
 import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
+import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:mockito/mockito.dart';
 
 import '../../../../mocks/generate_mocks.mocks.dart';
 import '../../../../mocks/mock_helpers.dart';
@@ -42,9 +41,9 @@ void main() {
 
   tearDown(() => bloc.close());
 
-  group('US39 - Navegación basada en roles (carga de perfil)', () {
+  group('US39 - Role-based navigation (profile loading)', () {
     blocTest<ProfileBloc, ProfileState>(
-      'debe emitir [Loading, Loaded] al cargar perfil exitosamente',
+      'should emit [Loading, Loaded] when the profile loads successfully',
       build: () {
         when(mockGetProfile())
             .thenAnswer((_) async => const Right(tProfile));
@@ -58,7 +57,7 @@ void main() {
     );
 
     blocTest<ProfileBloc, ProfileState>(
-      'debe emitir [Loading, Error] cuando falla la carga del perfil',
+      'should emit [Loading, Error] when profile loading fails',
       build: () {
         when(mockGetProfile())
             .thenAnswer((_) async => const Left(ServerFailure('Token expirado')));
@@ -72,7 +71,7 @@ void main() {
     );
 
     blocTest<ProfileBloc, ProfileState>(
-      'debe emitir ProfileInitial al hacer reset del perfil',
+      'should emit ProfileInitial when the profile is reset',
       seed: () => const ProfileLoaded(tProfile),
       build: () => bloc,
       act: (bloc) => bloc.add(ProfileReset()),
@@ -82,9 +81,9 @@ void main() {
     );
   });
 
-  group('US42 - Actualización de perfil', () {
+  group('US42 - Profile update', () {
     blocTest<ProfileBloc, ProfileState>(
-      'debe emitir [Updating, UpdateSuccess] al actualizar perfil exitosamente',
+      'should emit [Updating, UpdateSuccess] when the profile updates successfully',
       build: () {
         const updatedProfile = ProfileEntity(
           id: 'profile-1',
@@ -113,20 +112,21 @@ void main() {
       expect: () => [
         ProfileUpdating(),
         isA<ProfileUpdateSuccess>(),
+        isA<ProfileLoaded>(),
       ],
     );
 
     blocTest<ProfileBloc, ProfileState>(
-      'debe emitir [Updating, Error] cuando falla la actualización del perfil',
+      'should emit [Updating, Error] when the profile update fails',
       build: () {
         when(mockUpdateProfile(any))
-            .thenAnswer((_) async => const Left(ServerFailure('Error al actualizar')));
+            .thenAnswer((_) async => const Left(ServerFailure('Update failed')));
         return bloc;
       },
       act: (bloc) => bloc.add(const ProfileUpdateRequested(tProfile)),
       expect: () => [
         ProfileUpdating(),
-        const ProfileError('Error al actualizar'),
+        const ProfileError('Update failed'),
       ],
     );
   });

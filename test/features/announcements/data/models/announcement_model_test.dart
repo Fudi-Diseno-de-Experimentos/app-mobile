@@ -1,14 +1,14 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:app_mobile/features/announcements/data/models/announcement_model.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('AnnouncementModel - US10: Publicación básica de anuncios', () {
-    test('fromJson debe crear un modelo válido con todos los campos', () {
+  group('AnnouncementModel - US10: Basic announcement publishing', () {
+    test('fromJson should build a valid model with all fields', () {
       // Arrange
       final json = {
         'id': 'ann-1',
-        'title': 'Anuncio Importante',
-        'description': 'Contenido del anuncio',
+        'title': 'Important Announcement',
+        'description': 'Announcement content',
         'image': 'https://example.com/image.png',
         'priority': 'HIGH',
         'createdBy': 'user-1',
@@ -21,8 +21,8 @@ void main() {
 
       // Assert
       expect(model.id, 'ann-1');
-      expect(model.title, 'Anuncio Importante');
-      expect(model.description, 'Contenido del anuncio');
+      expect(model.title, 'Important Announcement');
+      expect(model.description, 'Announcement content');
       expect(model.image, 'https://example.com/image.png');
       expect(model.priority, 'HIGH');
       expect(model.createdBy, 'user-1');
@@ -30,12 +30,12 @@ void main() {
       expect(model.updatedAt, '2024-01-02T00:00:00Z');
     });
 
-    test('fromJson debe manejar imagen nula correctamente', () {
+    test('fromJson should handle a null image correctly', () {
       // Arrange
       final json = {
         'id': 'ann-2',
         'title': 'Sin imagen',
-        'description': 'Descripción',
+        'description': 'Description',
         'image': null,
         'priority': 'NORMAL',
         'createdBy': 'user-1',
@@ -50,7 +50,7 @@ void main() {
       expect(model.image, isNull);
     });
 
-    test('fromJson debe usar valores por defecto cuando faltan campos', () {
+    test('fromJson should use defaults when fields are missing', () {
       // Arrange
       final json = <String, dynamic>{};
 
@@ -65,12 +65,12 @@ void main() {
       expect(model.createdBy, '');
     });
 
-    test('toJson debe generar un mapa válido para el API', () {
+    test('toJson should produce a valid map for the API', () {
       // Arrange
       const model = AnnouncementModel(
         id: 'ann-1',
-        title: 'Título',
-        description: 'Descripción',
+        title: 'Title',
+        description: 'Description',
         image: 'url.png',
         priority: 'HIGH',
         createdBy: 'user-1',
@@ -83,14 +83,14 @@ void main() {
 
       // Assert
       expect(json['id'], 'ann-1');
-      expect(json['title'], 'Título');
-      expect(json['description'], 'Descripción');
+      expect(json['title'], 'Title');
+      expect(json['description'], 'Description');
       expect(json['image'], 'url.png');
       expect(json['priority'], 'HIGH');
       expect(json['createdBy'], 'user-1');
     });
 
-    test('toJson/fromJson debe ser simétrico (roundtrip)', () {
+    test('toJson/fromJson should be symmetric (roundtrip)', () {
       // Arrange
       const original = AnnouncementModel(
         id: 'ann-1',
@@ -112,8 +112,8 @@ void main() {
     });
   });
 
-  group('AnnouncementModel - US11: Priorización de anuncios', () {
-    test('fromJson debe parsear prioridad HIGH correctamente', () {
+  group('AnnouncementModel - US11: Announcement prioritization', () {
+    test('fromJson should parse HIGH priority correctly', () {
       // Arrange
       final json = {
         'id': '1',
@@ -132,7 +132,7 @@ void main() {
       expect(model.priority, 'HIGH');
     });
 
-    test('fromJson debe asignar NORMAL como prioridad por defecto', () {
+    test('fromJson should default the priority to NORMAL', () {
       // Arrange
       final json = {
         'id': '1',

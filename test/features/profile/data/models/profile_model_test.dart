@@ -1,9 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:app_mobile/features/profile/data/models/profile_model.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('ProfileModel - US39: Navegación basada en roles', () {
-    test('fromJson debe crear un modelo válido con todos los campos', () {
+  group('ProfileModel - US39: Role-based navigation', () {
+    test('fromJson should build a valid model with all fields', () {
       // Arrange
       final json = {
         'profileId': 'profile-1',
@@ -32,7 +32,7 @@ void main() {
       expect(model.avatarUrl, 'https://example.com/avatar.png');
     });
 
-    test('fromJson debe usar campo id como fallback si profileId no existe', () {
+    test('fromJson should fall back to the id field when profileId is absent', () {
       // Arrange
       final json = {
         'id': 'fallback-id',
@@ -49,7 +49,7 @@ void main() {
       expect(model.id, 'fallback-id');
     });
 
-    test('fromJson debe usar name/lastname como fallback de firstName/lastName', () {
+    test('fromJson should fall back to name/lastname for firstName/lastName', () {
       // Arrange
       final json = {
         'id': '1',
@@ -67,7 +67,7 @@ void main() {
       expect(model.lastname, 'FallbackLastname');
     });
 
-    test('fromJson debe manejar roles nulos como lista vacía', () {
+    test('fromJson should handle null roles as an empty list', () {
       // Arrange
       final json = {
         'id': '1',
@@ -85,7 +85,7 @@ void main() {
       expect(model.roles, isEmpty);
     });
 
-    test('fromJson debe parsear roles de administrador correctamente', () {
+    test('fromJson should parse admin roles correctly', () {
       // Arrange
       final json = {
         'profileId': '1',
@@ -105,7 +105,7 @@ void main() {
       expect(model.roles!.length, 3);
     });
 
-    test('toJson debe generar el formato esperado por el API de actualización', () {
+    test('toJson should produce the format expected by the update API', () {
       // Arrange
       const model = ProfileModel(
         id: '1',
@@ -129,7 +129,7 @@ void main() {
       expect(json.containsKey('username'), false);
     });
 
-    test('toCacheJson debe incluir todos los campos para persistencia local', () {
+    test('toCacheJson should include every field for local persistence', () {
       // Arrange
       const model = ProfileModel(
         id: '1',

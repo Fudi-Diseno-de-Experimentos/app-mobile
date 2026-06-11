@@ -1,14 +1,14 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:app_mobile/features/events/data/models/event_model.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('EventModel - US18: Creación básica de eventos', () {
-    test('fromJson debe crear un modelo válido con todos los campos', () {
+  group('EventModel - US18: Basic event creation', () {
+    test('fromJson should build a valid model with all fields', () {
       // Arrange
       final json = {
         'id': 'evt-1',
-        'title': 'Reunión Trimestral',
-        'description': 'Revisión de objetivos Q1',
+        'title': 'Quarterly Meeting',
+        'description': 'Q1 goals review',
         'date': '2024-03-15T10:00:00Z',
         'location': 'Sala Principal',
         'createdBy': 'manager-1',
@@ -22,19 +22,19 @@ void main() {
 
       // Assert
       expect(model.id, 'evt-1');
-      expect(model.title, 'Reunión Trimestral');
-      expect(model.description, 'Revisión de objetivos Q1');
+      expect(model.title, 'Quarterly Meeting');
+      expect(model.description, 'Q1 goals review');
       expect(model.date, '2024-03-15T10:00:00Z');
       expect(model.location, 'Sala Principal');
       expect(model.createdBy, 'manager-1');
       expect(model.recipientIds, ['emp-1', 'emp-2', 'emp-3']);
     });
 
-    test('fromJson debe manejar recipientIds vacío', () {
+    test('fromJson should handle empty recipientIds', () {
       // Arrange
       final json = {
         'id': 'evt-2',
-        'title': 'Evento sin invitados',
+        'title': 'Event without invitees',
         'description': 'Desc',
         'date': '2024-03-15',
         'location': 'Sala B',
@@ -51,11 +51,11 @@ void main() {
       expect(model.recipientIds, isEmpty);
     });
 
-    test('fromJson debe manejar recipientIds nulo como lista vacía', () {
+    test('fromJson should handle null recipientIds as an empty list', () {
       // Arrange
       final json = {
         'id': 'evt-3',
-        'title': 'Evento',
+        'title': 'Event',
         'description': 'Desc',
         'date': '',
         'location': '',
@@ -71,7 +71,7 @@ void main() {
       expect(model.recipientIds, isEmpty);
     });
 
-    test('fromJson debe usar valores por defecto cuando faltan campos', () {
+    test('fromJson should use defaults when fields are missing', () {
       // Arrange
       final json = <String, dynamic>{};
 
@@ -88,12 +88,12 @@ void main() {
       expect(model.recipientIds, isEmpty);
     });
 
-    test('toJson debe generar un mapa válido para el API', () {
+    test('toJson should produce a valid map for the API', () {
       // Arrange
       const model = EventModel(
         id: 'evt-1',
-        title: 'Reunión',
-        description: 'Descripción',
+        title: 'Meeting',
+        description: 'Description',
         date: '2024-03-15T10:00:00Z',
         location: 'Sala A',
         createdBy: 'manager-1',
@@ -107,12 +107,12 @@ void main() {
 
       // Assert
       expect(json['id'], 'evt-1');
-      expect(json['title'], 'Reunión');
+      expect(json['title'], 'Meeting');
       expect(json['recipientIds'], ['emp-1', 'emp-2']);
       expect(json['location'], 'Sala A');
     });
 
-    test('toJson/fromJson debe ser simétrico (roundtrip)', () {
+    test('toJson/fromJson should be symmetric (roundtrip)', () {
       // Arrange
       const original = EventModel(
         id: 'evt-1',
