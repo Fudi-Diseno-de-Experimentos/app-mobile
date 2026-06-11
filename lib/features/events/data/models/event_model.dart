@@ -1,4 +1,4 @@
-import '../../domain/entities/event_entity.dart';
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
 
 class EventModel extends EventEntity {
   const EventModel({

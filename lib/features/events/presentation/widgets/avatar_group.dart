@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class AvatarGroup extends StatelessWidget {
   final List<String> uuids;
@@ -19,18 +18,18 @@ class AvatarGroup extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               border: Border.all(
-                color: AppColors.surface,
+                color: Theme.of(context).colorScheme.surface,
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(800),
-              color: AppColors.secondary,
+              color: Theme.of(context).colorScheme.secondary,
             ),
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
             margin: const EdgeInsets.only(right: 4),
             child: Text(
-              "+$remainingCount",
-              style: const TextStyle(
-                color: AppColors.primary,
+              '+$remainingCount',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
               ),
@@ -41,11 +40,11 @@ class AvatarGroup extends StatelessWidget {
             width: 24,
             height: 24,
             margin: EdgeInsets.only(left: i == 0 ? 0 : 4),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.tertiary,
+              color: Theme.of(context).colorScheme.tertiary,
             ),
-            child: const Icon(Icons.person, size: 16, color: AppColors.surface),
+            child: Icon(Icons.person, size: 16, color: Theme.of(context).colorScheme.surface),
           ),
       ],
     );

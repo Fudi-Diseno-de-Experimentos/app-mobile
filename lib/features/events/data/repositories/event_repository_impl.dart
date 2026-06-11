@@ -1,86 +1,55 @@
-import 'dart:convert';
+import 'package:app_mobile/core/cache/ttl_cache.dart';
+import 'package:app_mobile/core/error/exceptions.dart';
+import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/events/data/datasources/event_remote_datasource.dart';
+import 'package:app_mobile/features/events/data/models/event_model.dart';
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
+import 'package:app_mobile/features/events/domain/repositories/event_repository.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../core/error/failures.dart';
-import '../../domain/entities/event_entity.dart';
-import '../../domain/repositories/event_repository.dart';
-import '../datasources/event_remote_datasource.dart';
-import '../models/event_model.dart';
 
 class EventRepositoryImpl implements EventRepository {
   final EventRemoteDataSource remoteDataSource;
-  final SharedPreferences sharedPreferences;
 
-  List<EventEntity>? _inMemoryCache;
-  DateTime? _lastFetchTime;
-
-  static const Duration _cacheTtl = Duration(minutes: 5);
-  static const String _cacheKey = 'events_cache';
-  static const String _cacheTimeKey = 'events_cache_time';
+  final TtlCache<List<EventEntity>> _cache;
 
   EventRepositoryImpl({
     required this.remoteDataSource,
-    required this.sharedPreferences,
-  });
+    required SharedPreferences sharedPreferences,
+  }) : _cache = TtlCache(
+          prefs: sharedPreferences,
+          key: 'events_cache',
+          ttl: const Duration(minutes: 5),
+          fromJson: (json) => (json as List)
+              .map<EventEntity>((item) => EventModel.fromJson(item))
+              .toList(),
+          // The cached list always comes from the remote datasource, whose
+          // elements are EventModel instances.
+          toJson: (list) =>
+              list.map((item) => (item as EventModel).toJson()).toList(),
+        );
 
-  bool _isCacheValid(DateTime? lastFetch) {
-    if (lastFetch == null) return false;
-    return DateTime.now().difference(lastFetch) < _cacheTtl;
-  }
+  @override
+  Future<void> clearCache() => _cache.clear();
 
-  Future<List<EventEntity>?> _loadFromPersistentCache() async {
-    try {
-      final jsonStr = sharedPreferences.getString(_cacheKey);
-      final timeStr = sharedPreferences.getString(_cacheTimeKey);
-      if (jsonStr != null && timeStr != null) {
-        final lastFetch = DateTime.tryParse(timeStr);
-        if (_isCacheValid(lastFetch)) {
-          final List<dynamic> decoded = jsonDecode(jsonStr);
-          final list = decoded.map((item) => EventModel.fromJson(item)).toList();
-          _inMemoryCache = list;
-          _lastFetchTime = lastFetch;
-          return list;
-        }
+  @override
+  Future<Either<Failure, List<EventEntity>>> getEvents(
+      {bool forceRefresh = false}) async {
+    if (forceRefresh) {
+      await clearCache();
+    } else {
+      final cached = _cache.get();
+      if (cached != null) {
+        return Right(cached);
       }
-    } catch (_) {}
-    return null;
-  }
-
-  Future<void> _saveToCache(List<EventModel> list) async {
-    try {
-      final now = DateTime.now();
-      _inMemoryCache = list;
-      _lastFetchTime = now;
-      
-      final jsonList = list.map((item) => item.toJson()).toList();
-      await sharedPreferences.setString(_cacheKey, jsonEncode(jsonList));
-      await sharedPreferences.setString(_cacheTimeKey, now.toIso8601String());
-    } catch (_) {}
-  }
-
-  @override
-  Future<void> clearCache() async {
-    _inMemoryCache = null;
-    _lastFetchTime = null;
-    await sharedPreferences.remove(_cacheKey);
-    await sharedPreferences.remove(_cacheTimeKey);
-  }
-
-  @override
-  Future<Either<Failure, List<EventEntity>>> getEvents() async {
-    if (_inMemoryCache != null && _isCacheValid(_lastFetchTime)) {
-      return Right(_inMemoryCache!);
-    }
-
-    final persistent = await _loadFromPersistentCache();
-    if (persistent != null) {
-      return Right(persistent);
     }
 
     try {
       final remoteEvents = await remoteDataSource.getEvents();
-      await _saveToCache(remoteEvents);
+      await _cache.set(remoteEvents);
       return Right(remoteEvents);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -106,6 +75,8 @@ class EventRepositoryImpl implements EventRepository {
       );
       await clearCache();
       return Right(event);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -131,6 +102,8 @@ class EventRepositoryImpl implements EventRepository {
       );
       await clearCache();
       return Right(event);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -142,6 +115,8 @@ class EventRepositoryImpl implements EventRepository {
       await remoteDataSource.deleteEvent(id);
       await clearCache();
       return const Right(unit);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

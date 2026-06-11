@@ -1,12 +1,12 @@
-import '../../../../app/di.dart';
-import '../data/datasources/event_remote_datasource.dart';
-import '../data/repositories/event_repository_impl.dart';
-import '../domain/repositories/event_repository.dart';
-import '../domain/usecases/get_events_usecase.dart';
-import '../domain/usecases/create_event_usecase.dart';
-import '../domain/usecases/update_event_usecase.dart';
-import '../domain/usecases/delete_event_usecase.dart';
-import '../presentation/bloc/event_bloc.dart';
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/events/data/datasources/event_remote_datasource.dart';
+import 'package:app_mobile/features/events/data/repositories/event_repository_impl.dart';
+import 'package:app_mobile/features/events/domain/repositories/event_repository.dart';
+import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
 
 void initEventDependencies() {
   // Datasources
