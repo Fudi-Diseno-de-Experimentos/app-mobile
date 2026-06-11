@@ -1,5 +1,5 @@
+import 'package:app_mobile/features/announcements/domain/entities/comment_entity.dart';
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/comment_entity.dart';
 
 abstract class CommentState extends Equatable {
   const CommentState();

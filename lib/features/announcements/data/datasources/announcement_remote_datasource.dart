@@ -1,5 +1,5 @@
-import '../../../../core/network/api_client.dart';
-import '../models/announcement_model.dart';
+import 'package:app_mobile/core/network/api_client.dart';
+import 'package:app_mobile/features/announcements/data/models/announcement_model.dart';
 
 abstract class AnnouncementRemoteDataSource {
   Future<List<AnnouncementModel>> getAnnouncements();

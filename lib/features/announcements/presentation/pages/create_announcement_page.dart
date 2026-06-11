@@ -1,14 +1,14 @@
+import 'package:app_mobile/core/network/cloudinary_config.dart';
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_bloc.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_event.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_state.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:app_mobile/features/profile/presentation/bloc/profile_state.dart';
+import 'package:app_mobile/shared/widgets/image_upload_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/widgets/image_upload_picker.dart';
-import '../../../../core/network/cloudinary_config.dart';
-import '../../../profile/presentation/bloc/profile_bloc.dart';
-import '../../../profile/presentation/bloc/profile_state.dart';
-import '../../domain/entities/announcement_entity.dart';
-import '../bloc/announcement_bloc.dart';
-import '../bloc/announcement_event.dart';
-import '../bloc/announcement_state.dart';
 
 class CreateAnnouncementPage extends StatefulWidget {
   final AnnouncementEntity? announcement;
@@ -69,13 +69,8 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
     }
 
     final profileState = context.read<ProfileBloc>().state;
-    String userId = '00000000-0000-0000-0000-000000000000'; // Fallback
-
-    if (profileState is ProfileLoaded) {
-      userId = profileState.profile.id;
-    } else if (profileState is ProfileUpdateSuccess) {
-      userId = profileState.profile.id;
-    }
+    final userId =
+        profileState.profileOrNull?.id ?? '00000000-0000-0000-0000-000000000000';
 
     context.read<AnnouncementBloc>().add(
           CreateAnnouncementRequested(
@@ -134,7 +129,7 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _isEditMode ? "Edit Announcement" : "New Announcement",
+                    _isEditMode ? 'Edit Announcement' : 'New Announcement',
                     style: textTheme.headlineSmall?.copyWith(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
@@ -143,8 +138,8 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                   const SizedBox(height: 8),
                   Text(
                     _isEditMode
-                        ? "Update the details below and save your changes."
-                        : "Fill out the details below to broadcast a new announcement to your company feed.",
+                        ? 'Update the details below and save your changes.'
+                        : 'Fill out the details below to broadcast a new announcement to your company feed.',
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
@@ -152,11 +147,11 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                   const SizedBox(height: 32),
 
                   // Title Input
-                  _buildLabel("Title", colorScheme),
+                  _buildLabel('Title', colorScheme),
                   TextFormField(
                     controller: _titleController,
                     style: TextStyle(color: colorScheme.onSurface),
-                    decoration: _buildInputDecoration("Enter announcement title", colorScheme),
+                    decoration: _buildInputDecoration('Enter announcement title', colorScheme),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Please enter a title';
@@ -167,12 +162,12 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                   const SizedBox(height: 24),
 
                   // Priority Dropdown
-                  _buildLabel("Priority", colorScheme),
+                  _buildLabel('Priority', colorScheme),
                   DropdownButtonFormField<String>(
                     initialValue: _priority,
                     dropdownColor: colorScheme.surface,
                     style: TextStyle(color: colorScheme.onSurface),
-                    decoration: _buildInputDecoration("Select priority", colorScheme),
+                    decoration: _buildInputDecoration('Select priority', colorScheme),
                     items: _priorities.map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -190,12 +185,12 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                   const SizedBox(height: 24),
 
                   // Description Input
-                  _buildLabel("Description", colorScheme),
+                  _buildLabel('Description', colorScheme),
                   TextFormField(
                     controller: _descriptionController,
                     maxLines: 5,
                     style: TextStyle(color: colorScheme.onSurface),
-                    decoration: _buildInputDecoration("Enter announcement details...", colorScheme),
+                    decoration: _buildInputDecoration('Enter announcement details...', colorScheme),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Please enter a description';

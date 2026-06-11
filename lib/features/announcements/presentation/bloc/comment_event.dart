@@ -10,10 +10,13 @@ abstract class CommentEvent extends Equatable {
 class FetchComments extends CommentEvent {
   final String announcementId;
 
-  const FetchComments(this.announcementId);
+  /// Skip the cache and hit the API (pull-to-refresh).
+  final bool forceRefresh;
+
+  const FetchComments(this.announcementId, {this.forceRefresh = false});
 
   @override
-  List<Object> get props => [announcementId];
+  List<Object> get props => [announcementId, forceRefresh];
 }
 
 class CreateCommentRequested extends CommentEvent {

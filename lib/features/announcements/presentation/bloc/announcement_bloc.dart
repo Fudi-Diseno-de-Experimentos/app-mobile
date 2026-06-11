@@ -1,13 +1,13 @@
+import 'package:app_mobile/features/announcements/domain/usecases/create_announcement_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/delete_announcement_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcement_by_id_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_by_creator_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_by_priority_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_usecase.dart';
+import 'package:app_mobile/features/announcements/domain/usecases/update_announcement_usecase.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_event.dart';
+import 'package:app_mobile/features/announcements/presentation/bloc/announcement_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/get_announcements_usecase.dart';
-import '../../domain/usecases/get_announcement_by_id_usecase.dart';
-import '../../domain/usecases/get_announcements_by_priority_usecase.dart';
-import '../../domain/usecases/get_announcements_by_creator_usecase.dart';
-import '../../domain/usecases/create_announcement_usecase.dart';
-import '../../domain/usecases/update_announcement_usecase.dart';
-import '../../domain/usecases/delete_announcement_usecase.dart';
-import 'announcement_event.dart';
-import 'announcement_state.dart';
 
 class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
   final GetAnnouncementsUseCase getAnnouncementsUseCase;
@@ -41,7 +41,8 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
     Emitter<AnnouncementState> emit,
   ) async {
     emit(AnnouncementLoading());
-    final failureOrAnnouncements = await getAnnouncementsUseCase();
+    final failureOrAnnouncements =
+        await getAnnouncementsUseCase(forceRefresh: event.forceRefresh);
     failureOrAnnouncements.fold(
       (failure) => emit(AnnouncementError(failure.message)),
       (announcements) => emit(AnnouncementLoaded(announcements)),

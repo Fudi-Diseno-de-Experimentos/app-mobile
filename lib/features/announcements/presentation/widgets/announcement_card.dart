@@ -1,7 +1,8 @@
+import 'package:app_mobile/core/utils/date_format.dart';
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
+import 'package:app_mobile/features/announcements/presentation/widgets/priority_dot.dart';
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
 import 'package:flutter/material.dart';
-import '../../domain/entities/announcement_entity.dart';
-import 'priority_dot.dart';
-import '../../../profile/domain/entities/profile_entity.dart';
 
 class AnnouncementCard extends StatelessWidget {
   final AnnouncementEntity item;
@@ -18,20 +19,8 @@ class AnnouncementCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final matchedMember = members.cast<ProfileEntity>().firstWhere(
-      (m) => m.id == item.createdBy,
-      orElse: () => ProfileEntity(
-        id: item.createdBy,
-        userId: item.createdBy,
-        username: '',
-        name: 'Unknown',
-        lastname: 'User',
-        email: '',
-      ),
-    );
-
-    final initials = '${matchedMember.name.isNotEmpty ? matchedMember.name[0] : ''}${matchedMember.lastname.isNotEmpty ? matchedMember.lastname[0] : ''}'
-        .toUpperCase();
+    final matchedMember = members.byProfileId(item.createdBy);
+    final initials = matchedMember.initials;
 
     return IntrinsicHeight(
       child: Container(
@@ -137,7 +126,7 @@ class AnnouncementCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  _formatRelativeDate(item.createdAt),
+                  AppDateFormat.relativeDate(item.createdAt),
                   style: textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
@@ -153,23 +142,5 @@ class AnnouncementCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatRelativeDate(String isoDate) {
-    try {
-      final date = DateTime.parse(isoDate);
-      final now = DateTime.now();
-      final difference = now.difference(date);
-      
-      if (difference.inDays == 0 && now.day == date.day) {
-        return "Today";
-      } else if (difference.inDays == 1 || (difference.inDays == 0 && now.day != date.day)) {
-        return "Yesterday";
-      } else {
-        return "${date.day}/${date.month}/${date.year}";
-      }
-    } catch (e) {
-      return isoDate;
-    }
   }
 }

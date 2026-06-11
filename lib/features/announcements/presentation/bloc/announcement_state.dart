@@ -1,5 +1,5 @@
+import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/announcement_entity.dart';
 
 abstract class AnnouncementState extends Equatable {
   const AnnouncementState();
