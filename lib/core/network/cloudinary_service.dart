@@ -1,54 +1,55 @@
 import 'dart:io';
+
+import 'package:app_mobile/core/network/cloudinary_config.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
-import 'cloudinary_config.dart';
 
-/// Servicio para manejo de subida de imágenes con Cloudinary
+/// Image upload service backed by Cloudinary unsigned presets.
 class CloudinaryService {
   CloudinaryService();
 
-  /// 📤 Subir imagen a Cloudinary
+  /// Uploads an image to Cloudinary.
   ///
-  /// [imagePath] - Ruta del archivo de imagen
-  /// [imageType] - Tipo de imagen (avatar, chat, announcement)
-  /// [onProgress] - Callback para el progreso de subida (opcional)
+  /// [imagePath] - Path to the image file.
+  /// [imageType] - Image kind (avatar, chat, announcement, company).
+  /// [onProgress] - Optional upload progress callback.
   Future<String?> uploadImage(
     String imagePath, {
     ImageType imageType = ImageType.announcement,
     Function(double)? onProgress,
   }) async {
     try {
-      debugPrint('🚀 CloudinaryService: Iniciando subida de imagen...');
-      debugPrint('📁 Archivo: $imagePath');
-      debugPrint('🎯 Tipo: $imageType');
+      debugPrint('🚀 CloudinaryService: starting image upload...');
+      debugPrint('📁 File: $imagePath');
+      debugPrint('🎯 Type: $imageType');
 
       final config = CloudinaryConfig.getConfigForType(imageType);
 
-      // 📏 Validar tamaño del archivo
+      // Validate file size
       final file = File(imagePath);
       final fileSize = await file.length();
-      debugPrint('📊 Tamaño del archivo: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint('📊 File size: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
 
       if (fileSize > config.maxSize) {
-        debugPrint('❌ Archivo demasiado grande: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB > ${(config.maxSize / 1024 / 1024).toStringAsFixed(2)} MB');
+        debugPrint('❌ File too large: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB > ${(config.maxSize / 1024 / 1024).toStringAsFixed(2)} MB');
         throw Exception('Image too large. Maximum ${(config.maxSize / 1024 / 1024).toStringAsFixed(1)}MB');
       }
 
-      // 🗜️ Comprimir imagen si es necesario (opcional, podrías omitirlo si prefieres subir el original)
+      // Compress the image if needed before uploading
       final compressedPath = await _compressImageIfNeeded(imagePath, config, imageType);
-      debugPrint('🗜️ Imagen comprimida: $compressedPath');
+      debugPrint('🗜️ Compressed image: $compressedPath');
 
-      // 🔄 Configurar cloudinary para este tipo específico
+      // Configure Cloudinary for this image type
       final cloudinary = CloudinaryPublic(
         CloudinaryConfig.cloudName,
         config.uploadPreset,
         cache: false,
       );
 
-      // 📤 Realizar subida
-      onProgress?.call(0.1); // 10% - Iniciando subida
+      // Upload
+      onProgress?.call(0.1); // 10% - upload starting
 
       final response = await cloudinary.uploadFile(
         CloudinaryFile.fromFile(
@@ -58,39 +59,38 @@ class CloudinaryService {
         ),
       );
 
-      onProgress?.call(1.0); // 100% - Completado
+      onProgress?.call(1.0); // 100% - done
 
-      debugPrint('✅ Imagen subida exitosamente');
+      debugPrint('✅ Image uploaded successfully');
       debugPrint('🔗 URL: ${response.secureUrl}');
 
-      // 🧹 Limpiar archivo temporal si se creó uno comprimido
+      // Clean up the temporary file if a compressed copy was created
       if (compressedPath != imagePath) {
         try {
           await File(compressedPath).delete();
-          debugPrint('🧹 Archivo temporal eliminado');
+          debugPrint('🧹 Temporary file deleted');
         } catch (e) {
-          debugPrint('⚠️ Error al eliminar archivo temporal: $e');
+          debugPrint('⚠️ Failed to delete temporary file: $e');
         }
       }
 
       return response.secureUrl;
     } catch (e) {
-      debugPrint('❌ Error en CloudinaryService.uploadImage: $e');
+      debugPrint('❌ Error in CloudinaryService.uploadImage: $e');
       return null;
     }
   }
 
-  /// 🗜️ Comprimir imagen si excede el tamaño máximo o es muy grande.
+  /// Compresses the image when it exceeds the maximum size or is very large.
   ///
-  /// Preserva el formato de origen para evitar corrupción:
-  /// - GIF/WebP nunca se transcodifican (un GIF perdería su animación y
-  ///   WebP suele fallar al decodificar). El chequeo de tamaño duro previo
-  ///   ya garantiza `fileSize <= config.maxSize`, así que el original es
-  ///   seguro de subir tal cual.
-  /// - PNG se re-encoda como PNG (encodear PNG→JPG vuelve negra la
-  ///   transparencia).
-  /// - JPEG/otros usan el bucle de calidad JPG.
-  /// - Avatares se recortan a cuadrado (sin estirar/distorsionar).
+  /// Preserves the source format to avoid corruption:
+  /// - GIF/WebP are never transcoded (a GIF would lose its animation and
+  ///   WebP often fails to decode). The hard size check before this call
+  ///   already guarantees `fileSize <= config.maxSize`, so the original is
+  ///   safe to upload as-is.
+  /// - PNG is re-encoded as PNG (encoding PNG→JPG turns transparency black).
+  /// - JPEG/others use the JPG quality loop.
+  /// - Avatars are cropped to a square (no stretching/distortion).
   Future<String> _compressImageIfNeeded(
     String imagePath,
     ImageConfig config,
@@ -100,36 +100,35 @@ class CloudinaryService {
     final fileSize = await file.length();
     final ext = imagePath.split('.').last.toLowerCase();
 
-    // Formatos animados / con alfa por intención: no transcodificar.
+    // Animated / intentionally-alpha formats: never transcode.
     if (ext == 'gif' || ext == 'webp') {
       return imagePath;
     }
 
     final isPng = ext == 'png';
 
-    // Si el archivo ya es pequeño, retornar el original
+    // Already small enough: keep the original.
     if (fileSize <= config.maxSize && fileSize < 512 * 1024) {
       return imagePath;
     }
 
     try {
-      debugPrint('🗜️ Comprimiendo imagen...');
+      debugPrint('🗜️ Compressing image...');
 
-      // 📖 Leer imagen
       final imageBytes = await file.readAsBytes();
       img.Image? image = img.decodeImage(imageBytes);
 
       if (image == null) {
-        // No se pudo decodificar → no arriesgar un re-encode corrupto.
-        debugPrint('⚠️ No se pudo decodificar; subiendo original sin tocar.');
+        // Could not decode: do not risk a corrupt re-encode.
+        debugPrint('⚠️ Could not decode; uploading original untouched.');
         return imagePath;
       }
 
       if (imageType == ImageType.avatar) {
-        // ✂️ Recorte cuadrado centrado (sin estirar) y tamaño 512.
+        // Centered square crop (no stretching), 512px.
         image = img.copyResizeCropSquare(image, size: 512);
       } else {
-        // 📐 Redimensionar manteniendo proporción
+        // Resize keeping aspect ratio
         final (targetWidth, targetHeight) =
             _getTargetDimensions(imageType, image);
         if (image.width > targetWidth || image.height > targetHeight) {
@@ -139,7 +138,7 @@ class CloudinaryService {
             height: targetHeight,
             interpolation: img.Interpolation.linear,
           );
-          debugPrint('📐 Redimensionada a: ${image.width}x${image.height}');
+          debugPrint('📐 Resized to: ${image.width}x${image.height}');
         }
       }
 
@@ -147,17 +146,17 @@ class CloudinaryService {
       late String outExt;
 
       if (isPng) {
-        // Mantener alfa — PNG→JPG volvería negra la transparencia.
+        // Keep alpha — PNG→JPG would turn transparency black.
         outBytes = Uint8List.fromList(img.encodePng(image));
         outExt = 'png';
       } else {
-        // 💾 Comprimir con calidad variable hasta alcanzar tamaño objetivo
+        // Compress with decreasing quality until the target size is reached
         int quality = 85;
         Uint8List bytes;
         do {
           bytes = Uint8List.fromList(img.encodeJpg(image, quality: quality));
           debugPrint(
-            '🎛️ Calidad $quality: ${(bytes.length / 1024 / 1024).toStringAsFixed(2)} MB',
+            '🎛️ Quality $quality: ${(bytes.length / 1024 / 1024).toStringAsFixed(2)} MB',
           );
           if (bytes.length <= config.maxSize || quality <= 30) break;
           quality -= 15;
@@ -166,7 +165,7 @@ class CloudinaryService {
         outExt = 'jpg';
       }
 
-      // 📁 Guardar archivo comprimido temporalmente
+      // Save the compressed file to a temporary location
       final tempDir = await getTemporaryDirectory();
       final compressedFile = File(
         '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.$outExt',
@@ -174,24 +173,25 @@ class CloudinaryService {
       await compressedFile.writeAsBytes(outBytes);
 
       debugPrint(
-        '✅ Imagen comprimida final: ${(outBytes.length / 1024 / 1024).toStringAsFixed(2)} MB ($outExt)',
+        '✅ Final compressed image: ${(outBytes.length / 1024 / 1024).toStringAsFixed(2)} MB ($outExt)',
       );
 
       return compressedFile.path;
     } catch (e) {
-      debugPrint('❌ Error al comprimir imagen: $e');
-      // En caso de error, retornar el archivo original
+      debugPrint('❌ Error compressing image: $e');
+      // On failure, fall back to the original file
       return imagePath;
     }
   }
 
-  /// 📐 Obtener dimensiones objetivo según tipo de imagen
+  /// Target dimensions per image type.
   (int, int) _getTargetDimensions(ImageType imageType, img.Image image) {
     switch (imageType) {
       case ImageType.avatar:
-        return (512, 512); // Cuadrado para avatares
+      case ImageType.company:
+        return (512, 512); // Square, avatar-style
       case ImageType.chat:
-        // Mantener proporción, máximo 1024px en el lado más largo
+        // Keep aspect ratio, max 1024px on the longest side
         final aspectRatio = image.width / image.height;
         if (aspectRatio > 1) {
           return (1024, (1024 / aspectRatio).round());
@@ -199,7 +199,7 @@ class CloudinaryService {
           return ((1024 * aspectRatio).round(), 1024);
         }
       case ImageType.announcement:
-        // Mantener proporción, máximo 1200px en el lado más largo
+        // Keep aspect ratio, max 1200px on the longest side
         final aspectRatio = image.width / image.height;
         if (aspectRatio > 1) {
           return (1200, (1200 / aspectRatio).round());
@@ -209,23 +209,23 @@ class CloudinaryService {
     }
   }
 
-  /// 🧹 Limpiar archivos temporales
+  /// Removes leftover temporary files created by compression.
   static Future<void> cleanupTempFiles() async {
     try {
       final tempDir = await getTemporaryDirectory();
       final files = tempDir.listSync();
 
       for (final file in files) {
-        if (file is File && 
-            (file.path.contains('compressed_') || 
+        if (file is File &&
+            (file.path.contains('compressed_') ||
              file.path.contains('temp_image_'))) {
           await file.delete();
         }
       }
 
-      debugPrint('🧹 Archivos temporales limpiados');
+      debugPrint('🧹 Temporary files cleaned up');
     } catch (e) {
-      debugPrint('⚠️ Error al limpiar archivos temporales: $e');
+      debugPrint('⚠️ Error cleaning up temporary files: $e');
     }
   }
 }

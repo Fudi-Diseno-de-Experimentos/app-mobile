@@ -1,33 +1,36 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-/// Configuración de Cloudinary para subida de imágenes
+/// Cloudinary configuration for image uploads.
+///
+/// Uploads use unsigned presets, so only the cloud name is needed at runtime.
+/// Never add API keys/secrets here: `.env` is bundled as a Flutter asset and
+/// anything in it ships inside the APK/IPA.
 class CloudinaryConfig {
-  // 🔐 Credenciales de Cloudinary (usar variables de entorno)
-  static String get cloudName => dotenv.env['CLOUD_NAME'] ?? "dpprgycup";
-  static String get apiKey => dotenv.env['API_KEY'] ?? "454726488133594";
-  static String get apiSecret => dotenv.env['API_SECRET'] ?? "G1TYaQ8qxvFzqnO5pogYhr-nFFQ";
+  static String get cloudName =>
+      dotenv.env['CLOUD_NAME'] ??
+      (throw StateError('CLOUD_NAME is missing from .env'));
 
-  // 📁 Upload Presets (configurar en dashboard de Cloudinary como unsigned)
-  static const String avatarUploadPreset = "centralis_avatars";
-  static const String chatUploadPreset = "centralis_chat";
-  static const String announcementUploadPreset = "centralis_announcements";
+  // Upload presets (configured as unsigned in the Cloudinary dashboard)
+  static const String avatarUploadPreset = 'centralis_avatars';
+  static const String chatUploadPreset = 'centralis_chat';
+  static const String announcementUploadPreset = 'centralis_announcements';
 
-  // 📂 Carpetas organizadas
-  static const String avatarFolder = "avatars";
-  static const String chatFolder = "chat";
-  static const String announcementFolder = "announcements";
+  // Folders
+  static const String avatarFolder = 'avatars';
+  static const String chatFolder = 'chat';
+  static const String announcementFolder = 'announcements';
+  static const String companyFolder = 'companies';
 
-  // 🖼️ Transformaciones automáticas
-  static const String avatarTransformation = "c_fill,w_200,h_200,r_max,q_auto";
-  static const String chatTransformation = "c_fit,w_800,h_600,q_auto";
-  static const String announcementTransformation = "c_fit,w_1200,h_800,q_auto";
+  // Automatic transformations
+  static const String avatarTransformation = 'c_fill,w_200,h_200,r_max,q_auto';
+  static const String chatTransformation = 'c_fit,w_800,h_600,q_auto';
+  static const String announcementTransformation = 'c_fit,w_1200,h_800,q_auto';
 
-  // 📏 Tamaños máximos en bytes
-  static const int avatarMaxSize = 1024 * 1024;         // 1MB
-  static const int chatMaxSize = 5 * 1024 * 1024;       // 5MB
+  // Maximum sizes in bytes
+  static const int avatarMaxSize = 1024 * 1024; // 1MB
+  static const int chatMaxSize = 5 * 1024 * 1024; // 5MB
   static const int announcementMaxSize = 10 * 1024 * 1024; // 10MB
 
-  // 🎯 Configuración por tipo de imagen
   static ImageConfig getConfigForType(ImageType type) {
     switch (type) {
       case ImageType.avatar:
@@ -54,18 +57,30 @@ class CloudinaryConfig {
           maxSize: announcementMaxSize,
           allowedFormats: ['jpg', 'png', 'webp'],
         );
+      case ImageType.company:
+        // Reuses the announcement unsigned preset (no dedicated preset exists
+        // in the Cloudinary dashboard yet) but stores logos in their own
+        // folder with avatar-style sizing.
+        return const ImageConfig(
+          uploadPreset: announcementUploadPreset,
+          folder: companyFolder,
+          transformation: avatarTransformation,
+          maxSize: avatarMaxSize,
+          allowedFormats: ['jpg', 'png', 'webp'],
+        );
     }
   }
 }
 
-/// Tipos de imagen soportados
+/// Supported image types
 enum ImageType {
   avatar,
   chat,
-  announcement
+  announcement,
+  company
 }
 
-/// Configuración específica por tipo de imagen
+/// Per-type image configuration
 class ImageConfig {
   final String uploadPreset;
   final String folder;

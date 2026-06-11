@@ -1,6 +1,6 @@
+import 'package:app_mobile/core/theme/app_colors.dart';
+import 'package:app_mobile/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
-import 'app_typography.dart';
 
 class AppTheme {
   AppTheme._();
