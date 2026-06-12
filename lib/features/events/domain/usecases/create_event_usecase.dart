@@ -13,6 +13,7 @@ class CreateEventUseCase {
     required String description,
     required String date,
     required String location,
+    String? spaceId,
     required String createdBy,
     required List<String> recipientIds,
   }) {
@@ -21,6 +22,7 @@ class CreateEventUseCase {
       description: description,
       date: date,
       location: location,
+      spaceId: spaceId,
       createdBy: createdBy,
       recipientIds: recipientIds,
     );

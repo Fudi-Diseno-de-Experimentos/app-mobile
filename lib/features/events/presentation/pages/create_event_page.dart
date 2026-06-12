@@ -1,3 +1,6 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/features/company/domain/entities/space_entity.dart';
+import 'package:app_mobile/features/company/domain/usecases/get_spaces_usecase.dart';
 import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
 import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
 import 'package:app_mobile/features/events/presentation/bloc/event_event.dart';
@@ -30,7 +33,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
   List<ProfileEntity> _members = [];
   final Set<String> _selectedRecipientIds = {};
 
+  List<SpaceEntity> _spaces = [];
+  bool _loadingSpaces = false;
+  String? _selectedSpaceId;
+
   bool get _isEditMode => widget.event != null;
+
+  /// The room this event already books (edit mode). Stays selectable even if
+  /// the availability call reports it busy — it's busy *because of this event*.
+  String? get _ownSpaceId => widget.event?.spaceId;
 
   @override
   void initState() {
@@ -41,6 +52,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
       _descriptionController.text = existing.description;
       _locationController.text = existing.location;
       _selectedRecipientIds.addAll(existing.recipientIds);
+      _selectedSpaceId = existing.spaceId;
       try {
         final parsed = DateTime.parse(existing.date);
         _selectedDate = DateTime(parsed.year, parsed.month, parsed.day);
@@ -52,6 +64,38 @@ class _CreateEventPageState extends State<CreateEventPage> {
     if (companyId != null) {
       context.read<EventBloc>().add(FetchCompanyMembers(companyId));
     }
+    if (_selectedDate != null) {
+      _loadSpaces();
+    }
+  }
+
+  String _dateParam(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  /// Fetches rooms with per-day availability for the chosen date. Drops a
+  /// previously chosen room if it became occupied (unless it's our own).
+  Future<void> _loadSpaces() async {
+    final date = _selectedDate;
+    if (date == null) return;
+    setState(() => _loadingSpaces = true);
+
+    final result = await sl<GetSpacesUseCase>()(date: _dateParam(date));
+    if (!mounted) return;
+    result.fold(
+      (failure) => setState(() => _loadingSpaces = false),
+      (spaces) {
+        setState(() {
+          _spaces = spaces;
+          _loadingSpaces = false;
+          final selected = _selectedSpaceId;
+          if (selected != null && selected != _ownSpaceId) {
+            final match = spaces.where((s) => s.id == selected);
+            final stillFree = match.isNotEmpty && (match.first.available ?? true);
+            if (!stillFree) _selectedSpaceId = null;
+          }
+        });
+      },
+    );
   }
 
   @override
@@ -89,7 +133,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
         );
       },
     );
-    if (pickedDate != null) setState(() => _selectedDate = pickedDate);
+    if (pickedDate != null) {
+      setState(() => _selectedDate = pickedDate);
+      _loadSpaces();
+    }
   }
 
   Future<void> _selectTime() async {
@@ -153,6 +200,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
               description: _descriptionController.text,
               date: scheduled.toIso8601String(),
               location: _locationController.text,
+              spaceId: _selectedSpaceId,
               recipientIds: _selectedRecipientIds.toList(),
             ),
           );
@@ -169,6 +217,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
             description: _descriptionController.text,
             date: scheduled.toIso8601String(),
             location: _locationController.text,
+            spaceId: _selectedSpaceId,
             createdBy: userId,
             recipientIds: _selectedRecipientIds.toList(),
           ),
@@ -324,6 +373,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
                   ),
                   const SizedBox(height: 24),
 
+                  // Room (optional)
+                  _buildRoomPickerSection(colorScheme, textTheme),
+                  const SizedBox(height: 24),
+
                   // Recipient picker
                   _buildMemberPickerSection(colorScheme, textTheme),
                   const SizedBox(height: 48),
@@ -369,6 +422,160 @@ class _CreateEventPageState extends State<CreateEventPage> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoomPickerSection(ColorScheme colorScheme, TextTheme textTheme) {
+    Widget content;
+
+    if (_selectedDate == null) {
+      content = _roomPlaceholder(
+        'Pick a date first to choose a room',
+        colorScheme,
+      );
+    } else if (_loadingSpaces) {
+      content = Container(
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+        decoration: BoxDecoration(
+          color: colorScheme.secondary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              height: 18,
+              width: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Checking room availability…',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else if (_spaces.isEmpty) {
+      content = _roomPlaceholder(
+        'No rooms registered for your company',
+        colorScheme,
+      );
+    } else {
+      // Keep the dropdown value valid: only honor a selection that's an item.
+      final hasSelection = _spaces.any((s) => s.id == _selectedSpaceId);
+      content = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: colorScheme.secondary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String?>(
+            value: hasSelection ? _selectedSpaceId : null,
+            isExpanded: true,
+            icon: Icon(Icons.expand_more, color: colorScheme.onSurface),
+            hint: Text(
+              'No room',
+              style: TextStyle(
+                color: colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+            ),
+            items: [
+              DropdownMenuItem<String?>(
+                value: null,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.block,
+                      size: 18,
+                      color: colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'No room',
+                      style: TextStyle(color: colorScheme.onSurface),
+                    ),
+                  ],
+                ),
+              ),
+              ..._spaces.map((space) {
+                final isOwn = space.id == _ownSpaceId;
+                final isAvailable = (space.available ?? true) || isOwn;
+                final color = isAvailable
+                    ? colorScheme.onSurface
+                    : colorScheme.onSurface.withValues(alpha: 0.35);
+                return DropdownMenuItem<String?>(
+                  value: space.id,
+                  enabled: isAvailable,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isAvailable
+                              ? Colors.green
+                              : colorScheme.onSurface.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Icon(Icons.meeting_room_outlined, size: 18, color: color),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          space.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: color),
+                        ),
+                      ),
+                      if (!isAvailable)
+                        Text(
+                          'Booked',
+                          style: textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onSurface.withValues(alpha: 0.4),
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+            onChanged: (value) => setState(() => _selectedSpaceId = value),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLabel('Room (optional)', colorScheme),
+        content,
+      ],
+    );
+  }
+
+  Widget _roomPlaceholder(String text, ColorScheme colorScheme) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      decoration: BoxDecoration(
+        color: colorScheme.secondary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: colorScheme.onSurface.withValues(alpha: 0.4),
+          fontSize: 12,
         ),
       ),
     );

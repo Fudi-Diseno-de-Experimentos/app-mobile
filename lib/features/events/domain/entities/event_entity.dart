@@ -6,6 +6,9 @@ class EventEntity extends Equatable {
   final String description;
   final String date;
   final String location;
+
+  /// Booked room id (`null` when no room is reserved).
+  final String? spaceId;
   final String createdBy;
   final List<String> recipientIds;
   final String createdAt;
@@ -17,6 +20,7 @@ class EventEntity extends Equatable {
     required this.description,
     required this.date,
     required this.location,
+    this.spaceId,
     required this.createdBy,
     required this.recipientIds,
     required this.createdAt,
@@ -30,6 +34,7 @@ class EventEntity extends Equatable {
         description,
         date,
         location,
+        spaceId,
         createdBy,
         recipientIds,
         createdAt,
