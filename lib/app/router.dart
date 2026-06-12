@@ -15,6 +15,10 @@ import 'package:app_mobile/features/chat/presentation/pages/edit_group_page.dart
 import 'package:app_mobile/features/chat/presentation/pages/new_chat_page.dart';
 import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
 import 'package:app_mobile/features/company/presentation/bloc/company_bloc.dart';
+import 'package:app_mobile/features/company/presentation/bloc/space_bloc.dart';
+import 'package:app_mobile/features/company/presentation/pages/company_page.dart';
+import 'package:app_mobile/features/company/presentation/pages/spaces_page.dart';
+import 'package:app_mobile/features/company/presentation/pages/unassigned_employees_page.dart';
 import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
 import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
 import 'package:app_mobile/features/events/presentation/pages/create_event_page.dart';
@@ -103,6 +107,25 @@ final GoRouter appRouter = GoRouter(
         ],
         child: const CompanySetupPage(),
       ),
+    ),
+    GoRoute(
+      path: '/company',
+      builder: (context, state) =>
+          CompanyPage(company: state.extra as CompanyEntity),
+      routes: [
+        GoRoute(
+          path: 'spaces',
+          builder: (context, state) => BlocProvider(
+            create: (_) => sl<SpaceBloc>(),
+            child: const SpacesPage(),
+          ),
+        ),
+        GoRoute(
+          path: 'unassigned',
+          builder: (context, state) =>
+              UnassignedEmployeesPage(company: state.extra as CompanyEntity),
+        ),
+      ],
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
