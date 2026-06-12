@@ -339,6 +339,7 @@ class FakeCreateEventUseCase implements CreateEventUseCase {
     required String description,
     required String date,
     required String location,
+    String? spaceId,
     required String createdBy,
     required List<String> recipientIds,
   }) async {
@@ -367,6 +368,7 @@ class FakeUpdateEventUseCase implements UpdateEventUseCase {
     required String description,
     required String date,
     required String location,
+    String? spaceId,
     required List<String> recipientIds,
   }) async {
     return Right(EventEntity(

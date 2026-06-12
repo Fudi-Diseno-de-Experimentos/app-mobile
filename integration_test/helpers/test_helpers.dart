@@ -113,6 +113,7 @@ class FakeCreateEventUseCase implements CreateEventUseCase {
     required String description,
     required String date,
     required String location,
+    String? spaceId,
     required String createdBy,
     required List<String> recipientIds,
   }) async {

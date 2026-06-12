@@ -700,6 +700,7 @@ class MockCreateEventUseCase extends _i1.Mock
     required String? description,
     required String? date,
     required String? location,
+    String? spaceId,
     required String? createdBy,
     required List<String>? recipientIds,
   }) =>
@@ -709,6 +710,7 @@ class MockCreateEventUseCase extends _i1.Mock
               #description: description,
               #date: date,
               #location: location,
+              #spaceId: spaceId,
               #createdBy: createdBy,
               #recipientIds: recipientIds,
             }),
@@ -721,6 +723,7 @@ class MockCreateEventUseCase extends _i1.Mock
                       #description: description,
                       #date: date,
                       #location: location,
+                      #spaceId: spaceId,
                       #createdBy: createdBy,
                       #recipientIds: recipientIds,
                     }),
@@ -757,6 +760,7 @@ class MockUpdateEventUseCase extends _i1.Mock
     required String? description,
     required String? date,
     required String? location,
+    String? spaceId,
     required List<String>? recipientIds,
   }) =>
       (super.noSuchMethod(
@@ -766,6 +770,7 @@ class MockUpdateEventUseCase extends _i1.Mock
               #description: description,
               #date: date,
               #location: location,
+              #spaceId: spaceId,
               #recipientIds: recipientIds,
             }),
             returnValue:
@@ -778,6 +783,7 @@ class MockUpdateEventUseCase extends _i1.Mock
                       #description: description,
                       #date: date,
                       #location: location,
+                      #spaceId: spaceId,
                       #recipientIds: recipientIds,
                     }),
                   ),
@@ -1449,6 +1455,7 @@ class MockEventRemoteDataSource extends _i1.Mock
     required String? description,
     required String? date,
     required String? location,
+    String? spaceId,
     required String? createdBy,
     required List<String>? recipientIds,
   }) =>
@@ -1458,6 +1465,7 @@ class MockEventRemoteDataSource extends _i1.Mock
               #description: description,
               #date: date,
               #location: location,
+              #spaceId: spaceId,
               #createdBy: createdBy,
               #recipientIds: recipientIds,
             }),
@@ -1469,6 +1477,7 @@ class MockEventRemoteDataSource extends _i1.Mock
                   #description: description,
                   #date: date,
                   #location: location,
+                  #spaceId: spaceId,
                   #createdBy: createdBy,
                   #recipientIds: recipientIds,
                 }),
@@ -1484,6 +1493,7 @@ class MockEventRemoteDataSource extends _i1.Mock
     required String? description,
     required String? date,
     required String? location,
+    String? spaceId,
     required List<String>? recipientIds,
   }) =>
       (super.noSuchMethod(
@@ -1493,6 +1503,7 @@ class MockEventRemoteDataSource extends _i1.Mock
               #description: description,
               #date: date,
               #location: location,
+              #spaceId: spaceId,
               #recipientIds: recipientIds,
             }),
             returnValue: _i15.Future<_i10.EventModel>.value(
@@ -1504,6 +1515,7 @@ class MockEventRemoteDataSource extends _i1.Mock
                   #description: description,
                   #date: date,
                   #location: location,
+                  #spaceId: spaceId,
                   #recipientIds: recipientIds,
                 }),
               ),
@@ -1866,6 +1878,16 @@ class MockTokenStore extends _i1.Mock implements _i55.TokenStore {
   MockTokenStore() {
     _i1.throwOnMissingStub(this);
   }
+
+  @override
+  bool get hasToken =>
+      (super.noSuchMethod(Invocation.getter(#hasToken), returnValue: false)
+          as bool);
+
+  @override
+  bool get isExpired =>
+      (super.noSuchMethod(Invocation.getter(#isExpired), returnValue: false)
+          as bool);
 
   @override
   bool get isSignedIn =>
