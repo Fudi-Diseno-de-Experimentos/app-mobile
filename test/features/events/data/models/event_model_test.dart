@@ -10,7 +10,7 @@ void main() {
         'title': 'Quarterly Meeting',
         'description': 'Q1 goals review',
         'date': '2024-03-15T10:00:00Z',
-        'location': 'Sala Principal',
+        'spaceId': 'room-1',
         'createdBy': 'manager-1',
         'recipientIds': ['emp-1', 'emp-2', 'emp-3'],
         'createdAt': '2024-01-01T00:00:00Z',
@@ -25,7 +25,7 @@ void main() {
       expect(model.title, 'Quarterly Meeting');
       expect(model.description, 'Q1 goals review');
       expect(model.date, '2024-03-15T10:00:00Z');
-      expect(model.location, 'Sala Principal');
+      expect(model.spaceId, 'room-1');
       expect(model.createdBy, 'manager-1');
       expect(model.recipientIds, ['emp-1', 'emp-2', 'emp-3']);
     });
@@ -37,7 +37,7 @@ void main() {
         'title': 'Event without invitees',
         'description': 'Desc',
         'date': '2024-03-15',
-        'location': 'Sala B',
+        'spaceId': 'room-2',
         'createdBy': 'manager-1',
         'recipientIds': [],
         'createdAt': '',
@@ -58,7 +58,7 @@ void main() {
         'title': 'Event',
         'description': 'Desc',
         'date': '',
-        'location': '',
+        'spaceId': '',
         'createdBy': '',
         'createdAt': '',
         'updatedAt': '',
@@ -83,7 +83,7 @@ void main() {
       expect(model.title, '');
       expect(model.description, '');
       expect(model.date, '');
-      expect(model.location, '');
+      expect(model.spaceId, '');
       expect(model.createdBy, '');
       expect(model.recipientIds, isEmpty);
     });
@@ -95,7 +95,7 @@ void main() {
         title: 'Meeting',
         description: 'Description',
         date: '2024-03-15T10:00:00Z',
-        location: 'Sala A',
+        spaceId: 'room-1',
         createdBy: 'manager-1',
         recipientIds: ['emp-1', 'emp-2'],
         createdAt: '2024-01-01T00:00:00Z',
@@ -109,7 +109,7 @@ void main() {
       expect(json['id'], 'evt-1');
       expect(json['title'], 'Meeting');
       expect(json['recipientIds'], ['emp-1', 'emp-2']);
-      expect(json['location'], 'Sala A');
+      expect(json['spaceId'], 'room-1');
     });
 
     test('toJson/fromJson should be symmetric (roundtrip)', () {
@@ -119,7 +119,7 @@ void main() {
         title: 'Roundtrip',
         description: 'Test',
         date: '2024-03-15',
-        location: 'Sala',
+        spaceId: 'room-3',
         createdBy: 'user-1',
         recipientIds: ['emp-1'],
         createdAt: '2024-01-01',

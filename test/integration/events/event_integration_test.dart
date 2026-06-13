@@ -20,7 +20,7 @@ void main() {
     title: 'General Meeting',
     description: 'Quarterly review',
     date: '2024-03-15T10:00:00Z',
-    location: 'Auditorio',
+    spaceId: 'room-1',
     createdBy: 'manager-1',
     recipientIds: ['emp-1', 'emp-2'],
     createdAt: '2024-01-01',
@@ -67,7 +67,7 @@ void main() {
         title: anyNamed('title'),
         description: anyNamed('description'),
         date: anyNamed('date'),
-        location: anyNamed('location'),
+        spaceId: anyNamed('spaceId'),
         createdBy: anyNamed('createdBy'),
         recipientIds: anyNamed('recipientIds'),
       )).thenAnswer((_) async => tModel);
@@ -78,7 +78,7 @@ void main() {
         title: 'General Meeting',
         description: 'Quarterly review',
         date: '2024-03-15T10:00:00Z',
-        location: 'Auditorio',
+        spaceId: 'room-1',
         createdBy: 'manager-1',
         recipientIds: ['emp-1', 'emp-2'],
       );
@@ -89,7 +89,7 @@ void main() {
         (_) => fail('Should be Right'),
         (event) {
           expect(event.id, 'evt-1');
-          expect(event.location, 'Auditorio');
+          expect(event.spaceId, 'room-1');
         },
       );
     });
@@ -116,7 +116,7 @@ void main() {
         title: 'Postponed Meeting',
         description: 'Nueva fecha',
         date: '2024-04-15T10:00:00Z',
-        location: 'Sala B',
+        spaceId: 'room-2',
         createdBy: 'manager-1',
         recipientIds: ['emp-1', 'emp-2', 'emp-3'],
         createdAt: '2024-01-01',
@@ -127,7 +127,7 @@ void main() {
         title: anyNamed('title'),
         description: anyNamed('description'),
         date: anyNamed('date'),
-        location: anyNamed('location'),
+        spaceId: anyNamed('spaceId'),
         recipientIds: anyNamed('recipientIds'),
       )).thenAnswer((_) async => updatedModel);
       final useCase = UpdateEventUseCase(repository);
@@ -138,7 +138,7 @@ void main() {
         title: 'Postponed Meeting',
         description: 'Nueva fecha',
         date: '2024-04-15T10:00:00Z',
-        location: 'Sala B',
+        spaceId: 'room-2',
         recipientIds: ['emp-1', 'emp-2', 'emp-3'],
       );
 
@@ -193,7 +193,7 @@ void main() {
         title: anyNamed('title'),
         description: anyNamed('description'),
         date: anyNamed('date'),
-        location: anyNamed('location'),
+        spaceId: anyNamed('spaceId'),
         createdBy: anyNamed('createdBy'),
         recipientIds: anyNamed('recipientIds'),
       )).thenAnswer((_) async => tModel);
@@ -204,7 +204,7 @@ void main() {
         title: 'Nuevo',
         description: 'Desc',
         date: '2024-01-01',
-        location: 'Sala',
+        spaceId: 'room-3',
         createdBy: 'user-1',
         recipientIds: [],
       );
