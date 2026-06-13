@@ -168,8 +168,6 @@ class AnalyticsRemoteDataSourceImpl implements AnalyticsRemoteDataSource {
           }
         } catch (e) {
           if (isCancelled) break;
-          // Log error and wait 5 seconds before retrying
-          print("SSE Analytics connection failed: $e. Retrying in 5 seconds...");
         } finally {
           client?.close();
           client = null;
