@@ -1,4 +1,5 @@
 import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/core/utils/date_format.dart';
 import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
 import 'package:app_mobile/features/announcements/presentation/bloc/announcement_bloc.dart';
 import 'package:app_mobile/features/announcements/presentation/bloc/announcement_event.dart';
@@ -498,14 +499,14 @@ class _EventMiniCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        Icons.location_on_outlined,
+                        Icons.access_time,
                         size: 13,
                         color: colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                       const SizedBox(width: 3),
                       Expanded(
                         child: Text(
-                          item.location.isEmpty ? 'No location' : item.location,
+                          AppDateFormat.relativeDateTime(item.date),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: textTheme.bodySmall?.copyWith(

@@ -65,6 +65,31 @@ class _ChatPageState extends State<ChatPage> {
     context.push('/messages/conversation', extra: created);
   }
 
+  Future<void> _showComposerSheet(String userId, String companyId) async {
+    final route = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.person_outline),
+              title: const Text('New message'),
+              onTap: () => Navigator.of(context).pop('/messages/new-chat'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.group_add_outlined),
+              title: const Text('New group'),
+              onTap: () => Navigator.of(context).pop('/messages/new-group'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (route == null || !mounted) return;
+    await _openComposer(userId, companyId, route);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(
@@ -100,38 +125,14 @@ class _ChatPageState extends State<ChatPage> {
         }
 
         return Scaffold(
-          appBar: MainAppBar(
-            title: 'Messages',
-            actions: [
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.edit_square),
-                onSelected: (v) => _openComposer(
-                  userId,
-                  companyId,
-                  v == 'group'
-                      ? '/messages/new-group'
-                      : '/messages/new-chat',
-                ),
-                itemBuilder: (context) => const [
-                  PopupMenuItem(
-                    value: 'chat',
-                    child: ListTile(
-                      leading: Icon(Icons.person_outline),
-                      title: Text('New message'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'group',
-                    child: ListTile(
-                      leading: Icon(Icons.group_add_outlined),
-                      title: Text('New group'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+          appBar: const MainAppBar(title: 'Messages'),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _showComposerSheet(userId, companyId),
+            backgroundColor: Theme.of(context).colorScheme.onSurface,
+            child: Icon(
+              Icons.add,
+              color: Theme.of(context).colorScheme.surface,
+            ),
           ),
           body: Column(
             children: [

@@ -43,7 +43,7 @@ void registerFallbackValues() {
       title: '',
       description: '',
       date: '',
-      location: '',
+      spaceId: '',
       createdBy: '',
       recipientIds: [],
       createdAt: '',

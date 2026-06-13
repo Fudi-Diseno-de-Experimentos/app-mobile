@@ -75,7 +75,7 @@ class EventCard extends StatelessWidget {
             ),
           ),
           
-          // Footer: Time and Location
+          // Footer: Time
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 25),
             width: double.infinity,
@@ -88,21 +88,6 @@ class EventCard extends StatelessWidget {
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.tertiary,
                     fontSize: 10,
-                  ),
-                ),
-                const Spacer(),
-                Icon(Icons.location_on_outlined, size: 20, color: Theme.of(context).colorScheme.tertiary),
-                const SizedBox(width: 8),
-                SizedBox(
-                  width: 80,
-                  child: Text(
-                    item.location,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 10,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],

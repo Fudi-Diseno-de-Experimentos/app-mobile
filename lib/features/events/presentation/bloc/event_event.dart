@@ -4,7 +4,7 @@ abstract class EventEvent extends Equatable {
   const EventEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class FetchEvents extends EventEvent {
@@ -30,7 +30,7 @@ class CreateEventRequested extends EventEvent {
   final String title;
   final String description;
   final String date;
-  final String location;
+  final String spaceId;
   final String createdBy;
   final List<String> recipientIds;
 
@@ -38,13 +38,14 @@ class CreateEventRequested extends EventEvent {
     required this.title,
     required this.description,
     required this.date,
-    required this.location,
+    required this.spaceId,
     required this.createdBy,
     required this.recipientIds,
   });
 
   @override
-  List<Object> get props => [title, description, date, location, createdBy, recipientIds];
+  List<Object?> get props =>
+      [title, description, date, spaceId, createdBy, recipientIds];
 }
 
 class UpdateEventRequested extends EventEvent {
@@ -52,7 +53,7 @@ class UpdateEventRequested extends EventEvent {
   final String title;
   final String description;
   final String date;
-  final String location;
+  final String spaceId;
   final List<String> recipientIds;
 
   const UpdateEventRequested({
@@ -60,13 +61,13 @@ class UpdateEventRequested extends EventEvent {
     required this.title,
     required this.description,
     required this.date,
-    required this.location,
+    required this.spaceId,
     required this.recipientIds,
   });
 
   @override
-  List<Object> get props =>
-      [id, title, description, date, location, recipientIds];
+  List<Object?> get props =>
+      [id, title, description, date, spaceId, recipientIds];
 }
 
 class DeleteEventRequested extends EventEvent {

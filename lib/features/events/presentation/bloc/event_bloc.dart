@@ -62,7 +62,7 @@ class EventBloc extends Bloc<EventEvent, EventState> {
       title: event.title,
       description: event.description,
       date: event.date,
-      location: event.location,
+      spaceId: event.spaceId,
       createdBy: event.createdBy,
       recipientIds: event.recipientIds,
     );
@@ -86,7 +86,7 @@ class EventBloc extends Bloc<EventEvent, EventState> {
       title: event.title,
       description: event.description,
       date: event.date,
-      location: event.location,
+      spaceId: event.spaceId,
       recipientIds: event.recipientIds,
     );
     result.fold(

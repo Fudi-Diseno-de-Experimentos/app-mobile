@@ -25,7 +25,7 @@ void main() {
     title: 'Quarterly Meeting',
     description: 'Goals review',
     date: '2024-03-15T10:00:00Z',
-    location: 'Sala Principal',
+    spaceId: 'room-1',
     createdBy: 'manager-1',
     recipientIds: ['emp-1', 'emp-2'],
     createdAt: '2024-01-01',
@@ -97,7 +97,7 @@ void main() {
           title: anyNamed('title'),
           description: anyNamed('description'),
           date: anyNamed('date'),
-          location: anyNamed('location'),
+          spaceId: anyNamed('spaceId'),
           createdBy: anyNamed('createdBy'),
           recipientIds: anyNamed('recipientIds'),
         )).thenAnswer((_) async => const Right(tEvent));
@@ -109,7 +109,7 @@ void main() {
         title: 'Quarterly Meeting',
         description: 'Goals review',
         date: '2024-03-15T10:00:00Z',
-        location: 'Sala Principal',
+        spaceId: 'room-1',
         createdBy: 'manager-1',
         recipientIds: ['emp-1', 'emp-2'],
       )),
@@ -128,7 +128,7 @@ void main() {
           title: anyNamed('title'),
           description: anyNamed('description'),
           date: anyNamed('date'),
-          location: anyNamed('location'),
+          spaceId: anyNamed('spaceId'),
           createdBy: anyNamed('createdBy'),
           recipientIds: anyNamed('recipientIds'),
         )).thenAnswer((_) async => const Left(ServerFailure('Invalid fields')));
@@ -138,7 +138,7 @@ void main() {
         title: '',
         description: '',
         date: '',
-        location: '',
+        spaceId: '',
         createdBy: 'manager-1',
         recipientIds: [],
       )),
@@ -174,7 +174,7 @@ void main() {
           title: 'Postponed Meeting',
           description: 'Nueva fecha',
           date: '2024-04-15T10:00:00Z',
-          location: 'Sala B',
+          spaceId: 'room-2',
           createdBy: 'manager-1',
           recipientIds: ['emp-1', 'emp-2'],
           createdAt: '2024-01-01',
@@ -185,7 +185,7 @@ void main() {
           title: anyNamed('title'),
           description: anyNamed('description'),
           date: anyNamed('date'),
-          location: anyNamed('location'),
+          spaceId: anyNamed('spaceId'),
           recipientIds: anyNamed('recipientIds'),
         )).thenAnswer((_) async => const Right(updatedEvent));
         return bloc;
@@ -195,7 +195,7 @@ void main() {
         title: 'Postponed Meeting',
         description: 'Nueva fecha',
         date: '2024-04-15T10:00:00Z',
-        location: 'Sala B',
+        spaceId: 'room-2',
         recipientIds: ['emp-1', 'emp-2'],
       )),
       expect: () => [
@@ -212,7 +212,7 @@ void main() {
           title: anyNamed('title'),
           description: anyNamed('description'),
           date: anyNamed('date'),
-          location: anyNamed('location'),
+          spaceId: anyNamed('spaceId'),
           recipientIds: anyNamed('recipientIds'),
         )).thenAnswer((_) async => const Left(ServerFailure('Event not found')));
         return bloc;
@@ -222,7 +222,7 @@ void main() {
         title: 'Does not exist',
         description: 'Desc',
         date: '2024-01-01',
-        location: 'Sala',
+        spaceId: 'room-3',
         recipientIds: [],
       )),
       expect: () => [
