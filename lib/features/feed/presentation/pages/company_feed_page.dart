@@ -162,15 +162,25 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
 
   Widget? _buildFloatingActionButton() {
     if (_selectedIndex == 0) {
-      // Announcements: accessible to all roles
-      final announcementBloc = context.read<AnnouncementBloc>();
-      return FloatingActionButton(
-        onPressed: () async {
-          await context.push('/files/create-announcement');
-          announcementBloc.add(FetchAnnouncements());
+      // Announcements: accessible only to ROLE_ADMIN or ROLE_MANAGER
+      return BlocBuilder<ProfileBloc, ProfileState>(
+        builder: (context, state) {
+          final canCreateAnnouncement =
+              state.profileOrNull?.isManagerOrAdmin ?? false;
+
+          if (canCreateAnnouncement) {
+            final announcementBloc = context.read<AnnouncementBloc>();
+            return FloatingActionButton(
+              onPressed: () async {
+                await context.push('/files/create-announcement');
+                announcementBloc.add(FetchAnnouncements());
+              },
+              backgroundColor: Theme.of(context).colorScheme.onSurface,
+              child: Icon(Icons.add, color: Theme.of(context).colorScheme.surface),
+            );
+          }
+          return const SizedBox.shrink();
         },
-        backgroundColor: Theme.of(context).colorScheme.onSurface,
-        child: Icon(Icons.add, color: Theme.of(context).colorScheme.surface),
       );
     } else {
       // Events: accessible only to ROLE_ADMIN or ROLE_MANAGER
