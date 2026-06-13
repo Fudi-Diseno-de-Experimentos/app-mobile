@@ -76,10 +76,10 @@ class _SpacesPageState extends State<SpacesPage> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(title: const Text('Spaces')),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: _openCreateSheet,
-        icon: const Icon(Icons.add),
-        label: const Text('Add room'),
+        backgroundColor: colorScheme.onSurface,
+        child: Icon(Icons.add, color: colorScheme.surface),
       ),
       body: SafeArea(
         child: BlocConsumer<SpaceBloc, SpaceState>(
