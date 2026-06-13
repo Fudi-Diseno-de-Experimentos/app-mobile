@@ -10,12 +10,13 @@ import 'package:app_mobile/features/analytics/domain/usecases/get_user_announcem
 import 'package:app_mobile/features/analytics/domain/usecases/get_user_event_views_usecase.dart';
 import 'package:app_mobile/features/analytics/domain/usecases/register_announcement_view_usecase.dart';
 import 'package:app_mobile/features/analytics/domain/usecases/register_event_view_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/watch_analytics_updates_usecase.dart';
 import 'package:app_mobile/features/analytics/presentation/bloc/analytics_bloc.dart';
 
 void initAnalyticsDependencies() {
   // Datasource
   sl.registerLazySingleton<AnalyticsRemoteDataSource>(
-    () => AnalyticsRemoteDataSourceImpl(sl()),
+    () => AnalyticsRemoteDataSourceImpl(sl(), sl()),
   );
 
   // Repository
@@ -32,6 +33,7 @@ void initAnalyticsDependencies() {
   sl.registerLazySingleton(() => GetEventViewersUseCase(sl()));
   sl.registerLazySingleton(() => GetUserAnnouncementViewsUseCase(sl()));
   sl.registerLazySingleton(() => GetUserEventViewsUseCase(sl()));
+  sl.registerLazySingleton(() => WatchAnalyticsUpdatesUseCase(sl()));
 
   // BLoC — factory: isolated instance per detail page and member profile page to avoid state collision.
   sl.registerFactory(
@@ -44,6 +46,7 @@ void initAnalyticsDependencies() {
       getEventViewersUseCase: sl(),
       getUserAnnouncementViewsUseCase: sl(),
       getUserEventViewsUseCase: sl(),
+      watchAnalyticsUpdatesUseCase: sl(),
     ),
   );
 }

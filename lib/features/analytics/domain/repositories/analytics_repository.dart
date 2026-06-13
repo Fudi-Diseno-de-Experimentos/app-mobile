@@ -1,4 +1,5 @@
 import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/analytics/domain/entities/analytics_update_entity.dart';
 import 'package:app_mobile/features/analytics/domain/entities/content_stats_entity.dart';
 import 'package:app_mobile/features/analytics/domain/entities/user_announcement_view_entity.dart';
 import 'package:app_mobile/features/analytics/domain/entities/user_event_view_entity.dart';
@@ -21,6 +22,7 @@ abstract class AnalyticsRepository {
   Future<Either<Failure, List<ViewerEntity>>> getEventViewers(String id, {bool forceRefresh = false});
   Future<Either<Failure, List<UserAnnouncementViewEntity>>> getUserAnnouncementViews(String userId, {bool forceRefresh = false});
   Future<Either<Failure, List<UserEventViewEntity>>> getUserEventViews(String userId, {bool forceRefresh = false});
+  Stream<Either<Failure, AnalyticsUpdateEntity>> watchAnalyticsUpdates(String id, bool isEvent);
   Future<void> clearCache();
 }
 

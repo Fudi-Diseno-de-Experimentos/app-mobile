@@ -1,5 +1,6 @@
 import 'package:app_mobile/app/di.dart';
 import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/features/analytics/domain/entities/analytics_update_entity.dart';
 import 'package:app_mobile/features/analytics/domain/entities/content_stats_entity.dart';
 import 'package:app_mobile/features/analytics/domain/entities/user_announcement_view_entity.dart';
 import 'package:app_mobile/features/analytics/domain/entities/user_event_view_entity.dart';
@@ -14,6 +15,7 @@ import 'package:app_mobile/features/analytics/domain/usecases/get_user_announcem
 import 'package:app_mobile/features/analytics/domain/usecases/get_user_event_views_usecase.dart';
 import 'package:app_mobile/features/analytics/domain/usecases/register_announcement_view_usecase.dart';
 import 'package:app_mobile/features/analytics/domain/usecases/register_event_view_usecase.dart';
+import 'package:app_mobile/features/analytics/domain/usecases/watch_analytics_updates_usecase.dart';
 import 'package:app_mobile/features/analytics/presentation/bloc/analytics_bloc.dart';
 import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart';
 import 'package:app_mobile/features/announcements/domain/entities/comment_entity.dart';
@@ -608,6 +610,19 @@ class FakeGetMyGroupsUseCase implements GetMyGroupsUseCase {
   }
 }
 
+class FakeWatchAnalyticsUpdatesUseCase implements WatchAnalyticsUpdatesUseCase {
+  @override
+  AnalyticsRepository get repository => throw UnimplementedError();
+
+  @override
+  Stream<Either<Failure, AnalyticsUpdateEntity>> call({
+    required String contentId,
+    required bool isEvent,
+  }) {
+    return const Stream.empty();
+  }
+}
+
 void setupAllMockDependencies() {
   sl.allowReassignment = true;
 
@@ -656,6 +671,7 @@ void setupAllMockDependencies() {
   sl.registerLazySingleton<GetEventViewersUseCase>(() => FakeGetEventViewersUseCase());
   sl.registerLazySingleton<GetUserAnnouncementViewsUseCase>(() => FakeGetUserAnnouncementViewsUseCase());
   sl.registerLazySingleton<GetUserEventViewsUseCase>(() => FakeGetUserEventViewsUseCase());
+  sl.registerLazySingleton<WatchAnalyticsUpdatesUseCase>(() => FakeWatchAnalyticsUpdatesUseCase());
   sl.registerFactory<AnalyticsBloc>(() => AnalyticsBloc(
     registerAnnouncementViewUseCase: sl(),
     registerEventViewUseCase: sl(),
@@ -665,6 +681,7 @@ void setupAllMockDependencies() {
     getEventViewersUseCase: sl(),
     getUserAnnouncementViewsUseCase: sl(),
     getUserEventViewsUseCase: sl(),
+    watchAnalyticsUpdatesUseCase: sl(),
   ));
 
   // Chat
