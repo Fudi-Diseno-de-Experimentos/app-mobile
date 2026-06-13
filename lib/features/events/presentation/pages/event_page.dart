@@ -4,6 +4,7 @@ import 'package:app_mobile/features/analytics/presentation/bloc/analytics_bloc.d
 import 'package:app_mobile/features/analytics/presentation/bloc/analytics_event.dart';
 import 'package:app_mobile/features/analytics/presentation/bloc/analytics_state.dart';
 import 'package:app_mobile/features/announcements/presentation/pages/announcement_page.dart'; // To reuse PercentagePainter
+import 'package:app_mobile/features/company/domain/usecases/get_spaces_usecase.dart';
 import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
 import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
 import 'package:app_mobile/features/events/presentation/bloc/event_event.dart';
@@ -31,6 +32,10 @@ class _EventPageState extends State<EventPage> {
   late AnalyticsBloc _analyticsBloc;
   List<ProfileEntity> _companyMembers = [];
 
+  /// Resolved room name for the event's spaceId. Null while loading or if the
+  /// room was deleted — in which case the room row is hidden.
+  String? _roomName;
+
   // Updated copy received after an edit; falls back to route-passed data.
   EventEntity? _updated;
   EventEntity get _current => _updated ?? widget.event;
@@ -45,6 +50,7 @@ class _EventPageState extends State<EventPage> {
     } else {
       _recipientsLoaded = true;
     }
+    _loadRoomName();
     _registerView();
 
     final isManagerOrAdmin = context
@@ -66,6 +72,15 @@ class _EventPageState extends State<EventPage> {
   void dispose() {
     _analyticsBloc.close();
     super.dispose();
+  }
+
+  Future<void> _loadRoomName() async {
+    final result = await sl<GetSpacesUseCase>()();
+    if (!mounted) return;
+    result.fold((_) {}, (spaces) {
+      final match = spaces.where((s) => s.id == _current.spaceId);
+      setState(() => _roomName = match.isNotEmpty ? match.first.name : null);
+    });
   }
 
   void _registerView() {
@@ -171,6 +186,8 @@ class _EventPageState extends State<EventPage> {
         } else if (state is EventUpdateSuccess &&
             state.event.id == _current.id) {
           setState(() => _updated = state.event);
+          // The room may have changed on edit — re-resolve its name.
+          _loadRoomName();
         } else if (state is EventDeleteSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Event deleted')),
@@ -289,13 +306,13 @@ class _EventPageState extends State<EventPage> {
                       icon: Icons.access_time,
                       label: AppDateFormat.dateTime(_current.date),
                     ),
-                    const SizedBox(height: 8),
-                    _InfoRow(
-                      icon: Icons.location_on_outlined,
-                      label: _current.location.isEmpty
-                          ? 'No location'
-                          : _current.location,
-                    ),
+                    if (_roomName != null) ...[
+                      const SizedBox(height: 8),
+                      _InfoRow(
+                        icon: Icons.meeting_room_outlined,
+                        label: _roomName!,
+                      ),
+                    ],
                     const SizedBox(height: 24),
                     Text(
                       'Description',

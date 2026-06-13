@@ -1,6 +1,8 @@
 import 'package:app_mobile/app/di.dart';
 import 'package:app_mobile/features/company/domain/entities/space_entity.dart';
+import 'package:app_mobile/features/company/domain/usecases/create_space_usecase.dart';
 import 'package:app_mobile/features/company/domain/usecases/get_spaces_usecase.dart';
+import 'package:app_mobile/features/company/presentation/widgets/space_form_sheet.dart';
 import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
 import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
 import 'package:app_mobile/features/events/presentation/bloc/event_event.dart';
@@ -25,7 +27,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _locationController = TextEditingController();
 
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
@@ -50,7 +51,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
     if (existing != null) {
       _titleController.text = existing.title;
       _descriptionController.text = existing.description;
-      _locationController.text = existing.location;
       _selectedRecipientIds.addAll(existing.recipientIds);
       _selectedSpaceId = existing.spaceId;
       try {
@@ -98,11 +98,42 @@ class _CreateEventPageState extends State<CreateEventPage> {
     );
   }
 
+  /// Manager shortcut shown when the company has no rooms yet: create one
+  /// without leaving the half-filled event form, then reload + auto-select it.
+  Future<void> _createSpaceInline() async {
+    final result = await showSpaceFormSheet(context);
+    if (result == null || !mounted) return;
+    final colorScheme = Theme.of(context).colorScheme;
+    setState(() => _loadingSpaces = true);
+
+    final created = await sl<CreateSpaceUseCase>()(
+      name: result.name,
+      description: result.description,
+    );
+    if (!mounted) return;
+    created.fold(
+      (failure) {
+        setState(() => _loadingSpaces = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+      },
+      (space) {
+        // A freshly created room is free on any date, so it stays selected
+        // after _loadSpaces re-runs the availability check.
+        _selectedSpaceId = space.id;
+        _loadSpaces();
+      },
+    );
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _locationController.dispose();
     super.dispose();
   }
 
@@ -182,6 +213,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
       );
       return;
     }
+    if (_selectedSpaceId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please select a room for the event'),
+          backgroundColor: colorScheme.error,
+        ),
+      );
+      return;
+    }
 
     final scheduled = DateTime(
       _selectedDate!.year,
@@ -199,8 +239,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
               title: _titleController.text,
               description: _descriptionController.text,
               date: scheduled.toIso8601String(),
-              location: _locationController.text,
-              spaceId: _selectedSpaceId,
+              spaceId: _selectedSpaceId!,
               recipientIds: _selectedRecipientIds.toList(),
             ),
           );
@@ -216,8 +255,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
             title: _titleController.text,
             description: _descriptionController.text,
             date: scheduled.toIso8601String(),
-            location: _locationController.text,
-            spaceId: _selectedSpaceId,
+            spaceId: _selectedSpaceId!,
             createdBy: userId,
             recipientIds: _selectedRecipientIds.toList(),
           ),
@@ -361,19 +399,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Location
-                  _buildLabel('Location', colorScheme),
-                  TextFormField(
-                    controller: _locationController,
-                    style: TextStyle(color: colorScheme.onSurface),
-                    decoration: _buildInputDecoration(
-                        'e.g. Conference Room A, or Zoom', colorScheme),
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Please enter a location' : null,
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Room (optional)
+                  // Room (required)
                   _buildRoomPickerSection(colorScheme, textTheme),
                   const SizedBox(height: 24),
 
@@ -463,9 +489,31 @@ class _CreateEventPageState extends State<CreateEventPage> {
         ),
       );
     } else if (_spaces.isEmpty) {
-      content = _roomPlaceholder(
-        'No rooms registered for your company',
-        colorScheme,
+      // No rooms exist yet — offer the manager an inline "Add Space" shortcut.
+      content = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _roomPlaceholder(
+            'Your company has no rooms yet. Add one to book this event.',
+            colorScheme,
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: _createSpaceInline,
+            icon: const Icon(Icons.add),
+            label: const Text('Add Space'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: colorScheme.primary,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              side: BorderSide(
+                color: colorScheme.primary.withValues(alpha: 0.5),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ],
       );
     } else {
       // Keep the dropdown value valid: only honor a selection that's an item.
@@ -482,29 +530,12 @@ class _CreateEventPageState extends State<CreateEventPage> {
             isExpanded: true,
             icon: Icon(Icons.expand_more, color: colorScheme.onSurface),
             hint: Text(
-              'No room',
+              'Select a room',
               style: TextStyle(
                 color: colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
             items: [
-              DropdownMenuItem<String?>(
-                value: null,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.block,
-                      size: 18,
-                      color: colorScheme.onSurface.withValues(alpha: 0.4),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'No room',
-                      style: TextStyle(color: colorScheme.onSurface),
-                    ),
-                  ],
-                ),
-              ),
               ..._spaces.map((space) {
                 final isOwn = space.id == _ownSpaceId;
                 final isAvailable = (space.available ?? true) || isOwn;
@@ -557,7 +588,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel('Room (optional)', colorScheme),
+        _buildLabel('Room', colorScheme),
         content,
       ],
     );

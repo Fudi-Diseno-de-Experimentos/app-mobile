@@ -13,8 +13,7 @@ class UpdateEventUseCase {
     required String title,
     required String description,
     required String date,
-    required String location,
-    String? spaceId,
+    required String spaceId,
     required List<String> recipientIds,
   }) {
     return repository.updateEvent(
@@ -22,7 +21,6 @@ class UpdateEventUseCase {
       title: title,
       description: description,
       date: date,
-      location: location,
       spaceId: spaceId,
       recipientIds: recipientIds,
     );

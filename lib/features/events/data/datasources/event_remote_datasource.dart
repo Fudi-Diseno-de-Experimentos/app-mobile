@@ -7,8 +7,7 @@ abstract class EventRemoteDataSource {
     required String title,
     required String description,
     required String date,
-    required String location,
-    String? spaceId,
+    required String spaceId,
     required String createdBy,
     required List<String> recipientIds,
   });
@@ -17,8 +16,7 @@ abstract class EventRemoteDataSource {
     required String title,
     required String description,
     required String date,
-    required String location,
-    String? spaceId,
+    required String spaceId,
     required List<String> recipientIds,
   });
   Future<void> deleteEvent(String id);
@@ -43,8 +41,7 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
     required String title,
     required String description,
     required String date,
-    required String location,
-    String? spaceId,
+    required String spaceId,
     required String createdBy,
     required List<String> recipientIds,
   }) async {
@@ -54,7 +51,6 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
         'title': title,
         'description': description,
         'date': date,
-        'location': location,
         'spaceId': spaceId,
         'createdBy': createdBy,
         'recipientIds': recipientIds,
@@ -69,8 +65,7 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
     required String title,
     required String description,
     required String date,
-    required String location,
-    String? spaceId,
+    required String spaceId,
     required List<String> recipientIds,
   }) async {
     final response = await apiClient.put(
@@ -79,7 +74,6 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
         'title': title,
         'description': description,
         'date': date,
-        'location': location,
         'spaceId': spaceId,
         'recipientIds': recipientIds,
       },

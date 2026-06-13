@@ -60,8 +60,7 @@ class EventRepositoryImpl implements EventRepository {
     required String title,
     required String description,
     required String date,
-    required String location,
-    String? spaceId,
+    required String spaceId,
     required String createdBy,
     required List<String> recipientIds,
   }) async {
@@ -70,7 +69,6 @@ class EventRepositoryImpl implements EventRepository {
         title: title,
         description: description,
         date: date,
-        location: location,
         spaceId: spaceId,
         createdBy: createdBy,
         recipientIds: recipientIds,
@@ -90,8 +88,7 @@ class EventRepositoryImpl implements EventRepository {
     required String title,
     required String description,
     required String date,
-    required String location,
-    String? spaceId,
+    required String spaceId,
     required List<String> recipientIds,
   }) async {
     try {
@@ -100,7 +97,6 @@ class EventRepositoryImpl implements EventRepository {
         title: title,
         description: description,
         date: date,
-        location: location,
         spaceId: spaceId,
         recipientIds: recipientIds,
       );
