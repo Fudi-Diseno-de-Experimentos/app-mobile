@@ -165,7 +165,7 @@ class _SpacesPageState extends State<SpacesPage> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Tap "Add room" to create your first space.',
+              'Tap + to create your first space.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: colorScheme.onSurface.withValues(alpha: 0.6),
@@ -209,18 +209,32 @@ class _SpacesPageState extends State<SpacesPage> {
                 ),
               )
             : null,
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: Icon(Icons.edit_outlined, color: colorScheme.primary),
-              tooltip: 'Edit',
-              onPressed: () => _openEditSheet(space),
+        trailing: PopupMenuButton<String>(
+          icon: Icon(Icons.more_vert, color: colorScheme.onSurface),
+          onSelected: (value) {
+            if (value == 'edit') _openEditSheet(space);
+            if (value == 'delete') _confirmDelete(space);
+          },
+          itemBuilder: (_) => [
+            PopupMenuItem(
+              value: 'edit',
+              child: Row(
+                children: [
+                  Icon(Icons.edit_outlined, color: colorScheme.primary, size: 20),
+                  const SizedBox(width: 12),
+                  const Text('Edit'),
+                ],
+              ),
             ),
-            IconButton(
-              icon: Icon(Icons.delete_outline, color: colorScheme.error),
-              tooltip: 'Delete',
-              onPressed: () => _confirmDelete(space),
+            PopupMenuItem(
+              value: 'delete',
+              child: Row(
+                children: [
+                  Icon(Icons.delete_outline, color: colorScheme.error, size: 20),
+                  const SizedBox(width: 12),
+                  Text('Delete', style: TextStyle(color: colorScheme.error)),
+                ],
+              ),
             ),
           ],
         ),
