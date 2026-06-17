@@ -16,7 +16,9 @@ import 'package:app_mobile/features/company/domain/usecases/create_company_useca
 import 'package:app_mobile/features/company/domain/usecases/get_company_by_user_id_usecase.dart';
 import 'package:app_mobile/features/company/domain/usecases/update_company_usecase.dart';
 import 'package:app_mobile/features/events/data/datasources/event_remote_datasource.dart';
+import 'package:app_mobile/features/events/domain/usecases/accept_invitation_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/decline_invitation_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart';
@@ -50,6 +52,8 @@ import 'package:shared_preferences/shared_preferences.dart';
   CreateEventUseCase,
   UpdateEventUseCase,
   DeleteEventUseCase,
+  AcceptInvitationUseCase,
+  DeclineInvitationUseCase,
   // IAM use cases
   SignInUseCase,
   SignUpUseCase,
