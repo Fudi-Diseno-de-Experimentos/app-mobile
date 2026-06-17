@@ -1,15 +1,26 @@
 import 'package:app_mobile/core/utils/date_format.dart';
 import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_bloc.dart';
+import 'package:app_mobile/features/events/presentation/bloc/event_event.dart';
 import 'package:app_mobile/features/events/presentation/widgets/avatar_group.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EventCard extends StatelessWidget {
   final EventEntity item;
 
-  const EventCard({super.key, required this.item});
+  /// The signed-in user's *user* id, used to find this user's own invitation
+  /// status within the event's recipients.
+  final String? currentUserId;
+
+  const EventCard({super.key, required this.item, this.currentUserId});
 
   @override
   Widget build(BuildContext context) {
+    // Only an invitee still awaiting a response sees the inline controls. The
+    // creator and anyone who already responded have a null/non-pending status.
+    final isPending = item.statusFor(currentUserId) == RecipientStatus.pending;
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -45,7 +56,7 @@ class EventCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Button Label and Description
           Container(
             margin: const EdgeInsets.only(bottom: 45, left: 18, right: 30),
@@ -74,7 +85,7 @@ class EventCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Footer: Time
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 25),
@@ -93,8 +104,64 @@ class EventCard extends StatelessWidget {
               ],
             ),
           ),
+
+          // Inline invitation actions (only while awaiting a response).
+          if (isPending) ...[
+            const SizedBox(height: 14),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 25),
+              child: _InvitationActions(eventId: item.id),
+            ),
+          ],
         ],
       ),
+    );
+  }
+}
+
+class _InvitationActions extends StatelessWidget {
+  final String eventId;
+
+  const _InvitationActions({required this.eventId});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: () =>
+                context.read<EventBloc>().add(DeclineInvitation(eventId)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: colorScheme.error,
+              side: BorderSide(color: colorScheme.error.withValues(alpha: 0.5)),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+            child: const Text('Decline'),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () =>
+                context.read<EventBloc>().add(AcceptInvitation(eventId)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+            child: const Text('Accept'),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class EventEvent extends Equatable {
@@ -11,10 +12,55 @@ class FetchEvents extends EventEvent {
   /// Skip caches and hit the API (pull-to-refresh).
   final bool forceRefresh;
 
-  const FetchEvents({this.forceRefresh = false});
+  /// Recipient-scoping params. When set the list is filtered to this user's
+  /// invitations and the server hides events they've declined. Left null for
+  /// admins/managers, who see every company event (declined ones included).
+  final String? userId;
+  final String? filterType;
+
+  const FetchEvents({
+    this.forceRefresh = false,
+    this.userId,
+    this.filterType,
+  });
+
+  /// Builds the role-aware fetch: admins/managers (and an unknown profile) get
+  /// the unfiltered company list; regular members get only events they're a
+  /// recipient of, with declined ones hidden server-side.
+  factory FetchEvents.forProfile(
+    ProfileEntity? profile, {
+    bool forceRefresh = false,
+  }) {
+    if (profile == null || profile.isManagerOrAdmin) {
+      return FetchEvents(forceRefresh: forceRefresh);
+    }
+    return FetchEvents(
+      forceRefresh: forceRefresh,
+      userId: profile.userId,
+      filterType: 'recipient',
+    );
+  }
 
   @override
-  List<Object> get props => [forceRefresh];
+  List<Object?> get props => [forceRefresh, userId, filterType];
+}
+
+class AcceptInvitation extends EventEvent {
+  final String eventId;
+
+  const AcceptInvitation(this.eventId);
+
+  @override
+  List<Object> get props => [eventId];
+}
+
+class DeclineInvitation extends EventEvent {
+  final String eventId;
+
+  const DeclineInvitation(this.eventId);
+
+  @override
+  List<Object> get props => [eventId];
 }
 
 class FetchCompanyMembers extends EventEvent {
