@@ -30,7 +30,7 @@ void main() {
       await $.pumpAndSettle();
 
       // Navigate to the announcements feed (Announcements is selected by default)
-      await $('Files').tap();
+      await $('Feed').tap();
       await $.pumpAndSettle();
 
       // Tap the FAB to create an announcement
@@ -41,8 +41,19 @@ void main() {
       expect($('Create Announcement'), findsOneWidget);
       expect($('New Announcement'), findsOneWidget);
 
-      // Act - Fill the form (title and description)
+      // Act - Fill the title
       await $(TextFormField).at(0).enterText('New Sample Announcement');
+
+      // Act - Change the priority from NORMAL to URGENT
+      await $(DropdownButtonFormField<String>).tap();
+      await $.pumpAndSettle();
+      await $('URGENT').tap();
+      await $.pumpAndSettle();
+
+      // Assert - The selected priority is reflected in the field
+      expect($(DropdownButtonFormField<String>).$('URGENT'), findsOneWidget);
+
+      // Act - Fill the description
       await $(TextFormField).at(1).scrollTo().enterText('Announcement description for patrol tests.');
 
       // Tap Publish Announcement

@@ -98,7 +98,11 @@ class FakeGetEventsUseCase implements GetEventsUseCase {
   EventRepository get repository => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, List<EventEntity>>> call({bool forceRefresh = false}) async {
+  Future<Either<Failure, List<EventEntity>>> call({
+    bool forceRefresh = false,
+    String? userId,
+    String? filterType,
+  }) async {
     return const Right([]);
   }
 }
@@ -124,7 +128,7 @@ class FakeCreateEventUseCase implements CreateEventUseCase {
         date: date,
         spaceId: spaceId,
         createdBy: createdBy,
-        recipientIds: recipientIds,
+        recipients: recipientIds.map((id) => EventRecipient(userId: id)).toList(),
         createdAt: DateTime.now().toIso8601String(),
         updatedAt: DateTime.now().toIso8601String(),
       ),
