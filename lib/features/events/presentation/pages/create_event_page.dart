@@ -660,7 +660,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
             return Column(
               children: _members.map((member) {
-                final isSelected = _selectedRecipientIds.contains(member.id);
+                // Recipients are keyed by *user* id — accept/decline and the
+                // recipient filter key on userId, not the profile id.
+                final isSelected =
+                    _selectedRecipientIds.contains(member.userId);
                 final initials =
                     '${member.name.isNotEmpty ? member.name[0] : ''}${member.lastname.isNotEmpty ? member.lastname[0] : ''}'
                         .toUpperCase();
@@ -683,9 +686,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
                     onChanged: (checked) {
                       setState(() {
                         if (checked == true) {
-                          _selectedRecipientIds.add(member.id);
+                          _selectedRecipientIds.add(member.userId);
                         } else {
-                          _selectedRecipientIds.remove(member.id);
+                          _selectedRecipientIds.remove(member.userId);
                         }
                       });
                     },

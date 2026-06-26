@@ -1,4 +1,5 @@
 import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/core/auth/token_store.dart';
 import 'package:app_mobile/core/error/failures.dart';
 import 'package:app_mobile/features/analytics/domain/entities/analytics_update_entity.dart';
 import 'package:app_mobile/features/analytics/domain/entities/content_stats_entity.dart';
@@ -35,9 +36,12 @@ import 'package:app_mobile/features/chat/domain/entities/group_entity.dart';
 import 'package:app_mobile/features/chat/domain/repositories/chat_repository.dart';
 import 'package:app_mobile/features/chat/domain/usecases/get_my_groups_usecase.dart';
 import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
+import 'package:app_mobile/features/company/domain/entities/space_entity.dart';
 import 'package:app_mobile/features/company/domain/repositories/company_repository.dart';
+import 'package:app_mobile/features/company/domain/repositories/space_repository.dart';
 import 'package:app_mobile/features/company/domain/usecases/create_company_usecase.dart';
 import 'package:app_mobile/features/company/domain/usecases/get_company_by_user_id_usecase.dart';
+import 'package:app_mobile/features/company/domain/usecases/get_spaces_usecase.dart';
 import 'package:app_mobile/features/company/domain/usecases/update_company_usecase.dart';
 import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
 import 'package:app_mobile/features/events/domain/repositories/event_repository.dart';
@@ -89,7 +93,7 @@ const _tEvent = EventEntity(
   date: '2024-06-15T10:00:00Z',
   spaceId: 'room-1',
   createdBy: 'user-1',
-  recipientIds: [],
+  recipients: [],
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
 );
@@ -102,6 +106,10 @@ class FakeSignInUseCase implements SignInUseCase {
 
   @override
   Future<Either<Failure, UserEntity>> call(String username, String password) async {
+    // The real IamRepositoryImpl persists the token on sign-in; the router's
+    // redirect guard reads TokenStore.isSignedIn to gate every authed route.
+    // Replicate that here or every post-login route bounces back to /sign-in.
+    await sl<TokenStore>().save('fake-token');
     return const Right(UserEntity(
       id: 'user-1',
       username: 'testadmin',
@@ -134,6 +142,9 @@ class FakeSignOutUseCase implements SignOutUseCase {
 
   @override
   Future<Either<Failure, void>> call() async {
+    // Mirror IamRepositoryImpl.signOut: clear the token so the router guard
+    // redirects back to /sign-in.
+    await sl<TokenStore>().clear();
     return const Right(null);
   }
 }
@@ -326,7 +337,11 @@ class FakeGetEventsUseCase implements GetEventsUseCase {
   EventRepository get repository => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, List<EventEntity>>> call({bool forceRefresh = false}) async {
+  Future<Either<Failure, List<EventEntity>>> call({
+    bool forceRefresh = false,
+    String? userId,
+    String? filterType,
+  }) async {
     return const Right([_tEvent]);
   }
 }
@@ -351,7 +366,7 @@ class FakeCreateEventUseCase implements CreateEventUseCase {
       date: date,
       spaceId: spaceId,
       createdBy: createdBy,
-      recipientIds: recipientIds,
+      recipients: recipientIds.map((id) => EventRecipient(userId: id)).toList(),
       createdAt: DateTime.now().toIso8601String(),
       updatedAt: DateTime.now().toIso8601String(),
     ));
@@ -378,7 +393,7 @@ class FakeUpdateEventUseCase implements UpdateEventUseCase {
       date: date,
       spaceId: spaceId,
       createdBy: 'manager-1',
-      recipientIds: recipientIds,
+      recipients: recipientIds.map((id) => EventRecipient(userId: id)).toList(),
       createdAt: '2024-01-01',
       updatedAt: DateTime.now().toIso8601String(),
     ));
@@ -470,6 +485,26 @@ class FakeUpdateCompanyUseCase implements UpdateCompanyUseCase {
       userId: 'user-1',
       joinCode: 'ABC123',
     ));
+  }
+}
+
+class FakeGetSpacesUseCase implements GetSpacesUseCase {
+  @override
+  SpaceRepository get repository => throw UnimplementedError();
+
+  @override
+  Future<Either<Failure, List<SpaceEntity>>> call({String? date}) async {
+    // One always-available room so the event-creation room picker has a
+    // selectable option, and edit mode keeps booking 'room-1' (the _tEvent
+    // space) instead of falling back to the network.
+    return const Right([
+      SpaceEntity(
+        id: 'room-1',
+        name: 'Main Hall',
+        companyId: 'company-1',
+        available: true,
+      ),
+    ]);
   }
 }
 
@@ -661,6 +696,7 @@ void setupAllMockDependencies() {
   sl.registerLazySingleton<CreateCompanyUseCase>(() => FakeCreateCompanyUseCase());
   sl.registerLazySingleton<UpdateCompanyUseCase>(() => FakeUpdateCompanyUseCase());
   sl.registerLazySingleton<GetCompanyByUserIdUseCase>(() => FakeGetCompanyByUserIdUseCase());
+  sl.registerLazySingleton<GetSpacesUseCase>(() => FakeGetSpacesUseCase());
 
   // Analytics
   sl.registerLazySingleton<RegisterAnnouncementViewUseCase>(() => FakeRegisterAnnouncementViewUseCase());

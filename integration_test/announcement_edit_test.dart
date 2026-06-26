@@ -30,7 +30,7 @@ void main() {
       await $.pumpAndSettle();
 
       // Navigate to the announcements feed (Announcements is selected by default)
-      await $('Files').tap();
+      await $('Feed').tap();
       await $.pumpAndSettle();
 
       // Assert - Verify the mock announcements are shown
@@ -51,6 +51,31 @@ void main() {
       // Assert - Verify the edit screen is shown
       // 'Edit Announcement' appears in the AppBar and as the page header
       expect($('Edit Announcement'), findsWidgets);
+
+      // Assert - The form is pre-filled with the existing announcement
+      expect($('Sample Announcement'), findsOneWidget);
+
+      // Act - Modify the title
+      await $(TextFormField).at(0).enterText('Edited Announcement Title');
+
+      // Act - Change the priority to URGENT
+      await $(DropdownButtonFormField<String>).tap();
+      await $.pumpAndSettle();
+      await $('URGENT').tap();
+      await $.pumpAndSettle();
+
+      // Act - Modify the description
+      await $(TextFormField)
+          .at(1)
+          .scrollTo()
+          .enterText('Edited announcement description for patrol tests.');
+
+      // Act - Save the changes
+      await $('Save Changes').scrollTo().tap();
+      await $.pumpAndSettle();
+
+      // Assert - Verify the success snackbar
+      expect($('Announcement updated successfully!'), findsOneWidget);
     },
   );
 }

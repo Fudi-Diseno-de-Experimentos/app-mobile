@@ -2,7 +2,9 @@ import 'package:app_mobile/app/di.dart';
 import 'package:app_mobile/features/events/data/datasources/event_remote_datasource.dart';
 import 'package:app_mobile/features/events/data/repositories/event_repository_impl.dart';
 import 'package:app_mobile/features/events/domain/repositories/event_repository.dart';
+import 'package:app_mobile/features/events/domain/usecases/accept_invitation_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/decline_invitation_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart';
@@ -27,6 +29,8 @@ void initEventDependencies() {
   sl.registerLazySingleton(() => CreateEventUseCase(sl()));
   sl.registerLazySingleton(() => UpdateEventUseCase(sl()));
   sl.registerLazySingleton(() => DeleteEventUseCase(sl()));
+  sl.registerLazySingleton(() => AcceptInvitationUseCase(sl()));
+  sl.registerLazySingleton(() => DeclineInvitationUseCase(sl()));
 
   // BLoC
   sl.registerFactory(
@@ -35,6 +39,8 @@ void initEventDependencies() {
       createEventUseCase: sl(),
       updateEventUseCase: sl(),
       deleteEventUseCase: sl(),
+      acceptInvitationUseCase: sl(),
+      declineInvitationUseCase: sl(),
       getCompanyMembersUseCase: sl(),
     ),
   );

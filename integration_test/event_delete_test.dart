@@ -30,7 +30,7 @@ void main() {
       await $.pumpAndSettle();
 
       // Navigate to the Feed and switch to the Events tab
-      await $('Files').tap();
+      await $('Feed').tap();
       await $.pumpAndSettle();
 
       await $('Events').tap();

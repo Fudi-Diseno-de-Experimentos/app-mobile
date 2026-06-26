@@ -17,6 +17,8 @@ void main() {
   late MockCreateEventUseCase mockCreateEvent;
   late MockUpdateEventUseCase mockUpdateEvent;
   late MockDeleteEventUseCase mockDeleteEvent;
+  late MockAcceptInvitationUseCase mockAcceptInvitation;
+  late MockDeclineInvitationUseCase mockDeclineInvitation;
   late MockGetCompanyMembersUseCase mockGetCompanyMembers;
   late EventBloc bloc;
 
@@ -27,7 +29,10 @@ void main() {
     date: '2024-03-15T10:00:00Z',
     spaceId: 'room-1',
     createdBy: 'manager-1',
-    recipientIds: ['emp-1', 'emp-2'],
+    recipients: [
+      EventRecipient(userId: 'emp-1'),
+      EventRecipient(userId: 'emp-2'),
+    ],
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
   );
@@ -49,12 +54,16 @@ void main() {
     mockCreateEvent = MockCreateEventUseCase();
     mockUpdateEvent = MockUpdateEventUseCase();
     mockDeleteEvent = MockDeleteEventUseCase();
+    mockAcceptInvitation = MockAcceptInvitationUseCase();
+    mockDeclineInvitation = MockDeclineInvitationUseCase();
     mockGetCompanyMembers = MockGetCompanyMembersUseCase();
     bloc = EventBloc(
       getEventsUseCase: mockGetEvents,
       createEventUseCase: mockCreateEvent,
       updateEventUseCase: mockUpdateEvent,
       deleteEventUseCase: mockDeleteEvent,
+      acceptInvitationUseCase: mockAcceptInvitation,
+      declineInvitationUseCase: mockDeclineInvitation,
       getCompanyMembersUseCase: mockGetCompanyMembers,
     );
   });
@@ -176,7 +185,10 @@ void main() {
           date: '2024-04-15T10:00:00Z',
           spaceId: 'room-2',
           createdBy: 'manager-1',
-          recipientIds: ['emp-1', 'emp-2'],
+          recipients: [
+            EventRecipient(userId: 'emp-1'),
+            EventRecipient(userId: 'emp-2'),
+          ],
           createdAt: '2024-01-01',
           updatedAt: '2024-02-01',
         );
@@ -258,6 +270,115 @@ void main() {
       expect: () => [
         EventLoading(),
         const EventError('Permiso denegado'),
+      ],
+    );
+  });
+
+  group('Event invitation responses (accept / decline)', () {
+    const tAcceptedEvent = EventEntity(
+      id: 'evt-1',
+      title: 'Quarterly Meeting',
+      description: 'Goals review',
+      date: '2024-03-15T10:00:00Z',
+      spaceId: 'room-1',
+      createdBy: 'manager-1',
+      recipients: [
+        EventRecipient(userId: 'emp-1'),
+        EventRecipient(userId: 'emp-2'),
+      ],
+      myStatus: RecipientStatus.accepted,
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+    );
+
+    const tDeclinedEvent = EventEntity(
+      id: 'evt-1',
+      title: 'Quarterly Meeting',
+      description: 'Goals review',
+      date: '2024-03-15T10:00:00Z',
+      spaceId: 'room-1',
+      createdBy: 'manager-1',
+      recipients: [
+        EventRecipient(userId: 'emp-1'),
+        EventRecipient(userId: 'emp-2'),
+      ],
+      myStatus: RecipientStatus.declined,
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+    );
+
+    blocTest<EventBloc, EventState>(
+      'accept marks the event accepted in place and keeps it in the list',
+      build: () {
+        when(mockGetEvents(
+          forceRefresh: anyNamed('forceRefresh'),
+          userId: anyNamed('userId'),
+          filterType: anyNamed('filterType'),
+        )).thenAnswer((_) async => const Right([tEvent]));
+        when(mockAcceptInvitation('evt-1'))
+            .thenAnswer((_) async => const Right(tAcceptedEvent));
+        return bloc;
+      },
+      act: (bloc) async {
+        bloc.add(FetchEvents());
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        bloc.add(const AcceptInvitation('evt-1'));
+      },
+      expect: () => [
+        EventLoading(),
+        const EventLoaded([tEvent]),
+        const InvitationResponseSuccess(tAcceptedEvent),
+        EventLoaded([tEvent.copyWith(myStatus: RecipientStatus.accepted)]),
+      ],
+    );
+
+    blocTest<EventBloc, EventState>(
+      'decline removes the event from a recipient-scoped list',
+      build: () {
+        when(mockGetEvents(
+          forceRefresh: anyNamed('forceRefresh'),
+          userId: anyNamed('userId'),
+          filterType: anyNamed('filterType'),
+        )).thenAnswer((_) async => const Right([tEvent]));
+        when(mockDeclineInvitation('evt-1'))
+            .thenAnswer((_) async => const Right(tDeclinedEvent));
+        return bloc;
+      },
+      act: (bloc) async {
+        bloc.add(const FetchEvents(userId: 'emp-1', filterType: 'recipient'));
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        bloc.add(const DeclineInvitation('evt-1'));
+      },
+      expect: () => [
+        EventLoading(),
+        const EventLoaded([tEvent]),
+        const InvitationResponseSuccess(tDeclinedEvent),
+        const EventLoaded([]),
+      ],
+    );
+
+    blocTest<EventBloc, EventState>(
+      'accept failure surfaces a failure then restores the list',
+      build: () {
+        when(mockGetEvents(
+          forceRefresh: anyNamed('forceRefresh'),
+          userId: anyNamed('userId'),
+          filterType: anyNamed('filterType'),
+        )).thenAnswer((_) async => const Right([tEvent]));
+        when(mockAcceptInvitation('evt-1'))
+            .thenAnswer((_) async => const Left(ServerFailure('Not a recipient')));
+        return bloc;
+      },
+      act: (bloc) async {
+        bloc.add(FetchEvents());
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        bloc.add(const AcceptInvitation('evt-1'));
+      },
+      expect: () => [
+        EventLoading(),
+        const EventLoaded([tEvent]),
+        const InvitationResponseFailure('Not a recipient'),
+        const EventLoaded([tEvent]),
       ],
     );
   });

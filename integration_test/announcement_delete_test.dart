@@ -30,7 +30,7 @@ void main() {
       await $.pumpAndSettle();
 
       // Navigate to the announcements feed (Announcements is selected by default)
-      await $('Files').tap();
+      await $('Feed').tap();
       await $.pumpAndSettle();
 
       // Assert - Verify the announcement exists

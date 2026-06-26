@@ -30,7 +30,10 @@ class HomePage extends StatelessWidget {
           create: (_) => sl<AnnouncementBloc>()..add(FetchAnnouncements()),
         ),
         BlocProvider(
-          create: (_) => sl<EventBloc>()..add(FetchEvents()),
+          create: (_) => sl<EventBloc>()
+            ..add(FetchEvents.forProfile(
+              context.read<ProfileBloc>().state.profileOrNull,
+            )),
         ),
       ],
       child: const _HomeContent(),

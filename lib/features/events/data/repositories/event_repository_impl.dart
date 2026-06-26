@@ -33,8 +33,11 @@ class EventRepositoryImpl implements EventRepository {
   Future<void> clearCache() => _cache.clear();
 
   @override
-  Future<Either<Failure, List<EventEntity>>> getEvents(
-      {bool forceRefresh = false}) async {
+  Future<Either<Failure, List<EventEntity>>> getEvents({
+    bool forceRefresh = false,
+    String? userId,
+    String? filterType,
+  }) async {
     if (forceRefresh) {
       await clearCache();
     } else {
@@ -45,9 +48,38 @@ class EventRepositoryImpl implements EventRepository {
     }
 
     try {
-      final remoteEvents = await remoteDataSource.getEvents();
+      final remoteEvents = await remoteDataSource.getEvents(
+        userId: userId,
+        filterType: filterType,
+      );
       await _cache.set(remoteEvents);
       return Right(remoteEvents);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, EventEntity>> acceptInvitation(String id) async {
+    try {
+      final event = await remoteDataSource.acceptInvitation(id);
+      await clearCache();
+      return Right(event);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, EventEntity>> declineInvitation(String id) async {
+    try {
+      final event = await remoteDataSource.declineInvitation(id);
+      await clearCache();
+      return Right(event);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {

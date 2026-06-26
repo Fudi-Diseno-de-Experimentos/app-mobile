@@ -24,7 +24,10 @@ class CompanyFeedPage extends StatelessWidget {
           create: (_) => sl<AnnouncementBloc>()..add(FetchAnnouncements()),
         ),
         BlocProvider(
-          create: (_) => sl<EventBloc>()..add(FetchEvents()),
+          create: (_) => sl<EventBloc>()
+            ..add(FetchEvents.forProfile(
+              context.read<ProfileBloc>().state.profileOrNull,
+            )),
         ),
       ],
       child: const _CompanyFeedPageContent(),
@@ -194,7 +197,9 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
               onPressed: () async {
                 await context.push('/files/create-event');
                 if (context.mounted) {
-                  context.read<EventBloc>().add(FetchEvents());
+                  context.read<EventBloc>().add(FetchEvents.forProfile(
+                        context.read<ProfileBloc>().state.profileOrNull,
+                      ));
                 }
               },
               backgroundColor: Theme.of(context).colorScheme.onSurface,

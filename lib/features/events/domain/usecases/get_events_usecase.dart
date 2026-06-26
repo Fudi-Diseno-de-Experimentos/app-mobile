@@ -8,7 +8,15 @@ class GetEventsUseCase {
 
   GetEventsUseCase(this.repository);
 
-  Future<Either<Failure, List<EventEntity>>> call({bool forceRefresh = false}) {
-    return repository.getEvents(forceRefresh: forceRefresh);
+  Future<Either<Failure, List<EventEntity>>> call({
+    bool forceRefresh = false,
+    String? userId,
+    String? filterType,
+  }) {
+    return repository.getEvents(
+      forceRefresh: forceRefresh,
+      userId: userId,
+      filterType: filterType,
+    );
   }
 }
