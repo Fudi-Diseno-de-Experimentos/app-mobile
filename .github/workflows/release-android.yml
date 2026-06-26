@@ -1,0 +1,105 @@
+name: Release Android APK
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  extract-version:
+    name: Extract version from pubspec.yaml
+    runs-on: ubuntu-latest
+    outputs:
+      version_name: ${{ steps.version.outputs.version_name }}
+      version_code: ${{ steps.version.outputs.version_code }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION_LINE=$(grep '^version: ' pubspec.yaml)
+
+          if ! echo "$VERSION_LINE" | grep -qE '^version: [0-9]+\.[0-9]+\.[0-9]+\+[0-9]+$'; then
+            echo "Error: version in pubspec.yaml must follow the format X.Y.Z+N (e.g. 1.0.0+1)"
+            echo "Found: $VERSION_LINE"
+            exit 1
+          fi
+
+          VERSION_NAME=$(echo "$VERSION_LINE" | sed -E 's/^version: ([0-9]+\.[0-9]+\.[0-9]+)\+[0-9]+$/\1/')
+          VERSION_CODE=$(echo "$VERSION_LINE" | sed -E 's/^version: [0-9]+\.[0-9]+\.[0-9]+\+([0-9]+)$/\1/')
+
+          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+
+          echo "Extracted version name: $VERSION_NAME"
+          echo "Extracted version code: $VERSION_CODE"
+
+  build-and-release:
+    name: Build APK and create GitHub Release
+    needs: extract-version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+
+      - name: Create .env from GitHub Secrets
+        run: |
+          cat > .env <<EOF
+          #Cloundinary
+          API_SECRET=${{ secrets.API_SECRET }}
+          API_KEY=${{ secrets.API_KEY }}
+          CLOUD_NAME=${{ secrets.CLOUD_NAME }}
+
+          #Url del backend
+          URL_SERVICE=${{ secrets.URL_SERVICE }}
+          EOF
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build release APK
+        run: |
+          flutter build apk --release \
+            --build-name="${{ needs.extract-version.outputs.version_name }}" \
+            --build-number="${{ needs.extract-version.outputs.version_code }}"
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            NOTES=$(git log --pretty=format:"- %s" --no-merges)
+          else
+            NOTES=$(git log "$LAST_TAG"..HEAD --pretty=format:"- %s" --no-merges)
+          fi
+
+          if [ -z "$NOTES" ]; then
+            NOTES="Release v${{ needs.extract-version.outputs.version_name }}"
+          fi
+
+          {
+            echo "notes<<EOF"
+            echo "$NOTES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.extract-version.outputs.version_name }}
+          name: Release v${{ needs.extract-version.outputs.version_name }}
+          body: ${{ steps.release_notes.outputs.notes }}
+          files: build/app/outputs/flutter-apk/app-release.apk
+          fail_on_unmatched_files: true
