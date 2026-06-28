@@ -1,4 +1,6 @@
+import 'package:app_mobile/app/di.dart';
 import 'package:app_mobile/core/error/failures.dart';
+import 'package:app_mobile/core/network/notification_service.dart';
 import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
 import 'package:app_mobile/features/iam/presentation/bloc/iam_bloc.dart';
 import 'package:app_mobile/features/iam/presentation/bloc/iam_event.dart';
@@ -16,6 +18,7 @@ void main() {
   late MockSignUpUseCase mockSignUp;
   late MockSignOutUseCase mockSignOut;
   late MockJoinCompanyUseCase mockJoinCompany;
+  late MockNotificationService mockNotificationService;
   late IamBloc bloc;
 
   const tUser = UserEntity(
@@ -32,6 +35,18 @@ void main() {
     mockSignUp = MockSignUpUseCase();
     mockSignOut = MockSignOutUseCase();
     mockJoinCompany = MockJoinCompanyUseCase();
+    mockNotificationService = MockNotificationService();
+
+    // Register NotificationService mock in GetIt (sl)
+    if (sl.isRegistered<NotificationService>()) {
+      sl.unregister<NotificationService>();
+    }
+    sl.registerSingleton<NotificationService>(mockNotificationService);
+
+    // Mock NotificationService methods to avoid unhandled exceptions
+    when(mockNotificationService.initialize()).thenAnswer((_) async {});
+    when(mockNotificationService.unregisterToken(any)).thenAnswer((_) async {});
+
     bloc = IamBloc(
       signInUseCase: mockSignIn,
       signUpUseCase: mockSignUp,
@@ -40,7 +55,12 @@ void main() {
     );
   });
 
-  tearDown(() => bloc.close());
+  tearDown(() async {
+    await bloc.close();
+    if (sl.isRegistered<NotificationService>()) {
+      await sl.unregister<NotificationService>();
+    }
+  });
 
   group('US38 - Secure JWT authentication', () {
     blocTest<IamBloc, IamState>(

@@ -24,7 +24,7 @@ void main() {
   setUp(() {
     mockDataSource = MockIamRemoteDataSource();
     mockTokenStore = MockTokenStore();
-    when(mockTokenStore.save(any)).thenAnswer((_) async {});
+    when(mockTokenStore.save(any, userId: anyNamed('userId'))).thenAnswer((_) async {});
     when(mockTokenStore.clear()).thenAnswer((_) async {});
     repository = IamRepositoryImpl(
       remoteDataSource: mockDataSource,
@@ -52,7 +52,7 @@ void main() {
           expect(user.companyId, 'comp-1');
         },
       );
-      verify(mockTokenStore.save('jwt-token-valid')).called(1);
+      verify(mockTokenStore.save('jwt-token-valid', userId: 'user-1')).called(1);
     });
 
     test('should return ServerFailure with invalid credentials', () async {

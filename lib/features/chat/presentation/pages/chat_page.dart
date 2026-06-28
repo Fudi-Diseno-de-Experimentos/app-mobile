@@ -101,7 +101,15 @@ class _ChatPageState extends State<ChatPage> {
 
         if (profileState is! ProfileLoaded) {
           return Scaffold(
-            appBar: const MainAppBar(title: 'Messages'),
+            appBar: MainAppBar(
+              title: 'Messages',
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () => context.push('/notifications'),
+                ),
+              ],
+            ),
             body: profileState is ProfileError
                 ? Center(
                     child: Text(
@@ -125,7 +133,15 @@ class _ChatPageState extends State<ChatPage> {
         }
 
         return Scaffold(
-          appBar: const MainAppBar(title: 'Messages'),
+          appBar: MainAppBar(
+            title: 'Messages',
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.notifications_outlined),
+                onPressed: () => context.push('/notifications'),
+              ),
+            ],
+          ),
           floatingActionButton: FloatingActionButton(
             onPressed: () => _showComposerSheet(userId, companyId),
             backgroundColor: Theme.of(context).colorScheme.onSurface,
