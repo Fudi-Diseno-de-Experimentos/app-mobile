@@ -3,113 +3,122 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i15;
+import 'dart:async' as _i16;
 
-import 'package:app_mobile/core/auth/token_store.dart' as _i57;
-import 'package:app_mobile/core/error/failures.dart' as _i17;
+import 'package:app_mobile/core/auth/token_store.dart' as _i61;
+import 'package:app_mobile/core/error/failures.dart' as _i18;
+import 'package:app_mobile/core/network/notification_service.dart' as _i62;
 import 'package:app_mobile/features/announcements/data/datasources/announcement_remote_datasource.dart'
-    as _i50;
+    as _i54;
 import 'package:app_mobile/features/announcements/data/datasources/comment_remote_datasource.dart'
-    as _i51;
+    as _i55;
 import 'package:app_mobile/features/announcements/data/models/announcement_model.dart'
-    as _i8;
-import 'package:app_mobile/features/announcements/data/models/comment_model.dart'
     as _i9;
+import 'package:app_mobile/features/announcements/data/models/comment_model.dart'
+    as _i10;
 import 'package:app_mobile/features/announcements/domain/entities/announcement_entity.dart'
-    as _i18;
+    as _i19;
 import 'package:app_mobile/features/announcements/domain/entities/comment_entity.dart'
-    as _i27;
+    as _i28;
 import 'package:app_mobile/features/announcements/domain/repositories/announcement_repository.dart'
     as _i2;
 import 'package:app_mobile/features/announcements/domain/repositories/comment_repository.dart'
     as _i3;
 import 'package:app_mobile/features/announcements/domain/usecases/create_announcement_usecase.dart'
-    as _i23;
-import 'package:app_mobile/features/announcements/domain/usecases/create_comment_usecase.dart'
-    as _i28;
-import 'package:app_mobile/features/announcements/domain/usecases/delete_announcement_usecase.dart'
-    as _i25;
-import 'package:app_mobile/features/announcements/domain/usecases/delete_comment_usecase.dart'
-    as _i29;
-import 'package:app_mobile/features/announcements/domain/usecases/get_announcement_by_id_usecase.dart'
-    as _i20;
-import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_by_creator_usecase.dart'
-    as _i22;
-import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_by_priority_usecase.dart'
-    as _i21;
-import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_usecase.dart'
-    as _i14;
-import 'package:app_mobile/features/announcements/domain/usecases/get_comments_usecase.dart'
-    as _i26;
-import 'package:app_mobile/features/announcements/domain/usecases/update_announcement_usecase.dart'
     as _i24;
+import 'package:app_mobile/features/announcements/domain/usecases/create_comment_usecase.dart'
+    as _i29;
+import 'package:app_mobile/features/announcements/domain/usecases/delete_announcement_usecase.dart'
+    as _i26;
+import 'package:app_mobile/features/announcements/domain/usecases/delete_comment_usecase.dart'
+    as _i30;
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcement_by_id_usecase.dart'
+    as _i21;
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_by_creator_usecase.dart'
+    as _i23;
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_by_priority_usecase.dart'
+    as _i22;
+import 'package:app_mobile/features/announcements/domain/usecases/get_announcements_usecase.dart'
+    as _i15;
+import 'package:app_mobile/features/announcements/domain/usecases/get_comments_usecase.dart'
+    as _i27;
+import 'package:app_mobile/features/announcements/domain/usecases/update_announcement_usecase.dart'
+    as _i25;
 import 'package:app_mobile/features/company/data/datasources/company_remote_datasource.dart'
-    as _i54;
+    as _i58;
 import 'package:app_mobile/features/company/data/models/company_model.dart'
-    as _i12;
+    as _i13;
 import 'package:app_mobile/features/company/domain/entities/company_entity.dart'
-    as _i43;
+    as _i44;
 import 'package:app_mobile/features/company/domain/repositories/company_repository.dart'
     as _i6;
 import 'package:app_mobile/features/company/domain/usecases/create_company_usecase.dart'
-    as _i42;
+    as _i43;
 import 'package:app_mobile/features/company/domain/usecases/get_company_by_user_id_usecase.dart'
-    as _i45;
+    as _i46;
 import 'package:app_mobile/features/company/domain/usecases/update_company_usecase.dart'
-    as _i44;
+    as _i45;
 import 'package:app_mobile/features/events/data/datasources/event_remote_datasource.dart'
-    as _i52;
+    as _i56;
 import 'package:app_mobile/features/events/data/models/event_model.dart'
-    as _i10;
+    as _i11;
 import 'package:app_mobile/features/events/domain/entities/event_entity.dart'
-    as _i31;
+    as _i32;
 import 'package:app_mobile/features/events/domain/repositories/event_repository.dart'
     as _i4;
 import 'package:app_mobile/features/events/domain/usecases/accept_invitation_usecase.dart'
-    as _i35;
-import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart'
-    as _i32;
-import 'package:app_mobile/features/events/domain/usecases/decline_invitation_usecase.dart'
     as _i36;
-import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart'
-    as _i34;
-import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart'
-    as _i30;
-import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart'
+import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart'
     as _i33;
+import 'package:app_mobile/features/events/domain/usecases/decline_invitation_usecase.dart'
+    as _i37;
+import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart'
+    as _i35;
+import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart'
+    as _i31;
+import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart'
+    as _i34;
 import 'package:app_mobile/features/iam/data/datasources/iam_remote_datasource.dart'
-    as _i53;
-import 'package:app_mobile/features/iam/data/models/user_model.dart' as _i11;
+    as _i57;
+import 'package:app_mobile/features/iam/data/models/user_model.dart' as _i12;
 import 'package:app_mobile/features/iam/domain/entities/user_entity.dart'
-    as _i38;
+    as _i39;
 import 'package:app_mobile/features/iam/domain/repositories/iam_repository.dart'
     as _i5;
 import 'package:app_mobile/features/iam/domain/usecases/join_company_usecase.dart'
-    as _i41;
+    as _i42;
 import 'package:app_mobile/features/iam/domain/usecases/sign_in_usecase.dart'
-    as _i37;
+    as _i38;
 import 'package:app_mobile/features/iam/domain/usecases/sign_out_usecase.dart'
-    as _i40;
+    as _i41;
 import 'package:app_mobile/features/iam/domain/usecases/sign_up_usecase.dart'
-    as _i39;
+    as _i40;
+import 'package:app_mobile/features/notifications/domain/entities/notification_entity.dart'
+    as _i52;
+import 'package:app_mobile/features/notifications/domain/repositories/notification_repository.dart'
+    as _i8;
+import 'package:app_mobile/features/notifications/domain/usecases/get_notifications_usecase.dart'
+    as _i51;
+import 'package:app_mobile/features/notifications/domain/usecases/mark_notification_as_read_usecase.dart'
+    as _i53;
 import 'package:app_mobile/features/profile/data/datasources/profile_remote_datasource.dart'
-    as _i55;
+    as _i59;
 import 'package:app_mobile/features/profile/data/models/profile_model.dart'
-    as _i13;
+    as _i14;
 import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart'
-    as _i47;
+    as _i48;
 import 'package:app_mobile/features/profile/domain/repositories/profile_repository.dart'
     as _i7;
 import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart'
-    as _i49;
+    as _i50;
 import 'package:app_mobile/features/profile/domain/usecases/get_profile_usecase.dart'
-    as _i46;
+    as _i47;
 import 'package:app_mobile/features/profile/domain/usecases/update_profile_usecase.dart'
-    as _i48;
-import 'package:fpdart/fpdart.dart' as _i16;
+    as _i49;
+import 'package:fpdart/fpdart.dart' as _i17;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i19;
-import 'package:shared_preferences/src/shared_preferences_legacy.dart' as _i56;
+import 'package:mockito/src/dummies.dart' as _i20;
+import 'package:shared_preferences/shared_preferences.dart' as _i60;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -161,34 +170,40 @@ class _FakeProfileRepository_5 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
-class _FakeAnnouncementModel_6 extends _i1.SmartFake
-    implements _i8.AnnouncementModel {
-  _FakeAnnouncementModel_6(Object parent, Invocation parentInvocation)
+class _FakeNotificationRepository_6 extends _i1.SmartFake
+    implements _i8.NotificationRepository {
+  _FakeNotificationRepository_6(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeCommentModel_7 extends _i1.SmartFake implements _i9.CommentModel {
-  _FakeCommentModel_7(Object parent, Invocation parentInvocation)
+class _FakeAnnouncementModel_7 extends _i1.SmartFake
+    implements _i9.AnnouncementModel {
+  _FakeAnnouncementModel_7(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeEventModel_8 extends _i1.SmartFake implements _i10.EventModel {
-  _FakeEventModel_8(Object parent, Invocation parentInvocation)
+class _FakeCommentModel_8 extends _i1.SmartFake implements _i10.CommentModel {
+  _FakeCommentModel_8(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeUserModel_9 extends _i1.SmartFake implements _i11.UserModel {
-  _FakeUserModel_9(Object parent, Invocation parentInvocation)
+class _FakeEventModel_9 extends _i1.SmartFake implements _i11.EventModel {
+  _FakeEventModel_9(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeCompanyModel_10 extends _i1.SmartFake implements _i12.CompanyModel {
-  _FakeCompanyModel_10(Object parent, Invocation parentInvocation)
+class _FakeUserModel_10 extends _i1.SmartFake implements _i12.UserModel {
+  _FakeUserModel_10(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeProfileModel_11 extends _i1.SmartFake implements _i13.ProfileModel {
-  _FakeProfileModel_11(Object parent, Invocation parentInvocation)
+class _FakeCompanyModel_11 extends _i1.SmartFake implements _i13.CompanyModel {
+  _FakeCompanyModel_11(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeProfileModel_12 extends _i1.SmartFake implements _i14.ProfileModel {
+  _FakeProfileModel_12(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -196,7 +211,7 @@ class _FakeProfileModel_11 extends _i1.SmartFake implements _i13.ProfileModel {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGetAnnouncementsUseCase extends _i1.Mock
-    implements _i14.GetAnnouncementsUseCase {
+    implements _i15.GetAnnouncementsUseCase {
   MockGetAnnouncementsUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -213,25 +228,25 @@ class MockGetAnnouncementsUseCase extends _i1.Mock
           as _i2.AnnouncementRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>> call({
+  _i16.Future<_i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>> call({
     bool? forceRefresh = false,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>
                   >(
                     this,
                     Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
                   ),
                 ),
           )
-          as _i15.Future<
-            _i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>
+          as _i16.Future<
+            _i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>
           >);
 }
 
@@ -239,7 +254,7 @@ class MockGetAnnouncementsUseCase extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGetAnnouncementByIdUseCase extends _i1.Mock
-    implements _i20.GetAnnouncementByIdUseCase {
+    implements _i21.GetAnnouncementByIdUseCase {
   MockGetAnnouncementByIdUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -256,28 +271,28 @@ class MockGetAnnouncementByIdUseCase extends _i1.Mock
           as _i2.AnnouncementRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i18.AnnouncementEntity>> call(
+  _i16.Future<_i17.Either<_i18.Failure, _i19.AnnouncementEntity>> call(
     String? id,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [id]),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, _i18.AnnouncementEntity>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, _i19.AnnouncementEntity>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, _i18.AnnouncementEntity>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, _i19.AnnouncementEntity>
                   >(this, Invocation.method(#call, [id])),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i18.AnnouncementEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i19.AnnouncementEntity>>);
 }
 
 /// A class which mocks [GetAnnouncementsByPriorityUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGetAnnouncementsByPriorityUseCase extends _i1.Mock
-    implements _i21.GetAnnouncementsByPriorityUseCase {
+    implements _i22.GetAnnouncementsByPriorityUseCase {
   MockGetAnnouncementsByPriorityUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -294,22 +309,22 @@ class MockGetAnnouncementsByPriorityUseCase extends _i1.Mock
           as _i2.AnnouncementRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>> call(
+  _i16.Future<_i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>> call(
     String? priority,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [priority]),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>
                   >(this, Invocation.method(#call, [priority])),
                 ),
           )
-          as _i15.Future<
-            _i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>
+          as _i16.Future<
+            _i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>
           >);
 }
 
@@ -317,7 +332,7 @@ class MockGetAnnouncementsByPriorityUseCase extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGetAnnouncementsByCreatorUseCase extends _i1.Mock
-    implements _i22.GetAnnouncementsByCreatorUseCase {
+    implements _i23.GetAnnouncementsByCreatorUseCase {
   MockGetAnnouncementsByCreatorUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -334,22 +349,22 @@ class MockGetAnnouncementsByCreatorUseCase extends _i1.Mock
           as _i2.AnnouncementRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>> call(
+  _i16.Future<_i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>> call(
     String? createdBy,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [createdBy]),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>
                   >(this, Invocation.method(#call, [createdBy])),
                 ),
           )
-          as _i15.Future<
-            _i16.Either<_i17.Failure, List<_i18.AnnouncementEntity>>
+          as _i16.Future<
+            _i17.Either<_i18.Failure, List<_i19.AnnouncementEntity>>
           >);
 }
 
@@ -357,7 +372,7 @@ class MockGetAnnouncementsByCreatorUseCase extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockCreateAnnouncementUseCase extends _i1.Mock
-    implements _i23.CreateAnnouncementUseCase {
+    implements _i24.CreateAnnouncementUseCase {
   MockCreateAnnouncementUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -374,7 +389,7 @@ class MockCreateAnnouncementUseCase extends _i1.Mock
           as _i2.AnnouncementRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i18.AnnouncementEntity>> call({
+  _i16.Future<_i17.Either<_i18.Failure, _i19.AnnouncementEntity>> call({
     required String? title,
     required String? description,
     String? image,
@@ -390,11 +405,11 @@ class MockCreateAnnouncementUseCase extends _i1.Mock
               #createdBy: createdBy,
             }),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, _i18.AnnouncementEntity>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, _i19.AnnouncementEntity>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, _i18.AnnouncementEntity>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, _i19.AnnouncementEntity>
                   >(
                     this,
                     Invocation.method(#call, [], {
@@ -407,14 +422,14 @@ class MockCreateAnnouncementUseCase extends _i1.Mock
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i18.AnnouncementEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i19.AnnouncementEntity>>);
 }
 
 /// A class which mocks [UpdateAnnouncementUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUpdateAnnouncementUseCase extends _i1.Mock
-    implements _i24.UpdateAnnouncementUseCase {
+    implements _i25.UpdateAnnouncementUseCase {
   MockUpdateAnnouncementUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -431,7 +446,7 @@ class MockUpdateAnnouncementUseCase extends _i1.Mock
           as _i2.AnnouncementRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i18.AnnouncementEntity>> call({
+  _i16.Future<_i17.Either<_i18.Failure, _i19.AnnouncementEntity>> call({
     required String? id,
     required String? title,
     required String? description,
@@ -447,11 +462,11 @@ class MockUpdateAnnouncementUseCase extends _i1.Mock
               #priority: priority,
             }),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, _i18.AnnouncementEntity>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, _i19.AnnouncementEntity>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, _i18.AnnouncementEntity>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, _i19.AnnouncementEntity>
                   >(
                     this,
                     Invocation.method(#call, [], {
@@ -464,14 +479,14 @@ class MockUpdateAnnouncementUseCase extends _i1.Mock
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i18.AnnouncementEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i19.AnnouncementEntity>>);
 }
 
 /// A class which mocks [DeleteAnnouncementUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockDeleteAnnouncementUseCase extends _i1.Mock
-    implements _i25.DeleteAnnouncementUseCase {
+    implements _i26.DeleteAnnouncementUseCase {
   MockDeleteAnnouncementUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -488,25 +503,25 @@ class MockDeleteAnnouncementUseCase extends _i1.Mock
           as _i2.AnnouncementRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>> call(String? id) =>
+  _i16.Future<_i17.Either<_i18.Failure, _i17.Unit>> call(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#call, [id]),
             returnValue:
-                _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>>.value(
-                  _i19.dummyValue<_i16.Either<_i17.Failure, _i16.Unit>>(
+                _i16.Future<_i17.Either<_i18.Failure, _i17.Unit>>.value(
+                  _i20.dummyValue<_i17.Either<_i18.Failure, _i17.Unit>>(
                     this,
                     Invocation.method(#call, [id]),
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i17.Unit>>);
 }
 
 /// A class which mocks [GetCommentsUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGetCommentsUseCase extends _i1.Mock
-    implements _i26.GetCommentsUseCase {
+    implements _i27.GetCommentsUseCase {
   MockGetCommentsUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -523,7 +538,7 @@ class MockGetCommentsUseCase extends _i1.Mock
           as _i3.CommentRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, List<_i27.CommentEntity>>> call(
+  _i16.Future<_i17.Either<_i18.Failure, List<_i28.CommentEntity>>> call(
     String? announcementId, {
     bool? forceRefresh = false,
   }) =>
@@ -534,11 +549,11 @@ class MockGetCommentsUseCase extends _i1.Mock
               {#forceRefresh: forceRefresh},
             ),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, List<_i27.CommentEntity>>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, List<_i28.CommentEntity>>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, List<_i27.CommentEntity>>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, List<_i28.CommentEntity>>
                   >(
                     this,
                     Invocation.method(
@@ -549,14 +564,14 @@ class MockGetCommentsUseCase extends _i1.Mock
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, List<_i27.CommentEntity>>>);
+          as _i16.Future<_i17.Either<_i18.Failure, List<_i28.CommentEntity>>>);
 }
 
 /// A class which mocks [CreateCommentUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockCreateCommentUseCase extends _i1.Mock
-    implements _i28.CreateCommentUseCase {
+    implements _i29.CreateCommentUseCase {
   MockCreateCommentUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -573,7 +588,7 @@ class MockCreateCommentUseCase extends _i1.Mock
           as _i3.CommentRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i27.CommentEntity>> call({
+  _i16.Future<_i17.Either<_i18.Failure, _i28.CommentEntity>> call({
     required String? announcementId,
     required String? content,
     required String? authorId,
@@ -585,11 +600,11 @@ class MockCreateCommentUseCase extends _i1.Mock
               #authorId: authorId,
             }),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, _i27.CommentEntity>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, _i28.CommentEntity>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, _i27.CommentEntity>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, _i28.CommentEntity>
                   >(
                     this,
                     Invocation.method(#call, [], {
@@ -600,14 +615,14 @@ class MockCreateCommentUseCase extends _i1.Mock
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i27.CommentEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i28.CommentEntity>>);
 }
 
 /// A class which mocks [DeleteCommentUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockDeleteCommentUseCase extends _i1.Mock
-    implements _i29.DeleteCommentUseCase {
+    implements _i30.DeleteCommentUseCase {
   MockDeleteCommentUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -624,24 +639,24 @@ class MockDeleteCommentUseCase extends _i1.Mock
           as _i3.CommentRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>> call(String? commentId) =>
+  _i16.Future<_i17.Either<_i18.Failure, _i17.Unit>> call(String? commentId) =>
       (super.noSuchMethod(
             Invocation.method(#call, [commentId]),
             returnValue:
-                _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>>.value(
-                  _i19.dummyValue<_i16.Either<_i17.Failure, _i16.Unit>>(
+                _i16.Future<_i17.Either<_i18.Failure, _i17.Unit>>.value(
+                  _i20.dummyValue<_i17.Either<_i18.Failure, _i17.Unit>>(
                     this,
                     Invocation.method(#call, [commentId]),
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i17.Unit>>);
 }
 
 /// A class which mocks [GetEventsUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockGetEventsUseCase extends _i1.Mock implements _i30.GetEventsUseCase {
+class MockGetEventsUseCase extends _i1.Mock implements _i31.GetEventsUseCase {
   MockGetEventsUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -658,7 +673,7 @@ class MockGetEventsUseCase extends _i1.Mock implements _i30.GetEventsUseCase {
           as _i4.EventRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, List<_i31.EventEntity>>> call({
+  _i16.Future<_i17.Either<_i18.Failure, List<_i32.EventEntity>>> call({
     bool? forceRefresh = false,
     String? userId,
     String? filterType,
@@ -670,11 +685,11 @@ class MockGetEventsUseCase extends _i1.Mock implements _i30.GetEventsUseCase {
               #filterType: filterType,
             }),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, List<_i31.EventEntity>>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, List<_i32.EventEntity>>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, List<_i31.EventEntity>>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, List<_i32.EventEntity>>
                   >(
                     this,
                     Invocation.method(#call, [], {
@@ -685,14 +700,14 @@ class MockGetEventsUseCase extends _i1.Mock implements _i30.GetEventsUseCase {
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, List<_i31.EventEntity>>>);
+          as _i16.Future<_i17.Either<_i18.Failure, List<_i32.EventEntity>>>);
 }
 
 /// A class which mocks [CreateEventUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockCreateEventUseCase extends _i1.Mock
-    implements _i32.CreateEventUseCase {
+    implements _i33.CreateEventUseCase {
   MockCreateEventUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -709,7 +724,7 @@ class MockCreateEventUseCase extends _i1.Mock
           as _i4.EventRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>> call({
+  _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>> call({
     required String? title,
     required String? description,
     required String? date,
@@ -727,8 +742,8 @@ class MockCreateEventUseCase extends _i1.Mock
               #recipientIds: recipientIds,
             }),
             returnValue:
-                _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>>.value(
-                  _i19.dummyValue<_i16.Either<_i17.Failure, _i31.EventEntity>>(
+                _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>>.value(
+                  _i20.dummyValue<_i17.Either<_i18.Failure, _i32.EventEntity>>(
                     this,
                     Invocation.method(#call, [], {
                       #title: title,
@@ -741,14 +756,14 @@ class MockCreateEventUseCase extends _i1.Mock
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>>);
 }
 
 /// A class which mocks [UpdateEventUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUpdateEventUseCase extends _i1.Mock
-    implements _i33.UpdateEventUseCase {
+    implements _i34.UpdateEventUseCase {
   MockUpdateEventUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -765,7 +780,7 @@ class MockUpdateEventUseCase extends _i1.Mock
           as _i4.EventRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>> call({
+  _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>> call({
     required String? id,
     required String? title,
     required String? description,
@@ -783,8 +798,8 @@ class MockUpdateEventUseCase extends _i1.Mock
               #recipientIds: recipientIds,
             }),
             returnValue:
-                _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>>.value(
-                  _i19.dummyValue<_i16.Either<_i17.Failure, _i31.EventEntity>>(
+                _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>>.value(
+                  _i20.dummyValue<_i17.Either<_i18.Failure, _i32.EventEntity>>(
                     this,
                     Invocation.method(#call, [], {
                       #id: id,
@@ -797,14 +812,14 @@ class MockUpdateEventUseCase extends _i1.Mock
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>>);
 }
 
 /// A class which mocks [DeleteEventUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockDeleteEventUseCase extends _i1.Mock
-    implements _i34.DeleteEventUseCase {
+    implements _i35.DeleteEventUseCase {
   MockDeleteEventUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -821,25 +836,25 @@ class MockDeleteEventUseCase extends _i1.Mock
           as _i4.EventRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>> call(String? id) =>
+  _i16.Future<_i17.Either<_i18.Failure, _i17.Unit>> call(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#call, [id]),
             returnValue:
-                _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>>.value(
-                  _i19.dummyValue<_i16.Either<_i17.Failure, _i16.Unit>>(
+                _i16.Future<_i17.Either<_i18.Failure, _i17.Unit>>.value(
+                  _i20.dummyValue<_i17.Either<_i18.Failure, _i17.Unit>>(
                     this,
                     Invocation.method(#call, [id]),
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i16.Unit>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i17.Unit>>);
 }
 
 /// A class which mocks [AcceptInvitationUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockAcceptInvitationUseCase extends _i1.Mock
-    implements _i35.AcceptInvitationUseCase {
+    implements _i36.AcceptInvitationUseCase {
   MockAcceptInvitationUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -856,27 +871,27 @@ class MockAcceptInvitationUseCase extends _i1.Mock
           as _i4.EventRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>> call(
+  _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>> call(
     String? eventId,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [eventId]),
             returnValue:
-                _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>>.value(
-                  _i19.dummyValue<_i16.Either<_i17.Failure, _i31.EventEntity>>(
+                _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>>.value(
+                  _i20.dummyValue<_i17.Either<_i18.Failure, _i32.EventEntity>>(
                     this,
                     Invocation.method(#call, [eventId]),
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>>);
 }
 
 /// A class which mocks [DeclineInvitationUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockDeclineInvitationUseCase extends _i1.Mock
-    implements _i36.DeclineInvitationUseCase {
+    implements _i37.DeclineInvitationUseCase {
   MockDeclineInvitationUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -893,26 +908,26 @@ class MockDeclineInvitationUseCase extends _i1.Mock
           as _i4.EventRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>> call(
+  _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>> call(
     String? eventId,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [eventId]),
             returnValue:
-                _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>>.value(
-                  _i19.dummyValue<_i16.Either<_i17.Failure, _i31.EventEntity>>(
+                _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>>.value(
+                  _i20.dummyValue<_i17.Either<_i18.Failure, _i32.EventEntity>>(
                     this,
                     Invocation.method(#call, [eventId]),
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i31.EventEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i32.EventEntity>>);
 }
 
 /// A class which mocks [SignInUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSignInUseCase extends _i1.Mock implements _i37.SignInUseCase {
+class MockSignInUseCase extends _i1.Mock implements _i38.SignInUseCase {
   MockSignInUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -929,27 +944,27 @@ class MockSignInUseCase extends _i1.Mock implements _i37.SignInUseCase {
           as _i5.IamRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i38.UserEntity>> call(
+  _i16.Future<_i17.Either<_i18.Failure, _i39.UserEntity>> call(
     String? username,
     String? password,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [username, password]),
             returnValue:
-                _i15.Future<_i16.Either<_i17.Failure, _i38.UserEntity>>.value(
-                  _i19.dummyValue<_i16.Either<_i17.Failure, _i38.UserEntity>>(
+                _i16.Future<_i17.Either<_i18.Failure, _i39.UserEntity>>.value(
+                  _i20.dummyValue<_i17.Either<_i18.Failure, _i39.UserEntity>>(
                     this,
                     Invocation.method(#call, [username, password]),
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i38.UserEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i39.UserEntity>>);
 }
 
 /// A class which mocks [SignUpUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSignUpUseCase extends _i1.Mock implements _i39.SignUpUseCase {
+class MockSignUpUseCase extends _i1.Mock implements _i40.SignUpUseCase {
   MockSignUpUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -966,7 +981,7 @@ class MockSignUpUseCase extends _i1.Mock implements _i39.SignUpUseCase {
           as _i5.IamRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, void>> call({
+  _i16.Future<_i17.Either<_i18.Failure, void>> call({
     required String? username,
     required String? password,
     required String? name,
@@ -983,8 +998,8 @@ class MockSignUpUseCase extends _i1.Mock implements _i39.SignUpUseCase {
               #email: email,
               #roles: roles,
             }),
-            returnValue: _i15.Future<_i16.Either<_i17.Failure, void>>.value(
-              _i19.dummyValue<_i16.Either<_i17.Failure, void>>(
+            returnValue: _i16.Future<_i17.Either<_i18.Failure, void>>.value(
+              _i20.dummyValue<_i17.Either<_i18.Failure, void>>(
                 this,
                 Invocation.method(#call, [], {
                   #username: username,
@@ -997,13 +1012,13 @@ class MockSignUpUseCase extends _i1.Mock implements _i39.SignUpUseCase {
               ),
             ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, void>>);
+          as _i16.Future<_i17.Either<_i18.Failure, void>>);
 }
 
 /// A class which mocks [SignOutUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSignOutUseCase extends _i1.Mock implements _i40.SignOutUseCase {
+class MockSignOutUseCase extends _i1.Mock implements _i41.SignOutUseCase {
   MockSignOutUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -1020,24 +1035,24 @@ class MockSignOutUseCase extends _i1.Mock implements _i40.SignOutUseCase {
           as _i5.IamRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, void>> call() =>
+  _i16.Future<_i17.Either<_i18.Failure, void>> call() =>
       (super.noSuchMethod(
             Invocation.method(#call, []),
-            returnValue: _i15.Future<_i16.Either<_i17.Failure, void>>.value(
-              _i19.dummyValue<_i16.Either<_i17.Failure, void>>(
+            returnValue: _i16.Future<_i17.Either<_i18.Failure, void>>.value(
+              _i20.dummyValue<_i17.Either<_i18.Failure, void>>(
                 this,
                 Invocation.method(#call, []),
               ),
             ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, void>>);
+          as _i16.Future<_i17.Either<_i18.Failure, void>>);
 }
 
 /// A class which mocks [JoinCompanyUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockJoinCompanyUseCase extends _i1.Mock
-    implements _i41.JoinCompanyUseCase {
+    implements _i42.JoinCompanyUseCase {
   MockJoinCompanyUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -1054,24 +1069,24 @@ class MockJoinCompanyUseCase extends _i1.Mock
           as _i5.IamRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, void>> call(String? joinCode) =>
+  _i16.Future<_i17.Either<_i18.Failure, void>> call(String? joinCode) =>
       (super.noSuchMethod(
             Invocation.method(#call, [joinCode]),
-            returnValue: _i15.Future<_i16.Either<_i17.Failure, void>>.value(
-              _i19.dummyValue<_i16.Either<_i17.Failure, void>>(
+            returnValue: _i16.Future<_i17.Either<_i18.Failure, void>>.value(
+              _i20.dummyValue<_i17.Either<_i18.Failure, void>>(
                 this,
                 Invocation.method(#call, [joinCode]),
               ),
             ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, void>>);
+          as _i16.Future<_i17.Either<_i18.Failure, void>>);
 }
 
 /// A class which mocks [CreateCompanyUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockCreateCompanyUseCase extends _i1.Mock
-    implements _i42.CreateCompanyUseCase {
+    implements _i43.CreateCompanyUseCase {
   MockCreateCompanyUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -1088,7 +1103,7 @@ class MockCreateCompanyUseCase extends _i1.Mock
           as _i6.CompanyRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i43.CompanyEntity>> call({
+  _i16.Future<_i17.Either<_i18.Failure, _i44.CompanyEntity>> call({
     required String? ruc,
     required String? name,
     String? iconUrl,
@@ -1104,11 +1119,11 @@ class MockCreateCompanyUseCase extends _i1.Mock
               #userId: userId,
             }),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, _i43.CompanyEntity>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, _i44.CompanyEntity>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, _i43.CompanyEntity>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, _i44.CompanyEntity>
                   >(
                     this,
                     Invocation.method(#call, [], {
@@ -1121,14 +1136,14 @@ class MockCreateCompanyUseCase extends _i1.Mock
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i43.CompanyEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i44.CompanyEntity>>);
 }
 
 /// A class which mocks [UpdateCompanyUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUpdateCompanyUseCase extends _i1.Mock
-    implements _i44.UpdateCompanyUseCase {
+    implements _i45.UpdateCompanyUseCase {
   MockUpdateCompanyUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -1145,7 +1160,7 @@ class MockUpdateCompanyUseCase extends _i1.Mock
           as _i6.CompanyRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i43.CompanyEntity>> call({
+  _i16.Future<_i17.Either<_i18.Failure, _i44.CompanyEntity>> call({
     required String? id,
     required String? ruc,
     required String? name,
@@ -1161,11 +1176,11 @@ class MockUpdateCompanyUseCase extends _i1.Mock
               #isActive: isActive,
             }),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, _i43.CompanyEntity>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, _i44.CompanyEntity>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, _i43.CompanyEntity>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, _i44.CompanyEntity>
                   >(
                     this,
                     Invocation.method(#call, [], {
@@ -1178,14 +1193,14 @@ class MockUpdateCompanyUseCase extends _i1.Mock
                   ),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i43.CompanyEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i44.CompanyEntity>>);
 }
 
 /// A class which mocks [GetCompanyByUserIdUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGetCompanyByUserIdUseCase extends _i1.Mock
-    implements _i45.GetCompanyByUserIdUseCase {
+    implements _i46.GetCompanyByUserIdUseCase {
   MockGetCompanyByUserIdUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -1202,27 +1217,27 @@ class MockGetCompanyByUserIdUseCase extends _i1.Mock
           as _i6.CompanyRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i43.CompanyEntity>> call(
+  _i16.Future<_i17.Either<_i18.Failure, _i44.CompanyEntity>> call(
     String? userId,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [userId]),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, _i43.CompanyEntity>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, _i44.CompanyEntity>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, _i43.CompanyEntity>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, _i44.CompanyEntity>
                   >(this, Invocation.method(#call, [userId])),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i43.CompanyEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i44.CompanyEntity>>);
 }
 
 /// A class which mocks [GetProfileUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockGetProfileUseCase extends _i1.Mock implements _i46.GetProfileUseCase {
+class MockGetProfileUseCase extends _i1.Mock implements _i47.GetProfileUseCase {
   MockGetProfileUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -1239,26 +1254,26 @@ class MockGetProfileUseCase extends _i1.Mock implements _i46.GetProfileUseCase {
           as _i7.ProfileRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i47.ProfileEntity>> call() =>
+  _i16.Future<_i17.Either<_i18.Failure, _i48.ProfileEntity>> call() =>
       (super.noSuchMethod(
             Invocation.method(#call, []),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, _i47.ProfileEntity>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, _i48.ProfileEntity>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, _i47.ProfileEntity>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, _i48.ProfileEntity>
                   >(this, Invocation.method(#call, [])),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i47.ProfileEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i48.ProfileEntity>>);
 }
 
 /// A class which mocks [UpdateProfileUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUpdateProfileUseCase extends _i1.Mock
-    implements _i48.UpdateProfileUseCase {
+    implements _i49.UpdateProfileUseCase {
   MockUpdateProfileUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -1275,28 +1290,28 @@ class MockUpdateProfileUseCase extends _i1.Mock
           as _i7.ProfileRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, _i47.ProfileEntity>> call(
-    _i47.ProfileEntity? profile,
+  _i16.Future<_i17.Either<_i18.Failure, _i48.ProfileEntity>> call(
+    _i48.ProfileEntity? profile,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [profile]),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, _i47.ProfileEntity>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, _i48.ProfileEntity>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, _i47.ProfileEntity>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, _i48.ProfileEntity>
                   >(this, Invocation.method(#call, [profile])),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, _i47.ProfileEntity>>);
+          as _i16.Future<_i17.Either<_i18.Failure, _i48.ProfileEntity>>);
 }
 
 /// A class which mocks [GetCompanyMembersUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGetCompanyMembersUseCase extends _i1.Mock
-    implements _i49.GetCompanyMembersUseCase {
+    implements _i50.GetCompanyMembersUseCase {
   MockGetCompanyMembersUseCase() {
     _i1.throwOnMissingStub(this);
   }
@@ -1313,81 +1328,155 @@ class MockGetCompanyMembersUseCase extends _i1.Mock
           as _i7.ProfileRepository);
 
   @override
-  _i15.Future<_i16.Either<_i17.Failure, List<_i47.ProfileEntity>>> call(
+  _i16.Future<_i17.Either<_i18.Failure, List<_i48.ProfileEntity>>> call(
     String? companyId,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [companyId]),
             returnValue:
-                _i15.Future<
-                  _i16.Either<_i17.Failure, List<_i47.ProfileEntity>>
+                _i16.Future<
+                  _i17.Either<_i18.Failure, List<_i48.ProfileEntity>>
                 >.value(
-                  _i19.dummyValue<
-                    _i16.Either<_i17.Failure, List<_i47.ProfileEntity>>
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, List<_i48.ProfileEntity>>
                   >(this, Invocation.method(#call, [companyId])),
                 ),
           )
-          as _i15.Future<_i16.Either<_i17.Failure, List<_i47.ProfileEntity>>>);
+          as _i16.Future<_i17.Either<_i18.Failure, List<_i48.ProfileEntity>>>);
+}
+
+/// A class which mocks [GetNotificationsUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetNotificationsUseCase extends _i1.Mock
+    implements _i51.GetNotificationsUseCase {
+  MockGetNotificationsUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i8.NotificationRepository get repository =>
+      (super.noSuchMethod(
+            Invocation.getter(#repository),
+            returnValue: _FakeNotificationRepository_6(
+              this,
+              Invocation.getter(#repository),
+            ),
+          )
+          as _i8.NotificationRepository);
+
+  @override
+  _i16.Future<_i17.Either<_i18.Failure, List<_i52.NotificationEntity>>> call(
+    String? userId,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [userId]),
+            returnValue:
+                _i16.Future<
+                  _i17.Either<_i18.Failure, List<_i52.NotificationEntity>>
+                >.value(
+                  _i20.dummyValue<
+                    _i17.Either<_i18.Failure, List<_i52.NotificationEntity>>
+                  >(this, Invocation.method(#call, [userId])),
+                ),
+          )
+          as _i16.Future<
+            _i17.Either<_i18.Failure, List<_i52.NotificationEntity>>
+          >);
+}
+
+/// A class which mocks [MarkNotificationAsReadUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockMarkNotificationAsReadUseCase extends _i1.Mock
+    implements _i53.MarkNotificationAsReadUseCase {
+  MockMarkNotificationAsReadUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i8.NotificationRepository get repository =>
+      (super.noSuchMethod(
+            Invocation.getter(#repository),
+            returnValue: _FakeNotificationRepository_6(
+              this,
+              Invocation.getter(#repository),
+            ),
+          )
+          as _i8.NotificationRepository);
+
+  @override
+  _i16.Future<_i17.Either<_i18.Failure, void>> call(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [id]),
+            returnValue: _i16.Future<_i17.Either<_i18.Failure, void>>.value(
+              _i20.dummyValue<_i17.Either<_i18.Failure, void>>(
+                this,
+                Invocation.method(#call, [id]),
+              ),
+            ),
+          )
+          as _i16.Future<_i17.Either<_i18.Failure, void>>);
 }
 
 /// A class which mocks [AnnouncementRemoteDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockAnnouncementRemoteDataSource extends _i1.Mock
-    implements _i50.AnnouncementRemoteDataSource {
+    implements _i54.AnnouncementRemoteDataSource {
   MockAnnouncementRemoteDataSource() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i15.Future<List<_i8.AnnouncementModel>> getAnnouncements() =>
+  _i16.Future<List<_i9.AnnouncementModel>> getAnnouncements() =>
       (super.noSuchMethod(
             Invocation.method(#getAnnouncements, []),
-            returnValue: _i15.Future<List<_i8.AnnouncementModel>>.value(
-              <_i8.AnnouncementModel>[],
+            returnValue: _i16.Future<List<_i9.AnnouncementModel>>.value(
+              <_i9.AnnouncementModel>[],
             ),
           )
-          as _i15.Future<List<_i8.AnnouncementModel>>);
+          as _i16.Future<List<_i9.AnnouncementModel>>);
 
   @override
-  _i15.Future<_i8.AnnouncementModel> getAnnouncementById(String? id) =>
+  _i16.Future<_i9.AnnouncementModel> getAnnouncementById(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#getAnnouncementById, [id]),
-            returnValue: _i15.Future<_i8.AnnouncementModel>.value(
-              _FakeAnnouncementModel_6(
+            returnValue: _i16.Future<_i9.AnnouncementModel>.value(
+              _FakeAnnouncementModel_7(
                 this,
                 Invocation.method(#getAnnouncementById, [id]),
               ),
             ),
           )
-          as _i15.Future<_i8.AnnouncementModel>);
+          as _i16.Future<_i9.AnnouncementModel>);
 
   @override
-  _i15.Future<List<_i8.AnnouncementModel>> getAnnouncementsByPriority(
+  _i16.Future<List<_i9.AnnouncementModel>> getAnnouncementsByPriority(
     String? priority,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#getAnnouncementsByPriority, [priority]),
-            returnValue: _i15.Future<List<_i8.AnnouncementModel>>.value(
-              <_i8.AnnouncementModel>[],
+            returnValue: _i16.Future<List<_i9.AnnouncementModel>>.value(
+              <_i9.AnnouncementModel>[],
             ),
           )
-          as _i15.Future<List<_i8.AnnouncementModel>>);
+          as _i16.Future<List<_i9.AnnouncementModel>>);
 
   @override
-  _i15.Future<List<_i8.AnnouncementModel>> getAnnouncementsByCreator(
+  _i16.Future<List<_i9.AnnouncementModel>> getAnnouncementsByCreator(
     String? createdBy,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#getAnnouncementsByCreator, [createdBy]),
-            returnValue: _i15.Future<List<_i8.AnnouncementModel>>.value(
-              <_i8.AnnouncementModel>[],
+            returnValue: _i16.Future<List<_i9.AnnouncementModel>>.value(
+              <_i9.AnnouncementModel>[],
             ),
           )
-          as _i15.Future<List<_i8.AnnouncementModel>>);
+          as _i16.Future<List<_i9.AnnouncementModel>>);
 
   @override
-  _i15.Future<_i8.AnnouncementModel> createAnnouncement({
+  _i16.Future<_i9.AnnouncementModel> createAnnouncement({
     required String? title,
     required String? description,
     String? image,
@@ -1402,8 +1491,8 @@ class MockAnnouncementRemoteDataSource extends _i1.Mock
               #priority: priority,
               #createdBy: createdBy,
             }),
-            returnValue: _i15.Future<_i8.AnnouncementModel>.value(
-              _FakeAnnouncementModel_6(
+            returnValue: _i16.Future<_i9.AnnouncementModel>.value(
+              _FakeAnnouncementModel_7(
                 this,
                 Invocation.method(#createAnnouncement, [], {
                   #title: title,
@@ -1415,10 +1504,10 @@ class MockAnnouncementRemoteDataSource extends _i1.Mock
               ),
             ),
           )
-          as _i15.Future<_i8.AnnouncementModel>);
+          as _i16.Future<_i9.AnnouncementModel>);
 
   @override
-  _i15.Future<_i8.AnnouncementModel> updateAnnouncement({
+  _i16.Future<_i9.AnnouncementModel> updateAnnouncement({
     required String? id,
     required String? title,
     required String? description,
@@ -1433,8 +1522,8 @@ class MockAnnouncementRemoteDataSource extends _i1.Mock
               #image: image,
               #priority: priority,
             }),
-            returnValue: _i15.Future<_i8.AnnouncementModel>.value(
-              _FakeAnnouncementModel_6(
+            returnValue: _i16.Future<_i9.AnnouncementModel>.value(
+              _FakeAnnouncementModel_7(
                 this,
                 Invocation.method(#updateAnnouncement, [], {
                   #id: id,
@@ -1446,39 +1535,39 @@ class MockAnnouncementRemoteDataSource extends _i1.Mock
               ),
             ),
           )
-          as _i15.Future<_i8.AnnouncementModel>);
+          as _i16.Future<_i9.AnnouncementModel>);
 
   @override
-  _i15.Future<void> deleteAnnouncement(String? id) =>
+  _i16.Future<void> deleteAnnouncement(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteAnnouncement, [id]),
-            returnValue: _i15.Future<void>.value(),
-            returnValueForMissingStub: _i15.Future<void>.value(),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
           )
-          as _i15.Future<void>);
+          as _i16.Future<void>);
 }
 
 /// A class which mocks [CommentRemoteDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockCommentRemoteDataSource extends _i1.Mock
-    implements _i51.CommentRemoteDataSource {
+    implements _i55.CommentRemoteDataSource {
   MockCommentRemoteDataSource() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i15.Future<List<_i9.CommentModel>> getComments(String? announcementId) =>
+  _i16.Future<List<_i10.CommentModel>> getComments(String? announcementId) =>
       (super.noSuchMethod(
             Invocation.method(#getComments, [announcementId]),
-            returnValue: _i15.Future<List<_i9.CommentModel>>.value(
-              <_i9.CommentModel>[],
+            returnValue: _i16.Future<List<_i10.CommentModel>>.value(
+              <_i10.CommentModel>[],
             ),
           )
-          as _i15.Future<List<_i9.CommentModel>>);
+          as _i16.Future<List<_i10.CommentModel>>);
 
   @override
-  _i15.Future<_i9.CommentModel> createComment({
+  _i16.Future<_i10.CommentModel> createComment({
     required String? announcementId,
     required String? content,
     required String? authorId,
@@ -1489,8 +1578,8 @@ class MockCommentRemoteDataSource extends _i1.Mock
               #content: content,
               #authorId: authorId,
             }),
-            returnValue: _i15.Future<_i9.CommentModel>.value(
-              _FakeCommentModel_7(
+            returnValue: _i16.Future<_i10.CommentModel>.value(
+              _FakeCommentModel_8(
                 this,
                 Invocation.method(#createComment, [], {
                   #announcementId: announcementId,
@@ -1500,29 +1589,29 @@ class MockCommentRemoteDataSource extends _i1.Mock
               ),
             ),
           )
-          as _i15.Future<_i9.CommentModel>);
+          as _i16.Future<_i10.CommentModel>);
 
   @override
-  _i15.Future<void> deleteComment(String? commentId) =>
+  _i16.Future<void> deleteComment(String? commentId) =>
       (super.noSuchMethod(
             Invocation.method(#deleteComment, [commentId]),
-            returnValue: _i15.Future<void>.value(),
-            returnValueForMissingStub: _i15.Future<void>.value(),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
           )
-          as _i15.Future<void>);
+          as _i16.Future<void>);
 }
 
 /// A class which mocks [EventRemoteDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockEventRemoteDataSource extends _i1.Mock
-    implements _i52.EventRemoteDataSource {
+    implements _i56.EventRemoteDataSource {
   MockEventRemoteDataSource() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i15.Future<List<_i10.EventModel>> getEvents({
+  _i16.Future<List<_i11.EventModel>> getEvents({
     String? userId,
     String? filterType,
   }) =>
@@ -1531,40 +1620,40 @@ class MockEventRemoteDataSource extends _i1.Mock
               #userId: userId,
               #filterType: filterType,
             }),
-            returnValue: _i15.Future<List<_i10.EventModel>>.value(
-              <_i10.EventModel>[],
+            returnValue: _i16.Future<List<_i11.EventModel>>.value(
+              <_i11.EventModel>[],
             ),
           )
-          as _i15.Future<List<_i10.EventModel>>);
+          as _i16.Future<List<_i11.EventModel>>);
 
   @override
-  _i15.Future<_i10.EventModel> acceptInvitation(String? id) =>
+  _i16.Future<_i11.EventModel> acceptInvitation(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#acceptInvitation, [id]),
-            returnValue: _i15.Future<_i10.EventModel>.value(
-              _FakeEventModel_8(
+            returnValue: _i16.Future<_i11.EventModel>.value(
+              _FakeEventModel_9(
                 this,
                 Invocation.method(#acceptInvitation, [id]),
               ),
             ),
           )
-          as _i15.Future<_i10.EventModel>);
+          as _i16.Future<_i11.EventModel>);
 
   @override
-  _i15.Future<_i10.EventModel> declineInvitation(String? id) =>
+  _i16.Future<_i11.EventModel> declineInvitation(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#declineInvitation, [id]),
-            returnValue: _i15.Future<_i10.EventModel>.value(
-              _FakeEventModel_8(
+            returnValue: _i16.Future<_i11.EventModel>.value(
+              _FakeEventModel_9(
                 this,
                 Invocation.method(#declineInvitation, [id]),
               ),
             ),
           )
-          as _i15.Future<_i10.EventModel>);
+          as _i16.Future<_i11.EventModel>);
 
   @override
-  _i15.Future<_i10.EventModel> createEvent({
+  _i16.Future<_i11.EventModel> createEvent({
     required String? title,
     required String? description,
     required String? date,
@@ -1581,8 +1670,8 @@ class MockEventRemoteDataSource extends _i1.Mock
               #createdBy: createdBy,
               #recipientIds: recipientIds,
             }),
-            returnValue: _i15.Future<_i10.EventModel>.value(
-              _FakeEventModel_8(
+            returnValue: _i16.Future<_i11.EventModel>.value(
+              _FakeEventModel_9(
                 this,
                 Invocation.method(#createEvent, [], {
                   #title: title,
@@ -1595,10 +1684,10 @@ class MockEventRemoteDataSource extends _i1.Mock
               ),
             ),
           )
-          as _i15.Future<_i10.EventModel>);
+          as _i16.Future<_i11.EventModel>);
 
   @override
-  _i15.Future<_i10.EventModel> updateEvent({
+  _i16.Future<_i11.EventModel> updateEvent({
     required String? id,
     required String? title,
     required String? description,
@@ -1615,8 +1704,8 @@ class MockEventRemoteDataSource extends _i1.Mock
               #spaceId: spaceId,
               #recipientIds: recipientIds,
             }),
-            returnValue: _i15.Future<_i10.EventModel>.value(
-              _FakeEventModel_8(
+            returnValue: _i16.Future<_i11.EventModel>.value(
+              _FakeEventModel_9(
                 this,
                 Invocation.method(#updateEvent, [], {
                   #id: id,
@@ -1629,42 +1718,42 @@ class MockEventRemoteDataSource extends _i1.Mock
               ),
             ),
           )
-          as _i15.Future<_i10.EventModel>);
+          as _i16.Future<_i11.EventModel>);
 
   @override
-  _i15.Future<void> deleteEvent(String? id) =>
+  _i16.Future<void> deleteEvent(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteEvent, [id]),
-            returnValue: _i15.Future<void>.value(),
-            returnValueForMissingStub: _i15.Future<void>.value(),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
           )
-          as _i15.Future<void>);
+          as _i16.Future<void>);
 }
 
 /// A class which mocks [IamRemoteDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockIamRemoteDataSource extends _i1.Mock
-    implements _i53.IamRemoteDataSource {
+    implements _i57.IamRemoteDataSource {
   MockIamRemoteDataSource() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i15.Future<_i11.UserModel> signIn(String? username, String? password) =>
+  _i16.Future<_i12.UserModel> signIn(String? username, String? password) =>
       (super.noSuchMethod(
             Invocation.method(#signIn, [username, password]),
-            returnValue: _i15.Future<_i11.UserModel>.value(
-              _FakeUserModel_9(
+            returnValue: _i16.Future<_i12.UserModel>.value(
+              _FakeUserModel_10(
                 this,
                 Invocation.method(#signIn, [username, password]),
               ),
             ),
           )
-          as _i15.Future<_i11.UserModel>);
+          as _i16.Future<_i12.UserModel>);
 
   @override
-  _i15.Future<void> signUp({
+  _i16.Future<void> signUp({
     required String? username,
     required String? password,
     required String? name,
@@ -1681,32 +1770,32 @@ class MockIamRemoteDataSource extends _i1.Mock
               #email: email,
               #roles: roles,
             }),
-            returnValue: _i15.Future<void>.value(),
-            returnValueForMissingStub: _i15.Future<void>.value(),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
           )
-          as _i15.Future<void>);
+          as _i16.Future<void>);
 
   @override
-  _i15.Future<void> joinCompany(String? joinCode) =>
+  _i16.Future<void> joinCompany(String? joinCode) =>
       (super.noSuchMethod(
             Invocation.method(#joinCompany, [joinCode]),
-            returnValue: _i15.Future<void>.value(),
-            returnValueForMissingStub: _i15.Future<void>.value(),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
           )
-          as _i15.Future<void>);
+          as _i16.Future<void>);
 }
 
 /// A class which mocks [CompanyRemoteDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockCompanyRemoteDataSource extends _i1.Mock
-    implements _i54.CompanyRemoteDataSource {
+    implements _i58.CompanyRemoteDataSource {
   MockCompanyRemoteDataSource() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i15.Future<_i12.CompanyModel> createCompany({
+  _i16.Future<_i13.CompanyModel> createCompany({
     required String? ruc,
     required String? name,
     String? iconUrl,
@@ -1721,8 +1810,8 @@ class MockCompanyRemoteDataSource extends _i1.Mock
               #isActive: isActive,
               #userId: userId,
             }),
-            returnValue: _i15.Future<_i12.CompanyModel>.value(
-              _FakeCompanyModel_10(
+            returnValue: _i16.Future<_i13.CompanyModel>.value(
+              _FakeCompanyModel_11(
                 this,
                 Invocation.method(#createCompany, [], {
                   #ruc: ruc,
@@ -1734,10 +1823,10 @@ class MockCompanyRemoteDataSource extends _i1.Mock
               ),
             ),
           )
-          as _i15.Future<_i12.CompanyModel>);
+          as _i16.Future<_i13.CompanyModel>);
 
   @override
-  _i15.Future<_i12.CompanyModel> updateCompany({
+  _i16.Future<_i13.CompanyModel> updateCompany({
     required String? id,
     required String? ruc,
     required String? name,
@@ -1752,8 +1841,8 @@ class MockCompanyRemoteDataSource extends _i1.Mock
               #iconUrl: iconUrl,
               #isActive: isActive,
             }),
-            returnValue: _i15.Future<_i12.CompanyModel>.value(
-              _FakeCompanyModel_10(
+            returnValue: _i16.Future<_i13.CompanyModel>.value(
+              _FakeCompanyModel_11(
                 this,
                 Invocation.method(#updateCompany, [], {
                   #id: id,
@@ -1765,101 +1854,101 @@ class MockCompanyRemoteDataSource extends _i1.Mock
               ),
             ),
           )
-          as _i15.Future<_i12.CompanyModel>);
+          as _i16.Future<_i13.CompanyModel>);
 
   @override
-  _i15.Future<_i12.CompanyModel> getCompanyByUserId(String? userId) =>
+  _i16.Future<_i13.CompanyModel> getCompanyByUserId(String? userId) =>
       (super.noSuchMethod(
             Invocation.method(#getCompanyByUserId, [userId]),
-            returnValue: _i15.Future<_i12.CompanyModel>.value(
-              _FakeCompanyModel_10(
+            returnValue: _i16.Future<_i13.CompanyModel>.value(
+              _FakeCompanyModel_11(
                 this,
                 Invocation.method(#getCompanyByUserId, [userId]),
               ),
             ),
           )
-          as _i15.Future<_i12.CompanyModel>);
+          as _i16.Future<_i13.CompanyModel>);
 
   @override
-  _i15.Future<_i12.CompanyModel> getCompanyById(String? id) =>
+  _i16.Future<_i13.CompanyModel> getCompanyById(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#getCompanyById, [id]),
-            returnValue: _i15.Future<_i12.CompanyModel>.value(
-              _FakeCompanyModel_10(
+            returnValue: _i16.Future<_i13.CompanyModel>.value(
+              _FakeCompanyModel_11(
                 this,
                 Invocation.method(#getCompanyById, [id]),
               ),
             ),
           )
-          as _i15.Future<_i12.CompanyModel>);
+          as _i16.Future<_i13.CompanyModel>);
 }
 
 /// A class which mocks [ProfileRemoteDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockProfileRemoteDataSource extends _i1.Mock
-    implements _i55.ProfileRemoteDataSource {
+    implements _i59.ProfileRemoteDataSource {
   MockProfileRemoteDataSource() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i15.Future<_i13.ProfileModel> getProfile() =>
+  _i16.Future<_i14.ProfileModel> getProfile() =>
       (super.noSuchMethod(
             Invocation.method(#getProfile, []),
-            returnValue: _i15.Future<_i13.ProfileModel>.value(
-              _FakeProfileModel_11(this, Invocation.method(#getProfile, [])),
+            returnValue: _i16.Future<_i14.ProfileModel>.value(
+              _FakeProfileModel_12(this, Invocation.method(#getProfile, [])),
             ),
           )
-          as _i15.Future<_i13.ProfileModel>);
+          as _i16.Future<_i14.ProfileModel>);
 
   @override
-  _i15.Future<_i13.ProfileModel> updateProfile(_i13.ProfileModel? profile) =>
+  _i16.Future<_i14.ProfileModel> updateProfile(_i14.ProfileModel? profile) =>
       (super.noSuchMethod(
             Invocation.method(#updateProfile, [profile]),
-            returnValue: _i15.Future<_i13.ProfileModel>.value(
-              _FakeProfileModel_11(
+            returnValue: _i16.Future<_i14.ProfileModel>.value(
+              _FakeProfileModel_12(
                 this,
                 Invocation.method(#updateProfile, [profile]),
               ),
             ),
           )
-          as _i15.Future<_i13.ProfileModel>);
+          as _i16.Future<_i14.ProfileModel>);
 
   @override
-  _i15.Future<List<_i13.ProfileModel>> getCompanyMembers(String? companyId) =>
+  _i16.Future<List<_i14.ProfileModel>> getCompanyMembers(String? companyId) =>
       (super.noSuchMethod(
             Invocation.method(#getCompanyMembers, [companyId]),
-            returnValue: _i15.Future<List<_i13.ProfileModel>>.value(
-              <_i13.ProfileModel>[],
+            returnValue: _i16.Future<List<_i14.ProfileModel>>.value(
+              <_i14.ProfileModel>[],
             ),
           )
-          as _i15.Future<List<_i13.ProfileModel>>);
+          as _i16.Future<List<_i14.ProfileModel>>);
 
   @override
-  _i15.Future<List<_i13.ProfileModel>> getProfilesWithoutCompany() =>
+  _i16.Future<List<_i14.ProfileModel>> getProfilesWithoutCompany() =>
       (super.noSuchMethod(
             Invocation.method(#getProfilesWithoutCompany, []),
-            returnValue: _i15.Future<List<_i13.ProfileModel>>.value(
-              <_i13.ProfileModel>[],
+            returnValue: _i16.Future<List<_i14.ProfileModel>>.value(
+              <_i14.ProfileModel>[],
             ),
           )
-          as _i15.Future<List<_i13.ProfileModel>>);
+          as _i16.Future<List<_i14.ProfileModel>>);
 
   @override
-  _i15.Future<void> assignCompanyToUser(String? userId, String? companyId) =>
+  _i16.Future<void> assignCompanyToUser(String? userId, String? companyId) =>
       (super.noSuchMethod(
             Invocation.method(#assignCompanyToUser, [userId, companyId]),
-            returnValue: _i15.Future<void>.value(),
-            returnValueForMissingStub: _i15.Future<void>.value(),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
           )
-          as _i15.Future<void>);
+          as _i16.Future<void>);
 }
 
 /// A class which mocks [SharedPreferences].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSharedPreferences extends _i1.Mock implements _i56.SharedPreferences {
+class MockSharedPreferences extends _i1.Mock implements _i60.SharedPreferences {
   MockSharedPreferences() {
     _i1.throwOnMissingStub(this);
   }
@@ -1906,83 +1995,83 @@ class MockSharedPreferences extends _i1.Mock implements _i56.SharedPreferences {
           as List<String>?);
 
   @override
-  _i15.Future<bool> setBool(String? key, bool? value) =>
+  _i16.Future<bool> setBool(String? key, bool? value) =>
       (super.noSuchMethod(
             Invocation.method(#setBool, [key, value]),
-            returnValue: _i15.Future<bool>.value(false),
+            returnValue: _i16.Future<bool>.value(false),
           )
-          as _i15.Future<bool>);
+          as _i16.Future<bool>);
 
   @override
-  _i15.Future<bool> setInt(String? key, int? value) =>
+  _i16.Future<bool> setInt(String? key, int? value) =>
       (super.noSuchMethod(
             Invocation.method(#setInt, [key, value]),
-            returnValue: _i15.Future<bool>.value(false),
+            returnValue: _i16.Future<bool>.value(false),
           )
-          as _i15.Future<bool>);
+          as _i16.Future<bool>);
 
   @override
-  _i15.Future<bool> setDouble(String? key, double? value) =>
+  _i16.Future<bool> setDouble(String? key, double? value) =>
       (super.noSuchMethod(
             Invocation.method(#setDouble, [key, value]),
-            returnValue: _i15.Future<bool>.value(false),
+            returnValue: _i16.Future<bool>.value(false),
           )
-          as _i15.Future<bool>);
+          as _i16.Future<bool>);
 
   @override
-  _i15.Future<bool> setString(String? key, String? value) =>
+  _i16.Future<bool> setString(String? key, String? value) =>
       (super.noSuchMethod(
             Invocation.method(#setString, [key, value]),
-            returnValue: _i15.Future<bool>.value(false),
+            returnValue: _i16.Future<bool>.value(false),
           )
-          as _i15.Future<bool>);
+          as _i16.Future<bool>);
 
   @override
-  _i15.Future<bool> setStringList(String? key, List<String>? value) =>
+  _i16.Future<bool> setStringList(String? key, List<String>? value) =>
       (super.noSuchMethod(
             Invocation.method(#setStringList, [key, value]),
-            returnValue: _i15.Future<bool>.value(false),
+            returnValue: _i16.Future<bool>.value(false),
           )
-          as _i15.Future<bool>);
+          as _i16.Future<bool>);
 
   @override
-  _i15.Future<bool> remove(String? key) =>
+  _i16.Future<bool> remove(String? key) =>
       (super.noSuchMethod(
             Invocation.method(#remove, [key]),
-            returnValue: _i15.Future<bool>.value(false),
+            returnValue: _i16.Future<bool>.value(false),
           )
-          as _i15.Future<bool>);
+          as _i16.Future<bool>);
 
   @override
-  _i15.Future<bool> commit() =>
+  _i16.Future<bool> commit() =>
       (super.noSuchMethod(
             Invocation.method(#commit, []),
-            returnValue: _i15.Future<bool>.value(false),
+            returnValue: _i16.Future<bool>.value(false),
           )
-          as _i15.Future<bool>);
+          as _i16.Future<bool>);
 
   @override
-  _i15.Future<bool> clear() =>
+  _i16.Future<bool> clear() =>
       (super.noSuchMethod(
             Invocation.method(#clear, []),
-            returnValue: _i15.Future<bool>.value(false),
+            returnValue: _i16.Future<bool>.value(false),
           )
-          as _i15.Future<bool>);
+          as _i16.Future<bool>);
 
   @override
-  _i15.Future<void> reload() =>
+  _i16.Future<void> reload() =>
       (super.noSuchMethod(
             Invocation.method(#reload, []),
-            returnValue: _i15.Future<void>.value(),
-            returnValueForMissingStub: _i15.Future<void>.value(),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
           )
-          as _i15.Future<void>);
+          as _i16.Future<void>);
 }
 
 /// A class which mocks [TokenStore].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockTokenStore extends _i1.Mock implements _i57.TokenStore {
+class MockTokenStore extends _i1.Mock implements _i61.TokenStore {
   MockTokenStore() {
     _i1.throwOnMissingStub(this);
   }
@@ -2003,29 +2092,57 @@ class MockTokenStore extends _i1.Mock implements _i57.TokenStore {
           as bool);
 
   @override
-  _i15.Future<void> init() =>
+  _i16.Future<void> init() =>
       (super.noSuchMethod(
             Invocation.method(#init, []),
-            returnValue: _i15.Future<void>.value(),
-            returnValueForMissingStub: _i15.Future<void>.value(),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
           )
-          as _i15.Future<void>);
+          as _i16.Future<void>);
 
   @override
-  _i15.Future<void> save(String? token) =>
+  _i16.Future<void> save(String? token, {String? userId}) =>
       (super.noSuchMethod(
-            Invocation.method(#save, [token]),
-            returnValue: _i15.Future<void>.value(),
-            returnValueForMissingStub: _i15.Future<void>.value(),
+            Invocation.method(#save, [token], {#userId: userId}),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
           )
-          as _i15.Future<void>);
+          as _i16.Future<void>);
 
   @override
-  _i15.Future<void> clear() =>
+  _i16.Future<void> clear() =>
       (super.noSuchMethod(
             Invocation.method(#clear, []),
-            returnValue: _i15.Future<void>.value(),
-            returnValueForMissingStub: _i15.Future<void>.value(),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
           )
-          as _i15.Future<void>);
+          as _i16.Future<void>);
+}
+
+/// A class which mocks [NotificationService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockNotificationService extends _i1.Mock
+    implements _i62.NotificationService {
+  MockNotificationService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i16.Future<void> initialize() =>
+      (super.noSuchMethod(
+            Invocation.method(#initialize, []),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
+          )
+          as _i16.Future<void>);
+
+  @override
+  _i16.Future<void> unregisterToken(String? token) =>
+      (super.noSuchMethod(
+            Invocation.method(#unregisterToken, [token]),
+            returnValue: _i16.Future<void>.value(),
+            returnValueForMissingStub: _i16.Future<void>.value(),
+          )
+          as _i16.Future<void>);
 }

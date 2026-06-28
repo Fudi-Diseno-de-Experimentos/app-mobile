@@ -5,7 +5,7 @@ import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart'
 import 'package:app_mobile/features/profile/domain/repositories/profile_repository.dart';
 import 'package:app_mobile/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:app_mobile/features/profile/presentation/bloc/profile_event.dart';
-import 'package:app_mobile/features/profile/presentation/widgets/profile_action_button.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -105,7 +105,8 @@ class _ProfileBodyState extends State<ProfileBody> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: colorScheme.surface,
-                  image: widget.profile.avatarUrl != null &&
+                  image:
+                      widget.profile.avatarUrl != null &&
                           widget.profile.avatarUrl!.isNotEmpty
                       ? DecorationImage(
                           image: NetworkImage(widget.profile.avatarUrl!),
@@ -113,7 +114,8 @@ class _ProfileBodyState extends State<ProfileBody> {
                         )
                       : null,
                 ),
-                child: widget.profile.avatarUrl == null ||
+                child:
+                    widget.profile.avatarUrl == null ||
                         widget.profile.avatarUrl!.isEmpty
                     ? Icon(
                         Icons.person,
@@ -160,17 +162,6 @@ class _ProfileBodyState extends State<ProfileBody> {
                 ],
               ),
               const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ProfileActionButton(icon: Icons.phone, onPressed: () {}),
-                  const SizedBox(width: 18),
-                  ProfileActionButton(icon: Icons.message, onPressed: () {}),
-                  const SizedBox(width: 18),
-                  ProfileActionButton(icon: Icons.email, onPressed: () {}),
-                ],
-              ),
-              const SizedBox(height: 32),
               _buildCompanySection(colorScheme, textTheme, isManagerOrAdmin),
             ],
           ),
@@ -230,8 +221,9 @@ class _ProfileBodyState extends State<ProfileBody> {
         decoration: BoxDecoration(
           color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border:
-              Border.all(color: colorScheme.secondary.withValues(alpha: 0.2)),
+          border: Border.all(
+            color: colorScheme.secondary.withValues(alpha: 0.2),
+          ),
           boxShadow: [
             BoxShadow(
               color: colorScheme.onSurface.withValues(alpha: 0.05),

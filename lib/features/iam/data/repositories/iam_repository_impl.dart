@@ -65,7 +65,7 @@ class IamRepositoryImpl implements IamRepository {
     try {
       final userModel = await remoteDataSource.signIn(username, password);
       // Save token locally
-      await tokenStore.save(userModel.token);
+      await tokenStore.save(userModel.token, userId: userModel.id);
       
       // Clear all caches on login to avoid user leaks
       await _clearAllCaches();

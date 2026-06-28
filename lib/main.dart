@@ -3,6 +3,8 @@ import 'package:app_mobile/app/di.dart';
 import 'package:app_mobile/app/router.dart';
 import 'package:app_mobile/core/auth/token_store.dart';
 import 'package:app_mobile/core/network/auth_interceptor.dart';
+import 'package:app_mobile/core/network/notification_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -16,6 +18,7 @@ void _showSessionExpired() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   await dotenv.load(fileName: '.env');
   await initDependencies();
 
@@ -33,6 +36,8 @@ void main() async {
   if (tokenStore.hasToken && tokenStore.isExpired) {
     await tokenStore.clear();
     WidgetsBinding.instance.addPostFrameCallback((_) => _showSessionExpired());
+  } else if (tokenStore.isSignedIn) {
+    sl<NotificationService>().initialize();
   }
 
   runApp(const MyApp());

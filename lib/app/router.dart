@@ -29,6 +29,8 @@ import 'package:app_mobile/features/iam/presentation/bloc/iam_bloc.dart';
 import 'package:app_mobile/features/iam/presentation/pages/company_setup_page.dart';
 import 'package:app_mobile/features/iam/presentation/pages/sign_in_page.dart';
 import 'package:app_mobile/features/iam/presentation/pages/sign_up_page.dart';
+import 'package:app_mobile/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:app_mobile/features/notifications/presentation/pages/notifications_page.dart';
 import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
 import 'package:app_mobile/features/profile/presentation/pages/company_edit_page.dart';
 import 'package:app_mobile/features/profile/presentation/pages/profile_page.dart';
@@ -106,6 +108,14 @@ final GoRouter appRouter = GoRouter(
           BlocProvider(create: (_) => sl<IamBloc>()),
         ],
         child: const CompanySetupPage(),
+      ),
+    ),
+    GoRoute(
+      path: '/notifications',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => BlocProvider(
+        create: (context) => sl<NotificationBloc>(),
+        child: const NotificationsPage(),
       ),
     ),
     GoRoute(

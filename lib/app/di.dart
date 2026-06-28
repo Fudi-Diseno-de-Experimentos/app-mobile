@@ -1,12 +1,14 @@
 import 'package:app_mobile/core/auth/token_store.dart';
 import 'package:app_mobile/core/network/api_client.dart';
 import 'package:app_mobile/core/network/auth_interceptor.dart';
+import 'package:app_mobile/core/network/notification_service.dart';
 import 'package:app_mobile/features/analytics/di/analytics_dependency_injector.dart';
 import 'package:app_mobile/features/announcements/di/announcement_dependency_injector.dart';
 import 'package:app_mobile/features/chat/di/chat_dependency_injector.dart';
 import 'package:app_mobile/features/company/di/company_dependency_injector.dart';
 import 'package:app_mobile/features/events/di/event_dependency_injector.dart';
 import 'package:app_mobile/features/iam/di/iam_dependency_injector.dart';
+import 'package:app_mobile/features/notifications/di/notification_dependency_injector.dart';
 import 'package:app_mobile/features/profile/di/profile_dependency_injector.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -32,6 +34,11 @@ Future<void> initDependencies() async {
     apiClient.addAuthInterceptor(sl());
     return apiClient;
   });
+  sl.registerLazySingleton(() => NotificationService(
+        apiClient: sl(),
+        tokenStore: sl(),
+        sharedPreferences: sl(),
+      ));
 
   // Features
   initIamDependencies();
@@ -41,4 +48,5 @@ Future<void> initDependencies() async {
   initAnalyticsDependencies();
   initChatDependencies();
   initCompanyDependencies();
+  initNotificationDependencies();
 }
