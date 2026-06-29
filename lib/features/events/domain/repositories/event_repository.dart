@@ -3,8 +3,13 @@ import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
 import 'package:fpdart/fpdart.dart';
 
 abstract class EventRepository {
-  Future<Either<Failure, List<EventEntity>>> getEvents(
-      {bool forceRefresh = false});
+  Future<Either<Failure, List<EventEntity>>> getEvents({
+    bool forceRefresh = false,
+    String? userId,
+    String? filterType,
+  });
+  Future<Either<Failure, EventEntity>> acceptInvitation(String id);
+  Future<Either<Failure, EventEntity>> declineInvitation(String id);
   Future<Either<Failure, EventEntity>> createEvent({
     required String title,
     required String description,

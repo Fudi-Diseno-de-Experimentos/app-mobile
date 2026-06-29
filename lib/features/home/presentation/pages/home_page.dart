@@ -30,7 +30,10 @@ class HomePage extends StatelessWidget {
           create: (_) => sl<AnnouncementBloc>()..add(FetchAnnouncements()),
         ),
         BlocProvider(
-          create: (_) => sl<EventBloc>()..add(FetchEvents()),
+          create: (_) => sl<EventBloc>()
+            ..add(FetchEvents.forProfile(
+              context.read<ProfileBloc>().state.profileOrNull,
+            )),
         ),
       ],
       child: const _HomeContent(),
@@ -55,12 +58,21 @@ class _HomeContent extends StatelessWidget {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-                child: Text(
-                  'Home',
-                  style: textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Home',
+                      style: textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.notifications_outlined),
+                      onPressed: () => context.push('/notifications'),
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -4,6 +4,7 @@ import 'package:app_mobile/features/announcements/domain/entities/comment_entity
 import 'package:app_mobile/features/company/domain/entities/company_entity.dart';
 import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
 import 'package:app_mobile/features/iam/domain/entities/user_entity.dart';
+import 'package:app_mobile/features/notifications/domain/entities/notification_entity.dart';
 import 'package:app_mobile/features/profile/domain/entities/profile_entity.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mockito/mockito.dart';
@@ -11,6 +12,9 @@ import 'package:mockito/mockito.dart';
 void registerFallbackValues() {
   // Either<Failure, T> fallback values for mockito
   provideDummy<Either<Failure, List<AnnouncementEntity>>>(
+    const Right([]),
+  );
+  provideDummy<Either<Failure, List<NotificationEntity>>>(
     const Right([]),
   );
   provideDummy<Either<Failure, AnnouncementEntity>>(
@@ -45,7 +49,7 @@ void registerFallbackValues() {
       date: '',
       spaceId: '',
       createdBy: '',
-      recipientIds: [],
+      recipients: [],
       createdAt: '',
       updatedAt: '',
     )),

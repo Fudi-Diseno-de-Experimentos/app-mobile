@@ -1,4 +1,5 @@
 import 'package:app_mobile/core/auth/token_store.dart';
+import 'package:app_mobile/core/network/notification_service.dart';
 import 'package:app_mobile/features/announcements/data/datasources/announcement_remote_datasource.dart';
 import 'package:app_mobile/features/announcements/data/datasources/comment_remote_datasource.dart';
 import 'package:app_mobile/features/announcements/domain/usecases/create_announcement_usecase.dart';
@@ -16,7 +17,9 @@ import 'package:app_mobile/features/company/domain/usecases/create_company_useca
 import 'package:app_mobile/features/company/domain/usecases/get_company_by_user_id_usecase.dart';
 import 'package:app_mobile/features/company/domain/usecases/update_company_usecase.dart';
 import 'package:app_mobile/features/events/data/datasources/event_remote_datasource.dart';
+import 'package:app_mobile/features/events/domain/usecases/accept_invitation_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/decline_invitation_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart';
@@ -25,6 +28,8 @@ import 'package:app_mobile/features/iam/domain/usecases/join_company_usecase.dar
 import 'package:app_mobile/features/iam/domain/usecases/sign_in_usecase.dart';
 import 'package:app_mobile/features/iam/domain/usecases/sign_out_usecase.dart';
 import 'package:app_mobile/features/iam/domain/usecases/sign_up_usecase.dart';
+import 'package:app_mobile/features/notifications/domain/usecases/get_notifications_usecase.dart';
+import 'package:app_mobile/features/notifications/domain/usecases/mark_notification_as_read_usecase.dart';
 import 'package:app_mobile/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:app_mobile/features/profile/domain/usecases/get_company_members_usecase.dart';
 import 'package:app_mobile/features/profile/domain/usecases/get_profile_usecase.dart';
@@ -50,6 +55,8 @@ import 'package:shared_preferences/shared_preferences.dart';
   CreateEventUseCase,
   UpdateEventUseCase,
   DeleteEventUseCase,
+  AcceptInvitationUseCase,
+  DeclineInvitationUseCase,
   // IAM use cases
   SignInUseCase,
   SignUpUseCase,
@@ -63,6 +70,9 @@ import 'package:shared_preferences/shared_preferences.dart';
   GetProfileUseCase,
   UpdateProfileUseCase,
   GetCompanyMembersUseCase,
+  // Notification use cases
+  GetNotificationsUseCase,
+  MarkNotificationAsReadUseCase,
   // Data sources (for integration tests)
   AnnouncementRemoteDataSource,
   CommentRemoteDataSource,
@@ -74,5 +84,7 @@ import 'package:shared_preferences/shared_preferences.dart';
   SharedPreferences,
   // Auth token storage
   TokenStore,
+  // Notifications
+  NotificationService,
 ])
 void main() {}

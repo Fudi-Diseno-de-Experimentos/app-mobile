@@ -24,7 +24,10 @@ class CompanyFeedPage extends StatelessWidget {
           create: (_) => sl<AnnouncementBloc>()..add(FetchAnnouncements()),
         ),
         BlocProvider(
-          create: (_) => sl<EventBloc>()..add(FetchEvents()),
+          create: (_) => sl<EventBloc>()
+            ..add(FetchEvents.forProfile(
+              context.read<ProfileBloc>().state.profileOrNull,
+            )),
         ),
       ],
       child: const _CompanyFeedPageContent(),
@@ -66,13 +69,22 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Company Feed',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Company Feed',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.notifications_outlined),
+                        onPressed: () => context.push('/notifications'),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -194,7 +206,9 @@ class _CompanyFeedPageContentState extends State<_CompanyFeedPageContent> {
               onPressed: () async {
                 await context.push('/files/create-event');
                 if (context.mounted) {
-                  context.read<EventBloc>().add(FetchEvents());
+                  context.read<EventBloc>().add(FetchEvents.forProfile(
+                        context.read<ProfileBloc>().state.profileOrNull,
+                      ));
                 }
               },
               backgroundColor: Theme.of(context).colorScheme.onSurface,

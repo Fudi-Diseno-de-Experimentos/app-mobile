@@ -1,9 +1,12 @@
+import 'package:app_mobile/app/di.dart';
+import 'package:app_mobile/core/network/notification_service.dart';
 import 'package:app_mobile/features/iam/domain/usecases/join_company_usecase.dart';
 import 'package:app_mobile/features/iam/domain/usecases/sign_in_usecase.dart';
 import 'package:app_mobile/features/iam/domain/usecases/sign_out_usecase.dart';
 import 'package:app_mobile/features/iam/domain/usecases/sign_up_usecase.dart';
 import 'package:app_mobile/features/iam/presentation/bloc/iam_event.dart';
 import 'package:app_mobile/features/iam/presentation/bloc/iam_state.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class IamBloc extends Bloc<IamEvent, IamState> {
@@ -32,7 +35,10 @@ class IamBloc extends Bloc<IamEvent, IamState> {
     final result = await signInUseCase(event.username, event.password);
     result.fold(
       (failure) => emit(IamError(failure.message)),
-      (user) => emit(IamSignInSuccess(user)),
+      (user) {
+        sl<NotificationService>().initialize();
+        emit(IamSignInSuccess(user));
+      },
     );
   }
 
@@ -72,6 +78,12 @@ class IamBloc extends Bloc<IamEvent, IamState> {
     Emitter<IamState> emit,
   ) async {
     emit(IamLoading());
+    try {
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      if (fcmToken != null) {
+        await sl<NotificationService>().unregisterToken(fcmToken);
+      }
+    } catch (_) {}
     final result = await signOutUseCase();
     result.fold(
       (failure) => emit(IamError(failure.message)),

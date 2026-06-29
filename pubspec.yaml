@@ -51,6 +51,8 @@ dependencies:
   path_provider: ^2.1.5
   stomp_dart_client: ^2.1.0
   flutter_secure_storage: ^9.2.2
+  firebase_core: ^3.1.0
+  firebase_messaging: ^15.1.0
 
 patrol:
   test_directory: integration_test

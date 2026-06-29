@@ -2,7 +2,9 @@ import 'package:app_mobile/core/network/api_client.dart';
 import 'package:app_mobile/features/events/data/models/event_model.dart';
 
 abstract class EventRemoteDataSource {
-  Future<List<EventModel>> getEvents();
+  Future<List<EventModel>> getEvents({String? userId, String? filterType});
+  Future<EventModel> acceptInvitation(String id);
+  Future<EventModel> declineInvitation(String id);
   Future<EventModel> createEvent({
     required String title,
     required String description,
@@ -28,12 +30,31 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
   EventRemoteDataSourceImpl(this.apiClient);
 
   @override
-  Future<List<EventModel>> getEvents() async {
-    final response = await apiClient.get('/events');
+  Future<List<EventModel>> getEvents({String? userId, String? filterType}) async {
+    final params = <String, dynamic>{
+      'userId': ?userId,
+      'filterType': ?filterType,
+    };
+    final response = await apiClient.get(
+      '/events',
+      queryParameters: params.isEmpty ? null : params,
+    );
     if (response.data != null && response.data is List) {
       return (response.data as List).map((json) => EventModel.fromJson(json)).toList();
     }
     return [];
+  }
+
+  @override
+  Future<EventModel> acceptInvitation(String id) async {
+    final response = await apiClient.post('/events/$id/accept');
+    return EventModel.fromJson(response.data);
+  }
+
+  @override
+  Future<EventModel> declineInvitation(String id) async {
+    final response = await apiClient.post('/events/$id/decline');
+    return EventModel.fromJson(response.data);
   }
 
   @override

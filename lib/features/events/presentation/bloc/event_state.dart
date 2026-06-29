@@ -59,3 +59,24 @@ class EventError extends EventState {
   @override
   List<Object> get props => [message];
 }
+
+/// Accept/decline succeeded. Carries the server's updated event so the detail
+/// page can refresh its own view (and pop on decline). The list updates
+/// separately via an optimistic [EventLoaded] re-emit.
+class InvitationResponseSuccess extends EventState {
+  final EventEntity event;
+
+  const InvitationResponseSuccess(this.event);
+
+  @override
+  List<Object> get props => [event];
+}
+
+class InvitationResponseFailure extends EventState {
+  final String message;
+
+  const InvitationResponseFailure(this.message);
+
+  @override
+  List<Object> get props => [message];
+}

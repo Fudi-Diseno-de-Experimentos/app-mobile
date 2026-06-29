@@ -178,8 +178,9 @@ class _EventPageState extends State<EventPage> {
       listener: (context, state) {
         if (state is EventMembersLoaded) {
           setState(() {
+            // recipientIds are *user* ids — match on userId, not profile id.
             _recipients = state.members
-                .where((m) => _current.recipientIds.contains(m.id))
+                .where((m) => _current.recipientIds.contains(m.userId))
                 .toList();
             _recipientsLoaded = true;
           });
@@ -188,6 +189,26 @@ class _EventPageState extends State<EventPage> {
           setState(() => _updated = state.event);
           // The room may have changed on edit — re-resolve its name.
           _loadRoomName();
+        } else if (state is InvitationResponseSuccess &&
+            state.event.id == _current.id) {
+          if (state.event.myStatus == RecipientStatus.declined) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Invitation declined')),
+            );
+            context.pop();
+          } else {
+            setState(() => _updated = state.event);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Invitation accepted')),
+            );
+          }
+        } else if (state is InvitationResponseFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: colorScheme.error,
+            ),
+          );
         } else if (state is EventDeleteSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Event deleted')),
@@ -331,6 +352,18 @@ class _EventPageState extends State<EventPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
+                    // Invitees still awaiting a response can answer right here.
+                    // Derive my status from recipients[] (myStatus alone is
+                    // unreliable on the list payload).
+                    if (_current.statusFor(
+                          context
+                              .read<ProfileBloc>()
+                              .state
+                              .profileOrNull
+                              ?.userId,
+                        ) ==
+                        RecipientStatus.pending)
+                      _buildInvitationActions(colorScheme),
                     Text(
                       'Invited',
                       style: textTheme.titleMedium?.copyWith(
@@ -624,9 +657,15 @@ class _EventPageState extends State<EventPage> {
       );
     }
 
+    // Per-recipient status, keyed by user id (recipients carry user ids).
+    final statusByUserId = {
+      for (final r in _current.recipients) r.userId: r.status,
+    };
+
     return Column(
       children: _recipients.map((member) {
         final initials = member.initials;
+        final status = statusByUserId[member.userId] ?? RecipientStatus.pending;
         return Container(
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -675,10 +714,89 @@ class _EventPageState extends State<EventPage> {
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
+              _statusChip(status, colorScheme, textTheme),
             ],
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _statusChip(
+    RecipientStatus status,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    late final String label;
+    late final Color color;
+    switch (status) {
+      case RecipientStatus.accepted:
+        label = 'Accepted';
+        color = Colors.green;
+        break;
+      case RecipientStatus.declined:
+        label = 'Declined';
+        color = colorScheme.error;
+        break;
+      case RecipientStatus.pending:
+        label = 'Pending';
+        color = colorScheme.onSurface.withValues(alpha: 0.45);
+        break;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: textTheme.labelSmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInvitationActions(ColorScheme colorScheme) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () =>
+                  context.read<EventBloc>().add(DeclineInvitation(_current.id)),
+              icon: const Icon(Icons.close, size: 18),
+              label: const Text('Decline'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: colorScheme.error,
+                side: BorderSide(
+                  color: colorScheme.error.withValues(alpha: 0.5),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () =>
+                  context.read<EventBloc>().add(AcceptInvitation(_current.id)),
+              icon: const Icon(Icons.check, size: 18),
+              label: const Text('Accept'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

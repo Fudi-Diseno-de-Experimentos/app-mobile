@@ -1,4 +1,7 @@
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
+import 'package:app_mobile/features/events/domain/usecases/accept_invitation_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
+import 'package:app_mobile/features/events/domain/usecases/decline_invitation_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/update_event_usecase.dart';
@@ -12,13 +15,22 @@ class EventBloc extends Bloc<EventEvent, EventState> {
   final CreateEventUseCase createEventUseCase;
   final UpdateEventUseCase updateEventUseCase;
   final DeleteEventUseCase deleteEventUseCase;
+  final AcceptInvitationUseCase acceptInvitationUseCase;
+  final DeclineInvitationUseCase declineInvitationUseCase;
   final GetCompanyMembersUseCase getCompanyMembersUseCase;
+
+  /// Last loaded list and the filter mode it was fetched with, kept so an
+  /// accept/decline can update the list optimistically without a refetch.
+  List<EventEntity> _events = const [];
+  String? _lastFilterType;
 
   EventBloc({
     required this.getEventsUseCase,
     required this.createEventUseCase,
     required this.updateEventUseCase,
     required this.deleteEventUseCase,
+    required this.acceptInvitationUseCase,
+    required this.declineInvitationUseCase,
     required this.getCompanyMembersUseCase,
   }) : super(EventInitial()) {
     on<FetchEvents>(_onFetchEvents);
@@ -26,6 +38,8 @@ class EventBloc extends Bloc<EventEvent, EventState> {
     on<CreateEventRequested>(_onCreateEventRequested);
     on<UpdateEventRequested>(_onUpdateEventRequested);
     on<DeleteEventRequested>(_onDeleteEventRequested);
+    on<AcceptInvitation>(_onAcceptInvitation);
+    on<DeclineInvitation>(_onDeclineInvitation);
   }
 
   Future<void> _onFetchEvents(
@@ -33,11 +47,18 @@ class EventBloc extends Bloc<EventEvent, EventState> {
     Emitter<EventState> emit,
   ) async {
     emit(EventLoading());
-    final failureOrEvents =
-        await getEventsUseCase(forceRefresh: event.forceRefresh);
+    _lastFilterType = event.filterType;
+    final failureOrEvents = await getEventsUseCase(
+      forceRefresh: event.forceRefresh,
+      userId: event.userId,
+      filterType: event.filterType,
+    );
     failureOrEvents.fold(
       (failure) => emit(EventError(failure.message)),
-      (events) => emit(EventLoaded(events)),
+      (events) {
+        _events = events;
+        emit(EventLoaded(_events));
+      },
     );
   }
 
@@ -104,6 +125,57 @@ class EventBloc extends Bloc<EventEvent, EventState> {
     result.fold(
       (failure) => emit(EventError(failure.message)),
       (_) => emit(EventDeleteSuccess(event.id)),
+    );
+  }
+
+  Future<void> _onAcceptInvitation(
+    AcceptInvitation event,
+    Emitter<EventState> emit,
+  ) async {
+    final result = await acceptInvitationUseCase(event.eventId);
+    result.fold(
+      (failure) {
+        emit(InvitationResponseFailure(failure.message));
+        emit(EventLoaded(_events)); // keep the list on screen
+      },
+      (updated) {
+        // Accepting keeps the event in the list; just update its status.
+        _events = _events
+            .map((e) => e.id == updated.id
+                ? e.copyWith(myStatus: RecipientStatus.accepted)
+                : e)
+            .toList();
+        emit(InvitationResponseSuccess(updated));
+        emit(EventLoaded(_events));
+      },
+    );
+  }
+
+  Future<void> _onDeclineInvitation(
+    DeclineInvitation event,
+    Emitter<EventState> emit,
+  ) async {
+    final result = await declineInvitationUseCase(event.eventId);
+    result.fold(
+      (failure) {
+        emit(InvitationResponseFailure(failure.message));
+        emit(EventLoaded(_events));
+      },
+      (updated) {
+        // Declined events vanish from a recipient-scoped list (server hides
+        // them); on an unfiltered admin list they stay with a DECLINED status.
+        if (_lastFilterType == 'recipient') {
+          _events = _events.where((e) => e.id != updated.id).toList();
+        } else {
+          _events = _events
+              .map((e) => e.id == updated.id
+                  ? e.copyWith(myStatus: RecipientStatus.declined)
+                  : e)
+              .toList();
+        }
+        emit(InvitationResponseSuccess(updated));
+        emit(EventLoaded(_events));
+      },
     );
   }
 }

@@ -15,16 +15,20 @@ class TokenStore {
   TokenStore({required FlutterSecureStorage storage}) : _storage = storage;
 
   static const _key = 'auth_token';
+  static const _userIdKey = 'auth_user_id';
 
   final FlutterSecureStorage _storage;
   String? _token;
+  String? _userId;
 
   /// Loads the persisted token into memory. Call once before `runApp`.
   Future<void> init() async {
     _token = await _storage.read(key: _key);
+    _userId = await _storage.read(key: _userIdKey);
   }
 
   String? get token => _token;
+  String? get userId => _userId;
 
   /// True when a token is present, regardless of whether it has expired.
   bool get hasToken => _token != null;
@@ -43,16 +47,22 @@ class TokenStore {
     return token != null && !_isExpired(token);
   }
 
-  Future<void> save(String token) async {
+  Future<void> save(String token, {String? userId}) async {
     _token = token;
+    _userId = userId;
     await _storage.write(key: _key, value: token);
+    if (userId != null) {
+      await _storage.write(key: _userIdKey, value: userId);
+    }
   }
 
   /// The in-memory copy is cleared synchronously so guards/interceptors see
   /// the signed-out state immediately; secure-storage deletion follows.
-  Future<void> clear() {
+  Future<void> clear() async {
     _token = null;
-    return _storage.delete(key: _key);
+    _userId = null;
+    await _storage.delete(key: _key);
+    await _storage.delete(key: _userIdKey);
   }
 
   bool _isExpired(String token) {

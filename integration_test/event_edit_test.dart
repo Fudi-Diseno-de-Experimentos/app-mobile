@@ -30,7 +30,7 @@ void main() {
       await $.pumpAndSettle();
 
       // Navigate to the Feed and switch to the Events tab
-      await $('Files').tap();
+      await $('Feed').tap();
       await $.pumpAndSettle();
 
       await $('Events').tap();
@@ -53,6 +53,24 @@ void main() {
 
       // Assert - Verify the edit screen is shown
       expect($('Edit Event'), findsOneWidget);
+
+      // Assert - The form is pre-filled with the existing event
+      expect($('Sample Event'), findsOneWidget);
+
+      // Act - Modify the title and description. Date, time and room are already
+      // pre-filled from the existing event, so saving keeps booking 'room-1'.
+      await $(TextFormField).at(0).enterText('Updated Event Title');
+      await $(TextFormField)
+          .at(1)
+          .scrollTo()
+          .enterText('Updated event description for patrol tests.');
+
+      // Act - Save the changes
+      await $('Save Changes').scrollTo().tap();
+      await $.pumpAndSettle();
+
+      // Assert - Verify the success snackbar
+      expect($('Event updated successfully!'), findsOneWidget);
     },
   );
 }

@@ -1,6 +1,7 @@
 import 'package:app_mobile/core/error/exceptions.dart';
 import 'package:app_mobile/features/events/data/models/event_model.dart';
 import 'package:app_mobile/features/events/data/repositories/event_repository_impl.dart';
+import 'package:app_mobile/features/events/domain/entities/event_entity.dart';
 import 'package:app_mobile/features/events/domain/usecases/create_event_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/delete_event_usecase.dart';
 import 'package:app_mobile/features/events/domain/usecases/get_events_usecase.dart';
@@ -22,7 +23,10 @@ void main() {
     date: '2024-03-15T10:00:00Z',
     spaceId: 'room-1',
     createdBy: 'manager-1',
-    recipientIds: ['emp-1', 'emp-2'],
+    recipients: [
+      EventRecipient(userId: 'emp-1'),
+      EventRecipient(userId: 'emp-2'),
+    ],
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
   );
@@ -118,7 +122,11 @@ void main() {
         date: '2024-04-15T10:00:00Z',
         spaceId: 'room-2',
         createdBy: 'manager-1',
-        recipientIds: ['emp-1', 'emp-2', 'emp-3'],
+        recipients: [
+          EventRecipient(userId: 'emp-1'),
+          EventRecipient(userId: 'emp-2'),
+          EventRecipient(userId: 'emp-3'),
+        ],
         createdAt: '2024-01-01',
         updatedAt: '2024-02-01',
       );

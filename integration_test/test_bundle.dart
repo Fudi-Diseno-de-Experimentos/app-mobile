@@ -9,12 +9,6 @@ import 'package:patrol/src/platform/contracts/contracts.dart';
 import 'package:test_api/src/backend/invoker.dart';
 
 // START: GENERATED TEST IMPORTS
-import 'announcement_delete_test.dart' as announcement_delete_test;
-import 'announcement_edit_test.dart' as announcement_edit_test;
-import 'announcement_create_test.dart' as announcement_create_test;
-import 'event_delete_test.dart' as event_delete_test;
-import 'event_edit_test.dart' as event_edit_test;
-import 'event_create_test.dart' as event_create_test;
 import 'session_logout_test.dart' as session_logout_test;
 // END: GENERATED TEST IMPORTS
 
@@ -78,12 +72,6 @@ Future<void> main() async {
   });
 
 // START: GENERATED TEST GROUPS
-  group('announcement_delete_test', announcement_delete_test.main);
-  group('announcement_edit_test', announcement_edit_test.main);
-  group('announcement_create_test', announcement_create_test.main);
-  group('event_delete_test', event_delete_test.main);
-  group('event_edit_test', event_edit_test.main);
-  group('event_create_test', event_create_test.main);
   group('session_logout_test', session_logout_test.main);
 // END: GENERATED TEST GROUPS
 
